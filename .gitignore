@@ -14,3 +14,6 @@
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+
+# Nuget
+[Pp]ackages/
