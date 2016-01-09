@@ -2,8 +2,10 @@
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Xml.Linq;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -11,71 +13,85 @@
 
     public class Project : ObservableObject, IEquatable<Project>
     {
+        private static readonly XNamespace _xmlns = XNamespace.Get(@"http://schemas.microsoft.com/developer/msbuild/2003");
+        private static readonly XName _propertyGroupName = _xmlns.GetName("PropertyGroup");
+
+        // private static readonly Dictionary<string, Microsoft.Build.Evaluation.Project> _buildProjects = new Dictionary<string, Microsoft.Build.Evaluation.Project>();
+
         private readonly Solution _solution;
         private readonly EnvDTE.Project _project;
-        private readonly ObservableCollection<ProjectConfiguration> _internalProjectConfigurations = new ObservableCollection<ProjectConfiguration>();
-        private readonly ReadOnlyObservableCollection<ProjectConfiguration> _projectConfigurations;
+        private readonly ObservableCollection<ProjectConfiguration> _internalSpecificProjectConfigurations = new ObservableCollection<ProjectConfiguration>();
+        private readonly ReadOnlyObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
+        private readonly string _uniqueName;
+        private readonly string _name;
+        private readonly XDocument _document;
+        private readonly IList<string> _propertyNames;
+        private readonly IList<XElement> _propertyGroupNodes;
 
         internal Project(Solution solution, EnvDTE.Project project)
         {
             _solution = solution;
             _project = project;
-            _projectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalProjectConfigurations);
-            _solutionContexts = _solution.SolutionContexts.ObservableWhere(ctx => ctx.ProjectName == UniqueName);
+            _uniqueName = _project.UniqueName;
+            _name = _project.Name;
+
+            _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
+            _solutionContexts = _solution.SolutionContexts.ObservableWhere(ctx => ctx.ProjectName == _uniqueName);
+
+            try
+            {
+                // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
+                _document = XDocument.Load(_project.FullName, LoadOptions.PreserveWhitespace);
+
+                _propertyGroupNodes = _document
+                    .Descendants(_propertyGroupName)
+                    .ToArray();
+
+                _propertyNames = _propertyGroupNodes
+                    .SelectMany(group => group.Elements())
+                    .Where(node => node.GetAttribute("Condition") == null)
+                    .Select(node => node.Name.LocalName)
+                    .ToArray();
+            }
+            catch
+            {
+            }
 
             Update();
-
-            //using Microsoft.VisualStudio.Shell;
-            //using Microsoft.VisualStudio.Shell.Interop;
-
-            //try
-            //{
-            //    var uniqueName = project.UniqueName;
-            //    var vsSolution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
-
-            //    IVsHierarchy hierarchy;
-            //    vsSolution.GetProjectOfUniqueName(uniqueName, out hierarchy);
-            //    var buildPropertyStorage = hierarchy as IVsBuildPropertyStorage;
-            //    var projectBuildSystem = hierarchy as IVsProjectBuildSystem;
-
-            //    if (buildPropertyStorage != null)
-            //    {
-            //        bool success;
-            //        var hr = projectBuildSystem.BuildTarget("Any CPU", out success);
-
-            //        string value;
-            //        hr = buildPropertyStorage.GetPropertyValue("WarningLevel", "Debug|AnyCPU", (int)_PersistStorageType.PST_PROJECT_FILE, out value);
-            //        hr = buildPropertyStorage.GetPropertyValue("WarningLevel", "Release|AnyCPU", (int)_PersistStorageType.PST_PROJECT_FILE, out value);
-            //        hr = buildPropertyStorage.GetPropertyValue("WarningLevel", "Release|Any CPU", (int)_PersistStorageType.PST_PROJECT_FILE, out value);
-            //        hr = buildPropertyStorage.GetPropertyValue("WarningLevel", "Release", (int)_PersistStorageType.PST_PROJECT_FILE, out value);
-            //    }
-
-            //    //var buildProject = new Microsoft.Build.Evaluation.Project(_project.FullName, _defaults, null);
-            //    //var properties = buildProject.AllEvaluatedProperties.Where(p => !p.IsEnvironmentProperty && !p.IsGlobalProperty && !p.IsImported && !p.IsReservedProperty).ToArray();
-            //    //buildProject.SetProperty("WarningLevel", "3");
-            //    //buildProject.Save();
-            //}
-            //catch (NotImplementedException)
-            //{
-            //}
         }
 
         public Solution Solution => _solution;
 
-        public string Name => _project.Name;
+        public string Name => _name;
 
-        public string UniqueName => _project.UniqueName;
+        public string UniqueName => _uniqueName;
 
-        public string[] PropertyNames => GetPropertyNames();
+        public IEnumerable<string> PropertyNames => _propertyNames;
 
         public IObservableCollection<SolutionContext> SolutionContexts => _solutionContexts;
 
-        public ReadOnlyObservableCollection<ProjectConfiguration> ProjectConfigurations => _projectConfigurations;
+        public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
+
+        public ProjectConfiguration DefaultProjectConfiguration => new ProjectConfiguration(this, _propertyGroupNodes.Where(node => node.GetAttribute("Condition") == null), null, null);
+
+        private static bool MatchesCondition(XElement node, string configuration, string platform)
+        {
+            var conditionExpression = node.GetAttribute("Condition");
+            var condition = string.Join("|", configuration, platform.Replace(" ", ""));
+
+            var match = !string.IsNullOrEmpty(conditionExpression)
+                && conditionExpression.Contains("'$(Configuration)|$(Platform)'")
+                && conditionExpression.Contains(condition);
+
+            return match;
+        }
 
         internal void Update()
         {
             var configurationManager = _project.ConfigurationManager;
+
+            var projectConfigurations = Enumerable.Empty<ProjectConfiguration>();
 
             if (configurationManager != null)
             {
@@ -84,28 +100,12 @@
 
                 if ((configurationNames != null) && (platformNames != null))
                 {
-                    _internalProjectConfigurations.SynchronizeWith((configurationNames.SelectMany(cn => platformNames.Select(pn => new ProjectConfiguration(this, cn, pn))).ToArray()));
-                    return;
+                    projectConfigurations = configurationNames
+                        .SelectMany(configuration => platformNames.Select(platform => new ProjectConfiguration(this, _propertyGroupNodes.Where(node => MatchesCondition(node, configuration, platform)), configuration, platform)));
                 }
             }
 
-            _internalProjectConfigurations.Clear();
-        }
-
-        private string[] GetPropertyNames()
-        {
-            try
-            {
-                return _project.ConfigurationManager
-                    .OfType<EnvDTE.Configuration>()
-                    .SelectMany(conf => conf.Properties.GetProperties().Select(prop => prop.Name))
-                    .Distinct()
-                    .ToArray();
-            }
-            catch
-            {
-                return new string[0];
-            }
+            _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations.ToArray());
         }
 
         #region IEquatable implementation

@@ -1,9 +1,10 @@
 ﻿// Guids.cs
 // MUST match guids.h
-using System;
 
 namespace tomenglertde.ProjectConfigurationManager
 {
+    using System;
+
     static class GuidList
     {
         public const string guidProjectConfigurationManagerPkgString = "e31595c9-3e0c-4f5c-b35c-dd8d61e364d1";

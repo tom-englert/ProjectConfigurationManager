@@ -38,6 +38,10 @@
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DataGridExtensions, Version=1.0.25.0, Culture=neutral, PublicKeyToken=43de855f87de903a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DataGridExtensions.1.0.25.0\lib\net40-Client\DataGridExtensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="JetBrains.Annotations, Version=9.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.9.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
@@ -88,7 +92,12 @@
     <Compile Include="..\Version.cs">
       <Link>Properties\Version.cs</Link>
     </Compile>
-    <Compile Include="SolutionConfigurationColumnsManager.cs" />
+    <Compile Include="ProperitesColumnsMananger.cs" />
+    <Compile Include="PropertiesView.xaml.cs">
+      <DependentUpon>PropertiesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PropertiesViewModel.cs" />
+    <Compile Include="BuildConfigurationColumnsManager.cs" />
     <Compile Include="GlobalId.cs" />
     <Compile Include="BuildConfigurationViewModel.cs" />
     <Compile Include="ShellView.xaml.cs">
@@ -102,6 +111,10 @@
       <DependentUpon>BuildConfigurationView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PropertiesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ShellView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

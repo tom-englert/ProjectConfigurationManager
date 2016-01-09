@@ -10,18 +10,28 @@
     using TomsToolbox.Desktop;
     using TomsToolbox.Wpf.Composition;
 
-    [DisplayName("Build Configuration")]
-    [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 1)]
-    class BuildConfigurationViewModel : ObservableObject, IComposablePart
+    [DisplayName("Properties")]
+    [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 2)]
+    class PropertiesViewModel : ObservableObject, IComposablePart
     {
         private readonly Solution _solution;
+        private PropertyGrouping _propertyGrouping;
 
         [ImportingConstructor]
-        public BuildConfigurationViewModel(Solution solution)
+        public PropertiesViewModel(Solution solution)
         {
             Contract.Requires(solution != null);
 
             _solution = solution;
+
+            // var propertyNames = solution.ProjectProperties.Select(p => p.Name).ToArray();
+
+            //_propertyGrouping.Groups = new[]
+            //{
+            //    new PropertyGroup { Name = "Global", Properties = new[] { "ProjectGuid", "OutputType" } },
+            //    new PropertyGroup { Name = "CodeContracts", Properties = propertyNames.Where(name => name.StartsWith("CodeContracts", StringComparison.Ordinal)).ToArray()},
+            //    new PropertyGroup { Name = "Publish", Properties = new[] { "" }},
+            //};
         }
 
         public Solution Solution
@@ -31,6 +41,14 @@
                 Contract.Ensures(Contract.Result<Solution>() != null);
 
                 return _solution;
+            }
+        }
+
+        public PropertyGrouping PropertyGrouping
+        {
+            get
+            {
+                return _propertyGrouping;
             }
         }
 

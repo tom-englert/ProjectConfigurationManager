@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace tomenglertde.ProjectConfigurationManager.Model
+﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
+    using System;
+
     public interface IVsServiceProvider : IServiceProvider
     {
     }

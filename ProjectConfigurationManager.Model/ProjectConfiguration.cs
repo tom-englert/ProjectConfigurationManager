@@ -1,8 +1,10 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Windows.Threading;
+    using System.Xml.Linq;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -12,14 +14,26 @@
         private readonly string _configuration;
         private readonly string _platform;
         private readonly Project _project;
+        private readonly IDictionary<string, XElement> _propertyNodes;
 
-        public ProjectConfiguration(Project project, string configuration, string platform)
+        public ProjectConfiguration(Project project, IEnumerable<XElement> propertyGroupNodes, string configuration, string platform)
         {
             _project = project;
+
+            var propertyElements = propertyGroupNodes
+                .SelectMany(group => group.Elements())
+                .Where(node => node.GetAttribute("Condition") == null)
+                .ToArray();
+
+            _propertyNodes = propertyElements
+                .ToDictionary(node => node.Name.LocalName);
+
             _configuration = configuration;
             _platform = platform;
 
-            ShouldBuild = new ShouldBuildSelector(this);
+
+            ShouldBuild = new ShouldBuildIndexer(this);
+            PropertyValue = new PropertyIndexer(this);
         }
 
         public Project Project => _project;
@@ -28,9 +42,19 @@
 
         public string Platform => _platform;
 
-        public ShouldBuildSelector ShouldBuild
+        public ShouldBuildIndexer ShouldBuild
         {
             get;
+        }
+
+        public PropertyIndexer PropertyValue
+        {
+            get;
+        }
+
+        public string GetPropertyValue(string propertyName)
+        {
+            return _propertyNodes.GetValueOrDefault(propertyName)?.Value;
         }
 
         internal void Invalidate()
@@ -48,7 +72,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _project.GetHashCode() + _configuration.GetHashCode() + _platform.GetHashCode();
+            return _project.GetHashCode() + (_configuration?.GetHashCode()).GetValueOrDefault() + (_platform?.GetHashCode()).GetValueOrDefault();
         }
 
         /// <summary>
@@ -103,11 +127,11 @@
         #endregion
     }
 
-    public class ShouldBuildSelector
+    public class ShouldBuildIndexer
     {
         private readonly ProjectConfiguration _projectConfiguration;
 
-        public ShouldBuildSelector(ProjectConfiguration projectConfiguration)
+        public ShouldBuildIndexer(ProjectConfiguration projectConfiguration)
         {
             _projectConfiguration = projectConfiguration;
         }
@@ -137,8 +161,29 @@
 
                 Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                 {
-                    _projectConfiguration.Project.ProjectConfigurations.ForEach(pc => pc.Invalidate());
+                    _projectConfiguration.Project.SpecificProjectConfigurations.ForEach(pc => pc.Invalidate());
                 });
+            }
+        }
+    }
+
+    public class PropertyIndexer
+    {
+        private readonly ProjectConfiguration _projectConfiguration;
+
+        public PropertyIndexer(ProjectConfiguration projectConfiguration)
+        {
+            _projectConfiguration = projectConfiguration;
+        }
+
+        public string this[string propertyName]
+        {
+            get
+            {
+                return _projectConfiguration.GetPropertyValue(propertyName);
+            }
+            set
+            {
             }
         }
     }

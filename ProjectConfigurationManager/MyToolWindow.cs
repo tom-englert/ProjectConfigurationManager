@@ -47,7 +47,7 @@
             var context = new RegistrationBuilder();
             context.ForTypesDerivedFrom<FrameworkElement>().SetCreationPolicy(CreationPolicy.NonShared);
 
-            _compositionHost.AddCatalog(new DirectoryCatalog(path, "ProjectConfigurationManager*.dll", context));
+            _compositionHost.AddCatalog(new DirectoryCatalog(path, "*.dll", context));
             _compositionHost.ComposeExportedValue((IVsServiceProvider)this);
         }
 

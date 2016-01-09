@@ -24,10 +24,14 @@
 
         private readonly ObservableCollection<Project> _projects = new ObservableCollection<Project>();
         private readonly ObservableCollection<SolutionConfiguration> _configurations = new ObservableCollection<SolutionConfiguration>();
+        private readonly IObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
+        private readonly IObservableCollection<ProjectConfiguration> _defaultProjectConfigurations;
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
+        private readonly ObservableCollection<ProjectProperty> _projectProperties = new ObservableCollection<ProjectProperty>();
+
         private readonly SolutionEvents _solutionEvents;
-        private ProjectItemsEvents _solutionItemEvents;
+        private readonly ProjectItemsEvents _solutionItemEvents;
 
         [ImportingConstructor]
         public Solution(ITracer tracer, IVsServiceProvider serviceProvider)
@@ -38,8 +42,10 @@
             _tracer = tracer;
             _serviceProvider = serviceProvider;
 
-            _projectConfigurations = Projects.ObservableSelectMany(prj => prj.ProjectConfigurations);
+            _specificProjectConfigurations = Projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
             _solutionContexts = SolutionConfigurations.ObservableSelectMany(cfg => cfg.Contexts);
+            _defaultProjectConfigurations = Projects.ObservableSelect(prj => prj.DefaultProjectConfiguration);
+            _projectConfigurations = new ObservableCompositeCollection<ProjectConfiguration>(_specificProjectConfigurations, _defaultProjectConfigurations);
 
             _solutionEvents = Dte.Events.SolutionEvents;
 
@@ -64,6 +70,10 @@
         public IObservableCollection<SolutionContext> SolutionContexts => _solutionContexts;
 
         public IObservableCollection<ProjectConfiguration> ProjectConfigurations => _projectConfigurations;
+
+        public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
+
+        public ObservableCollection<ProjectProperty> ProjectProperties => _projectProperties;
 
         public string SolutionFolder
         {
@@ -90,13 +100,17 @@
             _projects.SynchronizeWith(GetProjects().ToArray());
 
             _configurations.SynchronizeWith(GetConfigurations().ToArray());
+
+            _projectProperties.SynchronizeWith(GetProjectProperties().ToArray());
         }
 
         private IEnumerable<SolutionConfiguration> GetConfigurations()
         {
-            return DteSolution.SolutionBuild.SolutionConfigurations
+            Contract.Ensures(Contract.Result<IEnumerable<SolutionConfiguration>>() != null);
+
+            return DteSolution?.SolutionBuild.SolutionConfigurations
                 .OfType<EnvDTE80.SolutionConfiguration2>()
-                .Select(item => new SolutionConfiguration(this, item));
+                .Select(item => new SolutionConfiguration(this, item)) ?? Enumerable.Empty<SolutionConfiguration>();
         }
 
         private IEnumerable<Project> GetProjects()
@@ -114,7 +128,8 @@
                 try
                 {
                     project = projects.Item(i);
-                    if (project == null)
+
+                    if (string.IsNullOrEmpty(project?.FullName))
                         continue;
                 }
                 catch
@@ -125,6 +140,22 @@
 
                 yield return new Project(this, project);
             }
+        }
+
+        private IEnumerable<ProjectProperty> GetProjectProperties()
+        {
+            return Projects
+                .SelectMany(prj => prj.PropertyNames ?? Enumerable.Empty<string>())
+                .Distinct()
+                .Select(name => new ProjectProperty(name, GetPropertyGroup(name)));
+        }
+
+        private string GetPropertyGroup(string name)
+        {
+            if (name.StartsWith("CodeContracts", StringComparison.OrdinalIgnoreCase))
+                return "CodeContracts";
+
+            return "Common";
         }
 
         // ReSharper disable once SuspiciousTypeConversion.Global
