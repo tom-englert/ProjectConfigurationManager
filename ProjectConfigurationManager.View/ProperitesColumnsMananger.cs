@@ -79,8 +79,7 @@
                 Header = projectPropertyName.DisplayName,
                 Binding = new Binding(@"PropertyValue[" + projectPropertyName.Name + @"]")
                 {
-                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                    Mode = BindingMode.TwoWay,
+                    Mode = BindingMode.TwoWay
                 }
             };
 

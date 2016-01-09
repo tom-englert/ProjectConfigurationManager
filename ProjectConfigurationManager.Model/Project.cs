@@ -26,12 +26,15 @@
 
         internal Project(Solution solution, EnvDTE.Project project)
         {
+            Contract.Requires(solution != null);
+            Contract.Requires(project != null);
+
             _solution = solution;
             _project = project;
             _uniqueName = _project.UniqueName;
             _name = _project.Name;
 
-            _projectFile = new ProjectFile(project);
+            _projectFile = new ProjectFile(solution, project);
 
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
             _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);

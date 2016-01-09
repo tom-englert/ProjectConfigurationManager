@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-namespace tomenglertde.ProjectConfigurationManager.Model
+﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
     using System.Collections.Generic;
@@ -7,6 +6,9 @@ namespace tomenglertde.ProjectConfigurationManager.Model
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Xml.Linq;
+
+    using Microsoft.VisualStudio;
+    using Microsoft.VisualStudio.Shell.Interop;
 
     using TomsToolbox.Desktop;
 
@@ -16,20 +18,31 @@ namespace tomenglertde.ProjectConfigurationManager.Model
         private static readonly XName _propertyGroupNodeName = _xmlns.GetName("PropertyGroup");
         private const string _conditionAttributeName = "Condition";
 
+        private readonly DispatcherThrottle _deferredSaveThrottle;
         private readonly XDocument _document;
+        private readonly Solution _solution;
         private readonly EnvDTE.Project _project;
         private readonly ProjectPropertyGroup[] _propertyGroups;
+        private readonly Guid _projectGuid;
+        private readonly string _fullName;
 
-        public ProjectFile(EnvDTE.Project project)
+        public ProjectFile(Solution solution, EnvDTE.Project project)
         {
+            Contract.Requires(solution != null);
             Contract.Requires(project != null);
 
+            _deferredSaveThrottle = new DispatcherThrottle(SaveProjectFile);
+
+            _solution = solution;
             _project = project;
+            _fullName = project.FullName;
+
+            _projectGuid = GetProjectGuid(solution, project);
 
             try
             {
                 // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
-                _document = XDocument.Load(_project.FullName, LoadOptions.PreserveWhitespace);
+                _document = XDocument.Load(_fullName, LoadOptions.PreserveWhitespace);
 
                 _propertyGroups = _document
                     .Descendants(_propertyGroupNodeName)
@@ -50,10 +63,54 @@ namespace tomenglertde.ProjectConfigurationManager.Model
 
         private void SaveChanges()
         {
-            if (!_project.Saved)
+            _deferredSaveThrottle.Tick();
+        }
+
+        private void SaveProjectFile()
+        {
+            var projectGuid = _projectGuid;
+            var solution = _solution.GetService(typeof(SVsSolution)) as IVsSolution4;
+
+            Contract.Assume(solution != null);
+
+            if (!IsSaved)
                 throw new InvalidOperationException("the project has local changes.");
 
-            _document.Save(_project.FullName, SaveOptions.None);
+            solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+
+            _document.Save(_fullName, SaveOptions.None);
+
+            solution.ReloadProject(ref projectGuid);
+        }
+
+        private bool IsSaved
+        {
+            get
+            {
+                try
+                {
+                    return _project.Saved;
+                }
+                catch
+                {
+                    // project is currently unloaded...
+                    return true;
+                }
+            }
+        }
+
+        private static Guid GetProjectGuid(IServiceProvider serviceProvider, EnvDTE.Project project)
+        {
+            var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
+            Contract.Assume(solution != null);
+
+            IVsHierarchy projectHierarchy;
+            ErrorHandler.ThrowOnFailure(solution.GetProjectOfUniqueName(project.UniqueName, out projectHierarchy));
+            Contract.Assume(projectHierarchy != null);
+
+            Guid projectGuid;
+            ErrorHandler.ThrowOnFailure(solution.GetGuidOfProject(projectHierarchy, out projectGuid));
+            return projectGuid;
         }
 
         private class ProjectPropertyGroup : IProjectPropertyGroup

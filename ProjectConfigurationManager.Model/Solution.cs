@@ -17,8 +17,9 @@
     using TomsToolbox.ObservableCollections;
 
     [Export]
-    public class Solution : ObservableObject
+    public class Solution : ObservableObject, IServiceProvider
     {
+        private readonly DispatcherThrottle _deferredUpdateThrottle;
         private readonly ITracer _tracer;
         private readonly IVsServiceProvider _serviceProvider;
 
@@ -38,6 +39,8 @@
         {
             Contract.Requires(tracer != null);
             Contract.Requires(serviceProvider != null);
+
+            _deferredUpdateThrottle = new DispatcherThrottle(Update);
 
             _tracer = tracer;
             _serviceProvider = serviceProvider;
@@ -60,7 +63,7 @@
 
         private void Solution_Changed()
         {
-            Update();
+            _deferredUpdateThrottle.Tick();
         }
 
         public ObservableCollection<Project> Projects => _projects;
@@ -94,6 +97,11 @@
         }
 
         public string FullName => DteSolution?.FullName;
+
+        public object GetService(Type serviceType)
+        {
+            return _serviceProvider.GetService(serviceType);
+        }
 
         internal void Update()
         {

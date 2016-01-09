@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows.Threading;
@@ -24,10 +25,12 @@
             _configuration = configuration;
             _platform = platform;
 
-            _properties = project.ProjectFile
+            var properties = project.ProjectFile
                 .GetPropertyGroups(configuration, platform)
                 .SelectMany(group => group.Properties)
                 .ToDictionary(node => node.Name);
+
+            _properties = new ReadOnlyDictionary<string, IProjectProperty>(properties);
 
             ShouldBuild = new ShouldBuildIndexer(this);
             PropertyValue = new PropertyValueIndexer(this);
@@ -39,22 +42,11 @@
 
         public string Platform => _platform;
 
-        public IIndexer<bool?> ShouldBuild
-        {
-            get;
-        }
+        public IIndexer<bool?> ShouldBuild { get; }
 
-        public IIndexer<string> PropertyValue
-        {
-            get;
-        }
+        public IIndexer<string> PropertyValue { get; }
 
-        public string GetPropertyValue(string propertyName)
-        {
-            return _properties.GetValueOrDefault(propertyName)?.Value;
-        }
-
-        internal void Invalidate()
+        private void Invalidate()
         {
             OnPropertyChanged(() => ShouldBuild);
         }
@@ -142,7 +134,7 @@
                                                 && (ctx.ConfigurationName == _projectConfiguration.Configuration)
                                                 && (ctx.PlatformName == _projectConfiguration.Platform));
 
-                    return context == null ? false : context.ShouldBuild ? (bool?) true : null;
+                    return context == null ? false : context.ShouldBuild ? (bool?)true : null;
                 }
                 set
                 {
@@ -177,10 +169,15 @@
             {
                 get
                 {
-                    return _projectConfiguration.GetPropertyValue(propertyName);
+                    return _projectConfiguration._properties.GetValueOrDefault(propertyName)?.Value;
                 }
                 set
                 {
+                    IProjectProperty property;
+                    if (!_projectConfiguration._properties.TryGetValue(propertyName, out property) || (property == null))
+                        throw new ArgumentException("Unknown property name", nameof(propertyName));
+
+                    property.Value = value;
                 }
             }
         }
