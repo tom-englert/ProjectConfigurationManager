@@ -28,7 +28,7 @@
         private readonly IObservableCollection<ProjectConfiguration> _defaultProjectConfigurations;
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
-        private readonly ObservableCollection<ProjectProperty> _projectProperties = new ObservableCollection<ProjectProperty>();
+        private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
 
         private readonly SolutionEvents _solutionEvents;
         private readonly ProjectItemsEvents _solutionItemEvents;
@@ -73,7 +73,7 @@
 
         public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
 
-        public ObservableCollection<ProjectProperty> ProjectProperties => _projectProperties;
+        public ObservableCollection<ProjectPropertyName> ProjectProperties => _projectProperties;
 
         public string SolutionFolder
         {
@@ -142,15 +142,16 @@
             }
         }
 
-        private IEnumerable<ProjectProperty> GetProjectProperties()
+        private IEnumerable<ProjectPropertyName> GetProjectProperties()
         {
             return Projects
-                .SelectMany(prj => prj.PropertyNames ?? Enumerable.Empty<string>())
+                .SelectMany(prj => prj.ProjectFile.PropertyGroups.SelectMany(group => group.Properties))
+                .Select(prop => prop.Name)
                 .Distinct()
-                .Select(name => new ProjectProperty(name, GetPropertyGroup(name)));
+                .Select(name => new ProjectPropertyName(name, GetPropertyDisplayGroupName(name)));
         }
 
-        private string GetPropertyGroup(string name)
+        private string GetPropertyDisplayGroupName(string name)
         {
             if (name.StartsWith("CodeContracts", StringComparison.OrdinalIgnoreCase))
                 return "CodeContracts";

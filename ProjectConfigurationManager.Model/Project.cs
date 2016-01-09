@@ -2,10 +2,10 @@
 {
     using System;
     using System.Collections;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Xml.Linq;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -13,21 +13,16 @@
 
     public class Project : ObservableObject, IEquatable<Project>
     {
-        private static readonly XNamespace _xmlns = XNamespace.Get(@"http://schemas.microsoft.com/developer/msbuild/2003");
-        private static readonly XName _propertyGroupName = _xmlns.GetName("PropertyGroup");
-
-        // private static readonly Dictionary<string, Microsoft.Build.Evaluation.Project> _buildProjects = new Dictionary<string, Microsoft.Build.Evaluation.Project>();
+        private readonly EnvDTE.Project _project;
 
         private readonly Solution _solution;
-        private readonly EnvDTE.Project _project;
+        private readonly ProjectFile _projectFile;
+        private readonly string _uniqueName;
+        private readonly string _name;
+
         private readonly ObservableCollection<ProjectConfiguration> _internalSpecificProjectConfigurations = new ObservableCollection<ProjectConfiguration>();
         private readonly ReadOnlyObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
-        private readonly string _uniqueName;
-        private readonly string _name;
-        private readonly XDocument _document;
-        private readonly IList<string> _propertyNames;
-        private readonly IList<XElement> _propertyGroupNodes;
 
         internal Project(Solution solution, EnvDTE.Project project)
         {
@@ -36,27 +31,10 @@
             _uniqueName = _project.UniqueName;
             _name = _project.Name;
 
+            _projectFile = new ProjectFile(project);
+
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
-            _solutionContexts = _solution.SolutionContexts.ObservableWhere(ctx => ctx.ProjectName == _uniqueName);
-
-            try
-            {
-                // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
-                _document = XDocument.Load(_project.FullName, LoadOptions.PreserveWhitespace);
-
-                _propertyGroupNodes = _document
-                    .Descendants(_propertyGroupName)
-                    .ToArray();
-
-                _propertyNames = _propertyGroupNodes
-                    .SelectMany(group => group.Elements())
-                    .Where(node => node.GetAttribute("Condition") == null)
-                    .Select(node => node.Name.LocalName)
-                    .ToArray();
-            }
-            catch
-            {
-            }
+            _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);
 
             Update();
         }
@@ -67,25 +45,13 @@
 
         public string UniqueName => _uniqueName;
 
-        public IEnumerable<string> PropertyNames => _propertyNames;
-
         public IObservableCollection<SolutionContext> SolutionContexts => _solutionContexts;
 
         public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
 
-        public ProjectConfiguration DefaultProjectConfiguration => new ProjectConfiguration(this, _propertyGroupNodes.Where(node => node.GetAttribute("Condition") == null), null, null);
+        public ProjectConfiguration DefaultProjectConfiguration => new ProjectConfiguration(this, null, null);
 
-        private static bool MatchesCondition(XElement node, string configuration, string platform)
-        {
-            var conditionExpression = node.GetAttribute("Condition");
-            var condition = string.Join("|", configuration, platform.Replace(" ", ""));
-
-            var match = !string.IsNullOrEmpty(conditionExpression)
-                && conditionExpression.Contains("'$(Configuration)|$(Platform)'")
-                && conditionExpression.Contains(condition);
-
-            return match;
-        }
+        internal ProjectFile ProjectFile => _projectFile;
 
         internal void Update()
         {
@@ -101,7 +67,7 @@
                 if ((configurationNames != null) && (platformNames != null))
                 {
                     projectConfigurations = configurationNames
-                        .SelectMany(configuration => platformNames.Select(platform => new ProjectConfiguration(this, _propertyGroupNodes.Where(node => MatchesCondition(node, configuration, platform)), configuration, platform)));
+                        .SelectMany(configuration => platformNames.Select(platform => new ProjectConfiguration(this, configuration, platform)));
                 }
             }
 
@@ -173,6 +139,15 @@
         public override string ToString()
         {
             return Name;
+        }
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_solution != null);
+            Contract.Invariant(_project != null);
+            Contract.Invariant(_projectFile != null);
         }
     }
 }

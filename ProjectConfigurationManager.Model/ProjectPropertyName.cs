@@ -4,15 +4,16 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
-    public class ProjectProperty : IEquatable<ProjectProperty>
+    public class ProjectPropertyName : IEquatable<ProjectPropertyName>
     {
         private readonly string _name;
         private readonly string _groupName;
         private readonly string _displayName;
 
-        internal ProjectProperty(string name, string groupName)
+        internal ProjectPropertyName(string name, string groupName)
         {
             Contract.Requires(name != null);
+            Contract.Requires(groupName != null);
 
             _name = name;
             _groupName = groupName;
@@ -45,20 +46,20 @@
         /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            return Equals(obj as ProjectProperty);
+            return Equals(obj as ProjectPropertyName);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="ProjectProperty"/> is equal to this instance.
+        /// Determines whether the specified <see cref="ProjectPropertyName"/> is equal to this instance.
         /// </summary>
-        /// <param name="other">The <see cref="ProjectProperty"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="ProjectProperty"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(ProjectProperty other)
+        /// <param name="other">The <see cref="ProjectPropertyName"/> to compare with this instance.</param>
+        /// <returns><c>true</c> if the specified <see cref="ProjectPropertyName"/> is equal to this instance; otherwise, <c>false</c>.</returns>
+        public bool Equals(ProjectPropertyName other)
         {
             return InternalEquals(this, other);
         }
 
-        private static bool InternalEquals(ProjectProperty left, ProjectProperty right)
+        private static bool InternalEquals(ProjectPropertyName left, ProjectPropertyName right)
         {
             if (ReferenceEquals(left, right))
                 return true;
@@ -73,14 +74,14 @@
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        public static bool operator ==(ProjectProperty left, ProjectProperty right)
+        public static bool operator ==(ProjectPropertyName left, ProjectPropertyName right)
         {
             return InternalEquals(left, right);
         }
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        public static bool operator !=(ProjectProperty left, ProjectProperty right)
+        public static bool operator !=(ProjectPropertyName left, ProjectPropertyName right)
         {
             return !InternalEquals(left, right);
         }
@@ -92,6 +93,8 @@
         private void ObjectInvariant()
         {
             Contract.Invariant(_name != null);
+            Contract.Invariant(_groupName != null);
+            Contract.Invariant(_displayName != null);
         }
     }
 }

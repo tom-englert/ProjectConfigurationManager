@@ -15,7 +15,7 @@
     public static class ProperitesColumnsMananger
     {
         private static readonly DependencyProperty _projectConfigurationProperty =
-            DependencyProperty.RegisterAttached("ProjectProperty", typeof(ProjectProperty), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
+            DependencyProperty.RegisterAttached("ProjectProperty", typeof(ProjectPropertyName), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
 
 
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
@@ -50,7 +50,7 @@
             if (properties == null)
                 return;
 
-            dataGrid.Columns.AddRange(properties.OfType<ProjectProperty>().Select(CreateColumn));
+            dataGrid.Columns.AddRange(properties.OfType<ProjectPropertyName>().Select(CreateColumn));
 
             ((INotifyCollectionChanged)properties).CollectionChanged += (sender, e) => ProjectProperties_CollectionChanged(dataGrid, e);
         }
@@ -63,7 +63,7 @@
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    dataGrid.Columns.Add(CreateColumn((ProjectProperty)e.NewItems[0]));
+                    dataGrid.Columns.Add(CreateColumn((ProjectPropertyName)e.NewItems[0]));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -72,19 +72,19 @@
             }
         }
 
-        private static DataGridColumn CreateColumn(ProjectProperty projectProperty)
+        private static DataGridColumn CreateColumn(ProjectPropertyName projectPropertyName)
         {
             var column = new DataGridTextColumn()
             {
-                Header = projectProperty.DisplayName,
-                Binding = new Binding(@"PropertyValue[" + projectProperty.Name + @"]")
+                Header = projectPropertyName.DisplayName,
+                Binding = new Binding(@"PropertyValue[" + projectPropertyName.Name + @"]")
                 {
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
                     Mode = BindingMode.TwoWay,
                 }
             };
 
-            column.SetValue(_projectConfigurationProperty, projectProperty);
+            column.SetValue(_projectConfigurationProperty, projectPropertyName);
 
             return column;
         }

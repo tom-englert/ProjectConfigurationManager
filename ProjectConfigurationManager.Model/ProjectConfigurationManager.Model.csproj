@@ -99,13 +99,17 @@
     <Compile Include="..\Version.cs">
       <Link>Properties\Version.cs</Link>
     </Compile>
+    <Compile Include="IIndexer.cs" />
     <Compile Include="IVsServiceProvider.cs" />
     <Compile Include="DteExtensions.cs" />
     <Compile Include="ITracer.cs" />
     <Compile Include="OutputWindowTracer.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectConfiguration.cs" />
-    <Compile Include="ProjectProperty.cs" />
+    <Compile Include="ProjectFile.cs" />
+    <Compile Include="IProjectProperty.cs" />
+    <Compile Include="ProjectPropertyName.cs" />
+    <Compile Include="IProjectPropertyGroup.cs" />
     <Compile Include="PropertyGrouping.cs" />
     <Compile Include="Solution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -39,9 +39,9 @@
                             </Style>
                           </DataGrid.ColumnHeaderStyle>
                           <DataGrid.Columns>
-                            <DataGridTextColumn Header="Project" Binding="{Binding Project.Name}" DisplayIndex="0"/>
-                            <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending"/>
-                            <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2"/>
+                            <DataGridTextColumn Header="Project" Binding="{Binding Project.Name}" DisplayIndex="0" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending"  IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True"/>
                           </DataGrid.Columns>
                         </DataGrid>
                       </StackPanel>

@@ -15,7 +15,6 @@
     class PropertiesViewModel : ObservableObject, IComposablePart
     {
         private readonly Solution _solution;
-        private PropertyGrouping _propertyGrouping;
 
         [ImportingConstructor]
         public PropertiesViewModel(Solution solution)
@@ -41,14 +40,6 @@
                 Contract.Ensures(Contract.Result<Solution>() != null);
 
                 return _solution;
-            }
-        }
-
-        public PropertyGrouping PropertyGrouping
-        {
-            get
-            {
-                return _propertyGrouping;
             }
         }
 
