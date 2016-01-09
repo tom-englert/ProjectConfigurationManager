@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              xmlns:local="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              d:DataContext="{d:DesignInstance local:PropertiesViewModel}">
   <UserControl.Resources>
     <CollectionViewSource x:Key="PropertiesSource" Source="{Binding Solution.ProjectProperties}">
@@ -43,6 +44,9 @@
                             <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending"  IsReadOnly="True"/>
                             <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True"/>
                           </DataGrid.Columns>
+                          <i:Interaction.Behaviors>
+                            <local:DataGridTryBeginEditBehavior/>
+                          </i:Interaction.Behaviors>
                         </DataGrid>
                       </StackPanel>
                     </ControlTemplate>

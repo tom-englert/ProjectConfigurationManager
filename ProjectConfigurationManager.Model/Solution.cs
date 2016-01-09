@@ -32,7 +32,6 @@
         private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
 
         private readonly SolutionEvents _solutionEvents;
-        private readonly ProjectItemsEvents _solutionItemEvents;
 
         [ImportingConstructor]
         public Solution(ITracer tracer, IVsServiceProvider serviceProvider)

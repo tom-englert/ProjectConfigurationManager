@@ -54,6 +54,11 @@
 
         public ProjectConfiguration DefaultProjectConfiguration => new ProjectConfiguration(this, null, null);
 
+        public bool CanEdit()
+        {
+            return _projectFile.CanEdit();
+        }
+
         internal ProjectFile ProjectFile => _projectFile;
 
         internal void Update()

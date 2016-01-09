@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.IO;
     using System.Linq;
     using System.Xml.Linq;
 
@@ -74,7 +75,7 @@
             Contract.Assume(solution != null);
 
             if (!IsSaved)
-                throw new InvalidOperationException("the project has local changes.");
+                return;
 
             solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
 
@@ -203,6 +204,49 @@
             Contract.Invariant(_document != null);
             Contract.Invariant(_project != null);
             Contract.Invariant(_propertyGroups != null);
+        }
+
+        public bool CanEdit()
+        {
+            if (!IsSaved)
+                return false;
+
+            var service = (IVsQueryEditQuerySave2)_solution.GetService(typeof(SVsQueryEditQuerySave));
+            if (service != null)
+            {
+                var files = new[] { _fullName };
+                uint editVerdict;
+                uint moreInfo;
+
+                if ((0 != service.QueryEditFiles(0, files.Length, files, null, null, out editVerdict, out moreInfo))
+                    || (editVerdict != (uint)tagVSQueryEditResult.QER_EditOK))
+                {
+                    return false;
+                }
+            }
+
+            return IsWritable;
+        }
+
+        private bool IsWritable
+        {
+            get
+            {
+                try
+                {
+                    if ((File.GetAttributes(_fullName) & (FileAttributes.ReadOnly | FileAttributes.System)) != 0)
+                        return false;
+
+                    using (File.Open(_fullName, FileMode.Open, FileAccess.Write))
+                    {
+                        return true;
+                    }
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+
+                return false;
+            }
         }
     }
 }
