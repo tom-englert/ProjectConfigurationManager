@@ -7,8 +7,9 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-
-    using EnvDTE;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Windows.Threading;
 
     using tomenglertde.ResXManager.Model;
 
@@ -31,7 +32,9 @@
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
         private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
 
-        private readonly SolutionEvents _solutionEvents;
+        private readonly EnvDTE.SolutionEvents _solutionEvents;
+
+        private FileSystemWatcher _fileSystemWatcher;
 
         [ImportingConstructor]
         public Solution(ITracer tracer, IVsServiceProvider serviceProvider)
@@ -81,21 +84,20 @@
         {
             get
             {
-                Contract.Ensures(Contract.Result<string>() != null);
-
                 try
                 {
-                    return Path.GetDirectoryName(FullName) ?? string.Empty;
+                    var fullName = DteSolution?.FullName;
+
+                    if (!string.IsNullOrEmpty(fullName))
+                        return Path.GetDirectoryName(fullName);
                 }
                 catch
                 {
                 }
 
-                return string.Empty;
+                return null;
             }
         }
-
-        public string FullName => DteSolution?.FullName;
 
         public object GetService(Type serviceType)
         {
@@ -103,6 +105,52 @@
         }
 
         internal void Update()
+        {
+            SynchronizeCollections();
+
+            SetupFileSystemWatcher();
+        }
+
+        private void SetupFileSystemWatcher()
+        {
+            var solutionFolder = SolutionFolder;
+
+            if (string.Equals(_fileSystemWatcher?.Path, solutionFolder, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var watcher = new FileSystemWatcher(solutionFolder, "*.*")
+            {
+                EnableRaisingEvents = true,
+                NotifyFilter = NotifyFilters.LastWrite,
+                IncludeSubdirectories = true
+            };
+
+            watcher.Changed += Watcher_Changed;
+
+            Interlocked.Exchange(ref _fileSystemWatcher, watcher)?.Dispose();
+        }
+
+        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
+
+                if ((project == null) || project.IsSaving)
+                    return;
+
+                try
+                {
+                    project.Reload();
+                    SynchronizeCollections();
+                }
+                catch (ExternalException)
+                {
+                }
+            });
+        }
+
+        private void SynchronizeCollections()
         {
             _projects.SynchronizeWith(GetProjects().ToArray());
 
@@ -169,8 +217,8 @@
             get
             {
                 var solution = DteSolution;
-
-                return string.IsNullOrEmpty(FullName) ? null : solution?.Globals;
+                var fullName = solution?.FullName;
+                return string.IsNullOrEmpty(fullName) ? null : solution?.Globals;
             }
         }
 

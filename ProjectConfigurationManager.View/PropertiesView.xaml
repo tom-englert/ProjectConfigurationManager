@@ -29,7 +29,7 @@
                     <ControlTemplate TargetType="{x:Type GroupItem}">
                       <Expander d:DataContext="{d:DesignInstance CollectionViewGroup}" IsExpanded="True">
                         <Expander.Header>
-                          <ContentPresenter x:Name="PART_Header" Margin="5"/>
+                          <ContentPresenter x:Name="PART_Header" Margin="5" TextElement.FontWeight="Bold"/>
                         </Expander.Header>
                         <DataGrid ItemsSource="{Binding Source={StaticResource ConfigurationsSource}}" 
                                   local:ProperitesColumnsMananger.Properites="{Binding Items}"

@@ -14,7 +14,7 @@
         private readonly string _configuration;
         private readonly string _platform;
         private readonly Project _project;
-        private readonly IDictionary<string, IProjectProperty> _properties;
+        private IDictionary<string, IProjectProperty> _properties = new Dictionary<string, IProjectProperty>();
 
         internal ProjectConfiguration(Project project, string configuration, string platform)
         {
@@ -23,13 +23,6 @@
             _project = project;
             _configuration = configuration;
             _platform = platform;
-
-            var properties = project.ProjectFile
-                .GetPropertyGroups(configuration, platform)
-                .SelectMany(group => group.Properties)
-                .ToDictionary(node => node.Name);
-
-            _properties = new Dictionary<string, IProjectProperty>(properties);
 
             ShouldBuild = new ShouldBuildIndexer(this);
             PropertyValue = new PropertyValueIndexer(this);
@@ -45,82 +38,24 @@
 
         public IIndexer<string> PropertyValue { get; }
 
+        internal void SetProjectFile(ProjectFile projectFile)
+        {
+            var properties = projectFile
+                .GetPropertyGroups(_configuration, _platform)
+                .SelectMany(group => group.Properties)
+                .ToDictionary(node => node.Name);
+
+            _properties = new Dictionary<string, IProjectProperty>(properties);
+
+            OnPropertyChanged(nameof(PropertyValue));
+        }
+
         internal IEnumerable<IProjectProperty> Properties => _properties.Values;
 
         private void InvalidateShouldBuild()
         {
             OnPropertyChanged(nameof(ShouldBuild));
         }
-
-        internal void InvalidatePropertyValues()
-        {
-            OnPropertyChanged(nameof(PropertyValue));
-        }
-
-        #region IEquatable implementation
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
-        {
-            return _project.GetHashCode() + (_configuration?.GetHashCode()).GetValueOrDefault() + (_platform?.GetHashCode()).GetValueOrDefault();
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as ProjectConfiguration);
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="ProjectConfiguration"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="ProjectConfiguration"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="ProjectConfiguration"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(ProjectConfiguration other)
-        {
-            return InternalEquals(this, other);
-        }
-
-        private static bool InternalEquals(ProjectConfiguration left, ProjectConfiguration right)
-        {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return (left._project == right._project)
-                   && (left._configuration == right._configuration)
-                   && (left._platform == right._platform);
-        }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==(ProjectConfiguration left, ProjectConfiguration right)
-        {
-            return InternalEquals(left, right);
-        }
-
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=(ProjectConfiguration left, ProjectConfiguration right)
-        {
-            return !InternalEquals(left, right);
-        }
-
-        #endregion
 
         private class ShouldBuildIndexer : IIndexer<bool?>
         {
@@ -191,7 +126,72 @@
 
         private IProjectProperty CreateProperty(string propertyName)
         {
-            return _project.ProjectFile.CreateProperty(propertyName, _configuration, _platform);
+            return _project.CreateProperty(propertyName, _configuration, _platform);
         }
+
+        #region IEquatable implementation
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return _project.GetHashCode() + (_configuration?.GetHashCode()).GetValueOrDefault() + (_platform?.GetHashCode()).GetValueOrDefault();
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
+        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ProjectConfiguration);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="ProjectConfiguration"/> is equal to this instance.
+        /// </summary>
+        /// <param name="other">The <see cref="ProjectConfiguration"/> to compare with this instance.</param>
+        /// <returns><c>true</c> if the specified <see cref="ProjectConfiguration"/> is equal to this instance; otherwise, <c>false</c>.</returns>
+        public bool Equals(ProjectConfiguration other)
+        {
+            return InternalEquals(this, other);
+        }
+
+        private static bool InternalEquals(ProjectConfiguration left, ProjectConfiguration right)
+        {
+            if (ReferenceEquals(left, right))
+                return true;
+            if (ReferenceEquals(left, null))
+                return false;
+            if (ReferenceEquals(right, null))
+                return false;
+
+            return (left._project == right._project)
+                   && (left._configuration == right._configuration)
+                   && (left._platform == right._platform);
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        public static bool operator ==(ProjectConfiguration left, ProjectConfiguration right)
+        {
+            return InternalEquals(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        public static bool operator !=(ProjectConfiguration left, ProjectConfiguration right)
+        {
+            return !InternalEquals(left, right);
+        }
+
+        #endregion
     }
 }

@@ -16,13 +16,16 @@
         private readonly EnvDTE.Project _project;
 
         private readonly Solution _solution;
-        private readonly ProjectFile _projectFile;
         private readonly string _uniqueName;
         private readonly string _name;
+        private readonly string _fullName;
 
         private readonly ObservableCollection<ProjectConfiguration> _internalSpecificProjectConfigurations = new ObservableCollection<ProjectConfiguration>();
         private readonly ReadOnlyObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
+        private readonly ProjectConfiguration _defaultProjectConfiguration;
+
+        private ProjectFile _projectFile;
 
         internal Project(Solution solution, EnvDTE.Project project)
         {
@@ -33,9 +36,11 @@
             _project = project;
             _uniqueName = _project.UniqueName;
             _name = _project.Name;
+            _fullName = _project.FullName;
 
             _projectFile = new ProjectFile(solution, project);
 
+            _defaultProjectConfiguration = new ProjectConfiguration(this, null, null);
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
             _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);
 
@@ -48,18 +53,27 @@
 
         public string UniqueName => _uniqueName;
 
+        public string FullName => _fullName;
+
         public IObservableCollection<SolutionContext> SolutionContexts => _solutionContexts;
 
         public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
 
-        public ProjectConfiguration DefaultProjectConfiguration => new ProjectConfiguration(this, null, null);
+        public ProjectConfiguration DefaultProjectConfiguration => _defaultProjectConfiguration;
+
+        public bool IsSaving => _projectFile.IsSaving;
 
         public bool CanEdit()
         {
             return _projectFile.CanEdit();
         }
 
-        internal ProjectFile ProjectFile => _projectFile;
+        public void Reload()
+        {
+            _projectFile = new ProjectFile(_solution, _project);
+
+            Update();
+        }
 
         internal void Update()
         {
@@ -80,6 +94,18 @@
             }
 
             _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations.ToArray());
+
+            _defaultProjectConfiguration.SetProjectFile(_projectFile);
+
+            foreach (var config in _internalSpecificProjectConfigurations)
+            {
+                config.SetProjectFile(_projectFile);
+            }
+        }
+
+        internal IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
+        {
+            return _projectFile.CreateProperty(propertyName, configuration, platform);
         }
 
         #region IEquatable implementation

@@ -7,6 +7,7 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Windows.Threading;
     using System.Xml;
     using System.Xml.Linq;
 
@@ -21,6 +22,7 @@
         private static readonly XName _propertyGroupNodeName = _xmlns.GetName("PropertyGroup");
         private const string _conditionAttributeName = "Condition";
 
+        private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
         private readonly DispatcherThrottle _deferredSaveThrottle;
         private readonly XDocument _document;
         private readonly Solution _solution;
@@ -35,7 +37,6 @@
             Contract.Requires(project != null);
 
             _deferredSaveThrottle = new DispatcherThrottle(SaveProjectFile);
-
             _solution = solution;
             _project = project;
             _fullName = project.FullName;
@@ -58,8 +59,6 @@
             }
         }
 
-        // public IEnumerable<IProjectPropertyGroup> PropertyGroups => _propertyGroups;
-
         public IEnumerable<IProjectPropertyGroup> GetPropertyGroups(string configuration, string platform)
         {
             return _propertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
@@ -72,6 +71,8 @@
             return group?.AddProperty(propertyName);
         }
 
+        public bool IsSaving { get; private set; }
+
         private void SaveChanges()
         {
             _deferredSaveThrottle.Tick();
@@ -79,6 +80,10 @@
 
         private void SaveProjectFile()
         {
+            IsSaving = true;
+
+            _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () => IsSaving = false);
+
             var projectGuid = _projectGuid;
             var solution = _solution.GetService(typeof(SVsSolution)) as IVsSolution4;
 
