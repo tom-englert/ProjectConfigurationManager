@@ -49,6 +49,12 @@
                             <Style TargetType="DataGridCell">
                               <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource Self}, Converter={toms:Import {x:Type local:CellToBackgroundBrushConverter}}}"/>
                               <Setter Property="BorderBrush" Value="{Binding Background, RelativeSource={RelativeSource Self}}"/>
+                              <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                  <Setter Property="BorderBrush" Value="Gray"/>
+                                  <Setter Property="Foreground" Value="Black"/>
+                                </Trigger>
+                              </Style.Triggers>
                             </Style>
                           </DataGrid.CellStyle>
                           <i:Interaction.Behaviors>
