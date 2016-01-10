@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows.Threading;
@@ -30,7 +29,7 @@
                 .SelectMany(group => group.Properties)
                 .ToDictionary(node => node.Name);
 
-            _properties = new ReadOnlyDictionary<string, IProjectProperty>(properties);
+            _properties = new Dictionary<string, IProjectProperty>(properties);
 
             ShouldBuild = new ShouldBuildIndexer(this);
             PropertyValue = new PropertyValueIndexer(this);
@@ -48,9 +47,14 @@
 
         internal IEnumerable<IProjectProperty> Properties => _properties.Values;
 
-        private void Invalidate()
+        private void InvalidateShouldBuild()
         {
-            OnPropertyChanged(() => ShouldBuild);
+            OnPropertyChanged(nameof(ShouldBuild));
+        }
+
+        internal void InvalidatePropertyValues()
+        {
+            OnPropertyChanged(nameof(PropertyValue));
         }
 
         #region IEquatable implementation
@@ -152,7 +156,7 @@
 
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        _projectConfiguration.Project.SpecificProjectConfigurations.ForEach(pc => pc.Invalidate());
+                        _projectConfiguration.Project.SpecificProjectConfigurations.ForEach(pc => pc.InvalidateShouldBuild());
                     });
                 }
             }
@@ -175,13 +179,19 @@
                 }
                 set
                 {
-                    IProjectProperty property;
-                    if (!_projectConfiguration._properties.TryGetValue(propertyName, out property) || (property == null))
-                        throw new ArgumentException("Unknown property name", nameof(propertyName));
+                    var property = _projectConfiguration._properties.ForceValue(propertyName, _projectConfiguration.CreateProperty);
+
+                    if (property == null)
+                        throw new ArgumentException("Unable to create property: " + propertyName, nameof(propertyName));
 
                     property.Value = value;
                 }
             }
+        }
+
+        private IProjectProperty CreateProperty(string propertyName)
+        {
+            return _project.ProjectFile.CreateProperty(propertyName, _configuration, _platform);
         }
     }
 }

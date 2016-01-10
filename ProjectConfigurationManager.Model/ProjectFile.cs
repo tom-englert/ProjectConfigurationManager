@@ -2,10 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Xml;
     using System.Xml.Linq;
 
     using Microsoft.VisualStudio;
@@ -43,7 +45,7 @@
             try
             {
                 // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
-                _document = XDocument.Load(_fullName, LoadOptions.PreserveWhitespace);
+                _document = XDocument.Load(_fullName, LoadOptions.None);
 
                 _propertyGroups = _document
                     .Descendants(_propertyGroupNodeName)
@@ -63,6 +65,13 @@
             return _propertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
         }
 
+        public IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
+        {
+            var group = GetPropertyGroups(configuration, platform).FirstOrDefault();
+
+            return group?.AddProperty(propertyName);
+        }
+
         private void SaveChanges()
         {
             _deferredSaveThrottle.Tick();
@@ -80,7 +89,16 @@
 
             solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
 
-            _document.Save(_fullName, SaveOptions.None);
+            var settings = new XmlWriterSettings
+            {
+                Indent = true,
+                IndentChars = "  "
+            };
+
+            using (var writer = XmlWriter.Create(_fullName, settings))
+            {
+                _document.WriteTo(writer);
+            }
 
             solution.ReloadProject(ref projectGuid);
         }
@@ -115,25 +133,83 @@
             return projectGuid;
         }
 
+        public bool CanEdit()
+        {
+            if (!IsSaved)
+                return false;
+
+            var service = (IVsQueryEditQuerySave2)_solution.GetService(typeof(SVsQueryEditQuerySave));
+            if (service != null)
+            {
+                var files = new[] { _fullName };
+                uint editVerdict;
+                uint moreInfo;
+
+                if ((0 != service.QueryEditFiles(0, files.Length, files, null, null, out editVerdict, out moreInfo))
+                    || (editVerdict != (uint)tagVSQueryEditResult.QER_EditOK))
+                {
+                    return false;
+                }
+            }
+
+            return IsWritable;
+        }
+
+        private bool IsWritable
+        {
+            get
+            {
+                try
+                {
+                    if ((File.GetAttributes(_fullName) & (FileAttributes.ReadOnly | FileAttributes.System)) != 0)
+                        return false;
+
+                    using (File.Open(_fullName, FileMode.Open, FileAccess.Write))
+                    {
+                        return true;
+                    }
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+
+                return false;
+            }
+        }
+
         private class ProjectPropertyGroup : IProjectPropertyGroup
         {
+            private readonly ProjectFile _projectFile;
             private readonly XElement _propertyGroupNode;
-            private readonly ProjectProperty[] _properties;
+            private readonly ObservableCollection<ProjectProperty> _properties;
 
             public ProjectPropertyGroup(ProjectFile projectFile, XElement propertyGroupNode)
             {
                 Contract.Requires(projectFile != null);
                 Contract.Requires(propertyGroupNode != null);
 
+                _projectFile = projectFile;
                 _propertyGroupNode = propertyGroupNode;
 
-                _properties = _propertyGroupNode.Elements()
-                    .Where(node => node.GetAttribute(_conditionAttributeName) == null)
-                    .Select(node => new ProjectProperty(projectFile, node))
-                    .ToArray();
+                _properties = new ObservableCollection<ProjectProperty>(
+                    _propertyGroupNode.Elements()
+                        .Where(node => node.GetAttribute(_conditionAttributeName) == null)
+                        .Select(node => new ProjectProperty(projectFile, node)));
             }
 
             public IEnumerable<IProjectProperty> Properties => _properties;
+
+            public IProjectProperty AddProperty(string propertyName)
+            {
+                var node = new XElement(_xmlns.GetName(propertyName));
+
+                _propertyGroupNode.Add(node);
+
+                var property = new ProjectProperty(_projectFile, node);
+
+                _properties.Add(property);
+
+                return property;
+            }
 
             public bool MatchesConfiguration(string configuration, string platform)
             {
@@ -209,49 +285,6 @@
             Contract.Invariant(_document != null);
             Contract.Invariant(_project != null);
             Contract.Invariant(_propertyGroups != null);
-        }
-
-        public bool CanEdit()
-        {
-            if (!IsSaved)
-                return false;
-
-            var service = (IVsQueryEditQuerySave2)_solution.GetService(typeof(SVsQueryEditQuerySave));
-            if (service != null)
-            {
-                var files = new[] { _fullName };
-                uint editVerdict;
-                uint moreInfo;
-
-                if ((0 != service.QueryEditFiles(0, files.Length, files, null, null, out editVerdict, out moreInfo))
-                    || (editVerdict != (uint)tagVSQueryEditResult.QER_EditOK))
-                {
-                    return false;
-                }
-            }
-
-            return IsWritable;
-        }
-
-        private bool IsWritable
-        {
-            get
-            {
-                try
-                {
-                    if ((File.GetAttributes(_fullName) & (FileAttributes.ReadOnly | FileAttributes.System)) != 0)
-                        return false;
-
-                    using (File.Open(_fullName, FileMode.Open, FileAccess.Write))
-                    {
-                        return true;
-                    }
-                }
-                catch (IOException) { }
-                catch (UnauthorizedAccessException) { }
-
-                return false;
-            }
         }
     }
 }

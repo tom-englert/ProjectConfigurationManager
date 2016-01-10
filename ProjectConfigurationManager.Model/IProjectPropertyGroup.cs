@@ -7,6 +7,8 @@
     interface IProjectPropertyGroup
     {
         IEnumerable<IProjectProperty> Properties { get; }
+
+        IProjectProperty AddProperty(string propertyName);
     }
 
     [ContractClassFor(typeof (IProjectPropertyGroup))]
@@ -19,6 +21,12 @@
                 Contract.Ensures(Contract.Result<IEnumerable<IProjectProperty>>() != null);
                 throw new System.NotImplementedException();
             }
+        }
+
+        public IProjectProperty AddProperty(string propertyName)
+        {
+            Contract.Requires(propertyName != null);
+            throw new System.NotImplementedException();
         }
     }
 }

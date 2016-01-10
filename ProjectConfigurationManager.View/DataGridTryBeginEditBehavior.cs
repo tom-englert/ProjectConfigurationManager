@@ -35,11 +35,6 @@
             var configuration = (ProjectConfiguration)dataGridRow.Item;
             var project = configuration.Project;
 
-            if (e.Column.OnCopyingCellClipboardContent(configuration) == null)
-            {
-                e.Cancel = true;
-            }
-            
             if (!project.CanEdit())
             {
                 e.Cancel = true;
