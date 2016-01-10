@@ -17,7 +17,14 @@
 
             _name = name;
             _groupName = groupName;
-            _displayName = name.StartsWith(groupName) ? name.Substring(groupName.Length) : name;
+            _displayName = HasGroupNamePrefix(name, groupName) ? name.Substring(groupName.Length) : name;
+        }
+
+        private static bool HasGroupNamePrefix(string name, string groupName)
+        {
+            var length = groupName.Length;
+
+            return name.Length > length && name.StartsWith(groupName) && char.IsUpper(name[length]);
         }
 
         public string Name => _name;

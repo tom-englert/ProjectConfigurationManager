@@ -47,6 +47,7 @@
 
                 _propertyGroups = _document
                     .Descendants(_propertyGroupNodeName)
+                    .Where(node => node.Parent?.Name.LocalName == "Project")
                     .Select(node => new ProjectPropertyGroup(this, node))
                     .ToArray();
             }
@@ -55,7 +56,7 @@
             }
         }
 
-        public IEnumerable<IProjectPropertyGroup> PropertyGroups => _propertyGroups;
+        // public IEnumerable<IProjectPropertyGroup> PropertyGroups => _propertyGroups;
 
         public IEnumerable<IProjectPropertyGroup> GetPropertyGroups(string configuration, string platform)
         {
@@ -144,10 +145,14 @@
                 if (string.IsNullOrEmpty(configuration) || string.IsNullOrEmpty(platform))
                     return false;
 
-                var condition = string.Join("|", configuration, platform.Replace(" ", ""));
+                conditionExpression = conditionExpression.Replace(" ", "");
 
-                return conditionExpression.Contains("$(Configuration)|$(Platform)")
-                    && conditionExpression.Contains(condition);
+                if (!conditionExpression.Contains("$(Configuration)|$(Platform)"))
+                    return false;
+
+                var condition = string.Join("|", configuration, platform).Replace(" ", "");
+
+                return conditionExpression.Contains(condition);
             }
 
             [ContractInvariantMethod]

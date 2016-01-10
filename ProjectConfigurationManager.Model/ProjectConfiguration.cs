@@ -46,6 +46,8 @@
 
         public IIndexer<string> PropertyValue { get; }
 
+        internal IEnumerable<IProjectProperty> Properties => _properties.Values;
+
         private void Invalidate()
         {
             OnPropertyChanged(() => ShouldBuild);

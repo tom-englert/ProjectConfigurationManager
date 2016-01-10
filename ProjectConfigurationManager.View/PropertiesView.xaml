@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:toms="urn:TomsToolbox"
              d:DataContext="{d:DesignInstance local:PropertiesViewModel}">
   <UserControl.Resources>
     <CollectionViewSource x:Key="PropertiesSource" Source="{Binding Solution.ProjectProperties}">
@@ -26,13 +27,13 @@
                 <Setter Property="Template">
                   <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GroupItem}">
-                      <StackPanel d:DataContext="{d:DesignInstance CollectionViewGroup}">
-                        <Border Background="DarkGray">
+                      <Expander d:DataContext="{d:DesignInstance CollectionViewGroup}" IsExpanded="True">
+                        <Expander.Header>
                           <ContentPresenter x:Name="PART_Header" Margin="5"/>
-                        </Border>
+                        </Expander.Header>
                         <DataGrid ItemsSource="{Binding Source={StaticResource ConfigurationsSource}}" 
                                   local:ProperitesColumnsMananger.Properites="{Binding Items}"
-                                  HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray"
+                                  HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray" SelectionUnit="Cell"
                                   AutoGenerateColumns="False" FrozenColumnCount="3" dgx:Tools.ApplyInitialSorting="True">
                           <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
@@ -44,11 +45,17 @@
                             <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending"  IsReadOnly="True"/>
                             <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True"/>
                           </DataGrid.Columns>
+                          <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                              <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource Self}, Converter={toms:Import {x:Type local:CellToBackgroundBrushConverter}}}"/>
+                              <Setter Property="BorderBrush" Value="{Binding Background, RelativeSource={RelativeSource Self}}"/>
+                            </Style>
+                          </DataGrid.CellStyle>
                           <i:Interaction.Behaviors>
                             <local:DataGridTryBeginEditBehavior/>
                           </i:Interaction.Behaviors>
                         </DataGrid>
-                      </StackPanel>
+                      </Expander>
                     </ControlTemplate>
                   </Setter.Value>
                 </Setter>

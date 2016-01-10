@@ -152,18 +152,11 @@
         private IEnumerable<ProjectPropertyName> GetProjectProperties()
         {
             return Projects
-                .SelectMany(prj => prj.ProjectFile.PropertyGroups.SelectMany(group => group.Properties))
+                .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties))
                 .Select(prop => prop.Name)
                 .Distinct()
-                .Select(name => new ProjectPropertyName(name, GetPropertyDisplayGroupName(name)));
-        }
-
-        private string GetPropertyDisplayGroupName(string name)
-        {
-            if (name.StartsWith("CodeContracts", StringComparison.OrdinalIgnoreCase))
-                return "CodeContracts";
-
-            return "Common";
+                .Where(PropertyGrouping.IsNotProjectSpecific)
+                .Select(name => new ProjectPropertyName(name, PropertyGrouping.GetPropertyGroupName(name)));
         }
 
         // ReSharper disable once SuspiciousTypeConversion.Global
