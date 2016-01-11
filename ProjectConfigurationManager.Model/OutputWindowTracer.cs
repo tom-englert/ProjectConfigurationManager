@@ -34,7 +34,7 @@
             IVsOutputWindowPane pane;
             var errorCode = outputWindow.GetPane(ref outputPaneGuid, out pane);
 
-            if (ErrorHandler.Failed(errorCode) || pane == null)
+            if (pane == null)
             {
                 outputWindow.CreatePane(ref outputPaneGuid, "PCM", Convert.ToInt32(true), Convert.ToInt32(false));
                 outputWindow.GetPane(ref outputPaneGuid, out pane);

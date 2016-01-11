@@ -130,11 +130,11 @@
             Contract.Assume(solution != null);
 
             IVsHierarchy projectHierarchy;
-            ErrorHandler.ThrowOnFailure(solution.GetProjectOfUniqueName(project.UniqueName, out projectHierarchy));
+            solution.GetProjectOfUniqueName(project.UniqueName, out projectHierarchy);
             Contract.Assume(projectHierarchy != null);
 
             Guid projectGuid;
-            ErrorHandler.ThrowOnFailure(solution.GetGuidOfProject(projectHierarchy, out projectGuid));
+            solution.GetGuidOfProject(projectHierarchy, out projectGuid);
             return projectGuid;
         }
 
