@@ -34,14 +34,16 @@
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var cell = value as DataGridCell;
-            if (cell == null)
+
+            var column = cell?.Column;
+            if (column == null || column.IsReadOnly)
                 return Brushes.Transparent;
 
-            var column = cell.Column;
-            if (column.IsReadOnly)
+            var dataContext = cell.DataContext;
+            if (dataContext == null)
                 return Brushes.Transparent;
 
-            var text = column.OnCopyingCellClipboardContent(cell.DataContext) as string;
+            var text = GetColumnText(column, dataContext);
             if (text == null)
                 return Brushes.LightGray;
 
@@ -49,6 +51,18 @@
                 return Brushes.Transparent;
 
             return _mappingCache.ForceValue(text, GetNextBrush);
+        }
+
+        private static string GetColumnText(DataGridColumn column, object dataContext)
+        {
+            try
+            {
+                return column.OnCopyingCellClipboardContent(dataContext) as string;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -60,7 +74,7 @@
         /// <param name="values">The array of values that the source bindings in the <see cref="T:System.Windows.Data.MultiBinding"/> produces. The value <see cref="F:System.Windows.DependencyProperty.UnsetValue"/> indicates that the source binding has no value to provide for conversion.</param><param name="targetType">The type of the binding target property.</param><param name="parameter">The converter parameter to use.</param><param name="culture">The culture to use in the converter.</param>
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            return Convert(values.OfType<DataGridCell>().FirstOrDefault(), targetType, parameter, culture);
+            return Convert(values?.OfType<DataGridCell>().FirstOrDefault(), targetType, parameter, culture);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
