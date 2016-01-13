@@ -43,7 +43,8 @@
             var properties = projectFile
                 .GetPropertyGroups(_configuration, _platform)
                 .SelectMany(group => group.Properties)
-                .ToDictionary(node => node.Name);
+                .Distinct(new DelegateEqualityComparer<IProjectProperty>(property => property.Name))
+                .ToDictionary(property => property.Name);
 
             _properties = new Dictionary<string, IProjectProperty>(properties);
 

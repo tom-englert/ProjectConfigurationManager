@@ -99,6 +99,7 @@
       <Link>Properties\Version.cs</Link>
     </Compile>
     <Compile Include="IIndexer.cs" />
+    <Compile Include="ItemKind.cs" />
     <Compile Include="IVsServiceProvider.cs" />
     <Compile Include="DteExtensions.cs" />
     <Compile Include="ITracer.cs" />
