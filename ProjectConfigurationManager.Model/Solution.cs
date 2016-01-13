@@ -4,12 +4,16 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using System.Windows;
     using System.Windows.Threading;
+
+    using Microsoft.VisualStudio.PlatformUI;
 
     using tomenglertde.ResXManager.Model;
 
@@ -42,7 +46,7 @@
             Contract.Requires(tracer != null);
             Contract.Requires(serviceProvider != null);
 
-            _deferredUpdateThrottle = new DispatcherThrottle(Update);
+            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ContextIdle, Update);
 
             _tracer = tracer;
             _serviceProvider = serviceProvider;
@@ -170,30 +174,63 @@
 
         private IEnumerable<Project> GetProjects()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
+            return GetDteProjects().Select(project => new Project(this, project));
+        }
+
+        private IEnumerable<EnvDTE.Project> GetDteProjects()
+        {
+            var items = new List<EnvDTE.Project>();
 
             var projects = DteSolution?.Projects;
 
             if (projects == null)
-                yield break;
+                return items;
 
             for (var i = 1; i <= projects.Count; i++)
             {
-                EnvDTE.Project project;
                 try
                 {
-                    project = projects.Item(i);
-
-                    if (string.IsNullOrEmpty(project?.FullName))
-                        continue;
+                    GetProjectOrSubProjects(items, projects.Item(i));
                 }
-                catch
+                catch (Exception ex)
                 {
-                    _tracer.TraceError("Error loading project #" + i);
-                    continue;
+                    _tracer.TraceError("Error loading a project: " + ex.Message);
+                }
+            }
+
+            return items;
+        }
+
+        private void GetProjectOrSubProjects(ICollection<EnvDTE.Project> items, EnvDTE.Project project)
+        {
+            if (project == null)
+                return;
+
+            try
+            {
+                if (!string.Equals(project.Kind, ItemKind.SolutionFolder, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!string.IsNullOrEmpty(project.FullName))
+                        items.Add(project);
+
+                    return;
                 }
 
-                yield return new Project(this, project);
+                foreach (var projectItem in project.ProjectItems.OfType<EnvDTE.ProjectItem>())
+                {
+                    try
+                    {
+                        GetProjectOrSubProjects(items, projectItem.SubProject);
+                    }
+                    catch (Exception ex)
+                    {
+                        _tracer.TraceError("Error loading a project: " + ex.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _tracer.TraceError("Error loading a project: " + ex.Message);
             }
         }
 
@@ -223,7 +260,7 @@
         }
 
         [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_tracer != null);
