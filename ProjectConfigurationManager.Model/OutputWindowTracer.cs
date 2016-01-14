@@ -5,7 +5,6 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
-    using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell.Interop;
 
     using tomenglertde.ProjectConfigurationManager.Model;

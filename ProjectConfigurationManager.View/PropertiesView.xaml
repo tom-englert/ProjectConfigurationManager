@@ -10,6 +10,8 @@
              d:DataContext="{d:DesignInstance local:PropertiesViewModel}"
              Padding="10">
   <UserControl.Resources>
+    <local:CellToBackgroundBrushConverter x:Key="CellToBackgroundBrushConverter" />
+    <local:ProjectTypeGuidToDisplayNameConverter x:Key="ProjectTypeGuidToDisplayNameConverter" />
     <CollectionViewSource x:Key="PropertiesSource" Source="{Binding Solution.ProjectProperties}">
       <CollectionViewSource.GroupDescriptions>
         <PropertyGroupDescription PropertyName="GroupName" />
@@ -17,60 +19,106 @@
     </CollectionViewSource>
     <CollectionViewSource x:Key="ConfigurationsSource" Source="{Binding Solution.ProjectConfigurations}" />
 
+    <Style TargetType="ListBoxItem" x:Key="FilterItemContainerStyle">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Gray" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ListBoxItem">
+            <Border CornerRadius="4" Margin="4" Padding="4" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Background="{TemplateBinding Background}">
+              <DockPanel>
+                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+                <Decorator Width="4" DockPanel.Dock="Left" />
+                <ContentPresenter VerticalAlignment="Center" />
+              </DockPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="Black" />
+              </Trigger>
+              <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="Aquamarine" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <ItemsPanelTemplate x:Key="FilterItemsPanelTemplate">
+      <WrapPanel />
+    </ItemsPanelTemplate>
+    <Style TargetType="ListBox" x:Key="FilterListBoxStyle">
+      <Setter Property="SelectionMode" Value="Extended" />
+      <Setter Property="ItemContainerStyle" Value="{StaticResource FilterItemContainerStyle}" />
+      <Setter Property="SelectedIndex" Value="0" />
+      <Setter Property="ItemsPanel" Value="{StaticResource FilterItemsPanelTemplate}" />
+    </Style>
+
   </UserControl.Resources>
-  <ItemsControl ItemsSource="{Binding Source={StaticResource PropertiesSource}}">
-    <ItemsControl.GroupStyle>
-      <GroupStyle>
-        <GroupStyle.ContainerStyle>
-          <Style TargetType="GroupItem">
-            <Setter Property="Template">
-              <Setter.Value>
-                <ControlTemplate TargetType="{x:Type GroupItem}">
-                  <Expander d:DataContext="{d:DesignInstance CollectionViewGroup}">
-                    <Expander.Header>
-                      <ContentPresenter x:Name="PART_Header" Margin="5" TextElement.FontWeight="Bold" />
-                    </Expander.Header>
-                    <DataGrid ItemsSource="{Binding Source={StaticResource ConfigurationsSource}}"
-                              local:ProperitesColumnsMananger.Properites="{Binding Items}"
-                              HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray" SelectionUnit="Cell"
-                              AutoGenerateColumns="False" FrozenColumnCount="3"
-                              dgx:Tools.ApplyInitialSorting="True"
-                              MaxHeight="600">
-                      <DataGrid.Columns>
-                        <DataGridTextColumn Header="Project" Binding="{Binding Project.Name}" DisplayIndex="0" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" />
-                      </DataGrid.Columns>
-                      <DataGrid.CellStyle>
-                        <Style TargetType="DataGridCell">
-                          <Setter Property="Background">
-                            <Setter.Value>
-                              <MultiBinding Converter="{toms:Import {x:Type local:CellToBackgroundBrushConverter}}">
-                                <Binding RelativeSource="{RelativeSource Self}" />
-                                <Binding />
-                              </MultiBinding>
-                            </Setter.Value>
-                          </Setter>
-                          <Setter Property="BorderBrush" Value="{Binding Background, RelativeSource={RelativeSource Self}}" />
-                          <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                              <Setter Property="BorderBrush" Value="Gray" />
-                              <Setter Property="Foreground" Value="Black" />
-                            </Trigger>
-                          </Style.Triggers>
-                        </Style>
-                      </DataGrid.CellStyle>
-                      <i:Interaction.Behaviors>
-                        <local:DataGridTryBeginEditBehavior />
-                      </i:Interaction.Behaviors>
-                    </DataGrid>
-                  </Expander>
-                </ControlTemplate>
-              </Setter.Value>
-            </Setter>
-          </Style>
-        </GroupStyle.ContainerStyle>
-      </GroupStyle>
-    </ItemsControl.GroupStyle>
-  </ItemsControl>
+
+  <DockPanel>
+
+    <StackPanel DockPanel.Dock="Top">
+      <ListBox x:Name="PropertyGroups"
+               ItemsSource="{Binding Groups, Source={StaticResource PropertiesSource}}"
+               Style="{StaticResource FilterListBoxStyle}">
+        <ListBox.ItemTemplate>
+          <DataTemplate DataType="CollectionViewGroup">
+            <TextBlock Text="{Binding Name}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <Decorator Height="20" />
+      <ListBox ItemsSource="{Binding Solution.ProjectTypeGuids}"
+               Style="{StaticResource FilterListBoxStyle}"
+               SelectionChanged="ProjectTypeGuids_SelectionChanged">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel />
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Converter={StaticResource ProjectTypeGuidToDisplayNameConverter}}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <Decorator Height="20" />
+    </StackPanel>
+
+    <DataGrid x:Name="DataGrid"
+              ItemsSource="{Binding Source={StaticResource ConfigurationsSource}}"
+              local:ProperitesColumnsMananger.Properites="{Binding ElementName=PropertyGroups, Path=SelectedItems}"
+              HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray" SelectionUnit="Cell"
+              AutoGenerateColumns="False" FrozenColumnCount="3"
+              dgx:Tools.ApplyInitialSorting="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Project" Binding="{Binding Project.Name}" DisplayIndex="0" IsReadOnly="True" />
+        <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" />
+        <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" />
+      </DataGrid.Columns>
+      <DataGrid.CellStyle>
+        <Style TargetType="DataGridCell">
+          <Setter Property="Background">
+            <Setter.Value>
+              <MultiBinding Converter="{StaticResource CellToBackgroundBrushConverter}">
+                <Binding RelativeSource="{RelativeSource Self}" />
+                <Binding />
+              </MultiBinding>
+            </Setter.Value>
+          </Setter>
+          <Setter Property="BorderBrush" Value="{Binding Background, RelativeSource={RelativeSource Self}}" />
+          <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+              <Setter Property="BorderBrush" Value="Gray" />
+              <Setter Property="Foreground" Value="Black" />
+            </Trigger>
+          </Style.Triggers>
+        </Style>
+      </DataGrid.CellStyle>
+      <i:Interaction.Behaviors>
+        <local:DataGridTryBeginEditBehavior />
+      </i:Interaction.Behaviors>
+    </DataGrid>
+  </DockPanel>
 </UserControl>

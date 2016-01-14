@@ -55,6 +55,8 @@
 
         public string FullName => _fullName;
 
+        public string[] ProjectTypeGuids => GetProjectTypeGuids();
+
         public IObservableCollection<SolutionContext> SolutionContexts => _solutionContexts;
 
         public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
@@ -106,6 +108,14 @@
         internal IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
         {
             return _projectFile.CreateProperty(propertyName, configuration, platform);
+        }
+
+        private string[] GetProjectTypeGuids()
+        {
+            return (_defaultProjectConfiguration.PropertyValue["ProjectTypeGuids"] ?? ProjectTypeGuid.Other)
+                .Split(';')
+                .Select(item => item.Trim())
+                .ToArray();
         }
 
         #region IEquatable implementation

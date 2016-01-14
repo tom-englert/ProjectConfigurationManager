@@ -9,7 +9,6 @@
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
-    using System.Windows.Threading;
 
     using tomenglertde.ResXManager.Model;
 
@@ -31,6 +30,7 @@
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
         private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
+        private readonly ObservableCollection<string> _projectTypeGuids = new ObservableCollection<string>();
 
         private readonly EnvDTE.SolutionEvents _solutionEvents;
 
@@ -79,6 +79,8 @@
         public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
 
         public ObservableCollection<ProjectPropertyName> ProjectProperties => _projectProperties;
+
+        public ObservableCollection<string> ProjectTypeGuids => _projectTypeGuids;
 
         public string SolutionFolder
         {
@@ -157,6 +159,8 @@
             _configurations.SynchronizeWith(GetConfigurations().ToArray());
 
             _projectProperties.SynchronizeWith(GetProjectProperties().ToArray());
+
+            _projectTypeGuids.SynchronizeWith(_projects.SelectMany(p => p.ProjectTypeGuids ?? Enumerable.Empty<string>()).ToArray());
         }
 
         private IEnumerable<SolutionConfiguration> GetConfigurations()

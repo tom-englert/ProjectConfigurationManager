@@ -11,7 +11,6 @@
     using System.Xml;
     using System.Xml.Linq;
 
-    using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell.Interop;
 
     using TomsToolbox.Desktop;

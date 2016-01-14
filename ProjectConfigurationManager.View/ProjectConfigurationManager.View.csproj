@@ -93,6 +93,7 @@
       <Link>Properties\Version.cs</Link>
     </Compile>
     <Compile Include="DataGridTryBeginEditBehavior.cs" />
+    <Compile Include="ProjectTypeGuidToDisplayNameConverter.cs" />
     <Compile Include="ProperitesColumnsMananger.cs" />
     <Compile Include="PropertiesView.xaml.cs">
       <DependentUpon>PropertiesView.xaml</DependentUpon>

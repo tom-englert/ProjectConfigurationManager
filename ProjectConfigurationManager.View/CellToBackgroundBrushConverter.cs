@@ -5,6 +5,7 @@
     using System.ComponentModel.Composition;
     using System.Globalization;
     using System.Linq;
+    using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
     using System.Windows.Media;
@@ -57,6 +58,9 @@
         {
             try
             {
+                if (column.Visibility != Visibility.Visible)
+                    return null;
+
                 return column.OnCopyingCellClipboardContent(dataContext) as string;
             }
             catch

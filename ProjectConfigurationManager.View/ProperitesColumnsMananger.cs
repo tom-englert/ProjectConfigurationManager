@@ -43,16 +43,16 @@
             Register(dataGrid, (ICollection)e.NewValue);
         }
 
-        private static void Register(DataGrid dataGrid, ICollection properties)
+        private static void Register(DataGrid dataGrid, ICollection propertieGroups)
         {
             Contract.Requires(dataGrid != null);
 
-            if (properties == null)
+            if (propertieGroups == null)
                 return;
 
-            dataGrid.Columns.AddRange(properties.OfType<ProjectPropertyName>().Select(CreateColumn));
+            dataGrid.Columns.AddRange(propertieGroups.OfType<CollectionViewGroup>().SelectMany(group => group.Items.Cast<ProjectPropertyName>()).Select(CreateColumn));
 
-            ((INotifyCollectionChanged)properties).CollectionChanged += (sender, e) => ProjectProperties_CollectionChanged(dataGrid, e);
+            ((INotifyCollectionChanged)propertieGroups).CollectionChanged += (sender, e) => ProjectProperties_CollectionChanged(dataGrid, e);
         }
 
         private static void ProjectProperties_CollectionChanged(DataGrid dataGrid, NotifyCollectionChangedEventArgs e)
@@ -63,11 +63,30 @@
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    dataGrid.Columns.Add(CreateColumn((ProjectPropertyName)e.NewItems[0]));
+                    var newColumns = e.NewItems?
+                        .OfType<CollectionViewGroup>()
+                        .SelectMany(group => group.Items.Cast<ProjectPropertyName>());
+
+                    if (newColumns != null)
+                        dataGrid.Columns.AddRange(newColumns.Select(CreateColumn));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    dataGrid.Columns.RemoveRange(col => Equals(col.GetValue(_projectConfigurationProperty), e.OldItems[0]));
+                    var oldColumns = e.OldItems?
+                        .OfType<CollectionViewGroup>()
+                        .SelectMany(group => group.Items.Cast<ProjectPropertyName>())
+                        .ToArray();
+
+                    var columnsToRemove = dataGrid.Columns
+                        .Where(col => (oldColumns?.Contains(col.GetValue(_projectConfigurationProperty))).GetValueOrDefault())
+                        .ToArray();
+
+                    foreach (var column in columnsToRemove)
+                    {
+                        column.Visibility = Visibility.Collapsed;
+                        dataGrid.Columns.Remove(column);
+                    }
+
                     break;
             }
         }
