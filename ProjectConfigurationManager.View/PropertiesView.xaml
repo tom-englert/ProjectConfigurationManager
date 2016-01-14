@@ -48,6 +48,8 @@
       <WrapPanel />
     </ItemsPanelTemplate>
     <Style TargetType="ListBox" x:Key="FilterListBoxStyle">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background" Value="Transparent"/>
       <Setter Property="SelectionMode" Value="Extended" />
       <Setter Property="ItemContainerStyle" Value="{StaticResource FilterItemContainerStyle}" />
       <Setter Property="SelectedIndex" Value="0" />
@@ -59,31 +61,35 @@
   <DockPanel>
 
     <StackPanel DockPanel.Dock="Top">
-      <ListBox x:Name="PropertyGroups"
-               ItemsSource="{Binding Groups, Source={StaticResource PropertiesSource}}"
-               Style="{StaticResource FilterListBoxStyle}">
-        <ListBox.ItemTemplate>
-          <DataTemplate DataType="CollectionViewGroup">
-            <TextBlock Text="{Binding Name}" />
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-      <Decorator Height="20" />
-      <ListBox ItemsSource="{Binding Solution.ProjectTypeGuids}"
-               Style="{StaticResource FilterListBoxStyle}"
-               SelectionChanged="ProjectTypeGuids_SelectionChanged">
-        <ListBox.ItemsPanel>
-          <ItemsPanelTemplate>
-            <WrapPanel />
-          </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Converter={StaticResource ProjectTypeGuidToDisplayNameConverter}}" />
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-      <Decorator Height="20" />
+      <GroupBox Header="Show properties:">
+        <ListBox x:Name="PropertyGroups"
+                 ItemsSource="{Binding Groups, Source={StaticResource PropertiesSource}}"
+                 Style="{StaticResource FilterListBoxStyle}">
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="CollectionViewGroup">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </GroupBox>
+      <Decorator Height="8" />
+      <GroupBox Header="Show projects:">
+        <ListBox ItemsSource="{Binding Solution.ProjectTypeGuids}"
+                 Style="{StaticResource FilterListBoxStyle}"
+                 SelectionChanged="ProjectTypeGuids_SelectionChanged">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Converter={StaticResource ProjectTypeGuidToDisplayNameConverter}}" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </GroupBox>
+      <Decorator Height="8" />
     </StackPanel>
 
     <DataGrid x:Name="DataGrid"
