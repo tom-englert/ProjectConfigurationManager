@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     public static class PropertyGrouping
     {
@@ -12,6 +13,27 @@
             "AppDesignerFolder",
             "RootNamespace",
             "AssemblyName",
+        };
+
+        private static readonly HashSet<string> _globalProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "ApplicationIcon",
+            "TargetFrameworkVersion",
+            "TargetFrameworkProfile",
+            "FileAlignment",
+            "ProjectTypeGuids",
+            "WarningLevel",
+            "OutputPath",
+            "DefineConstants",
+            "PlatformTarget",
+        };
+
+        private static readonly HashSet<string> _debugProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "UseVSHostingProcess",
+            "DebugSymbols",
+            "DebugType",
+            "Optimize",
         };
 
         private static readonly HashSet<string> _publishProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -43,7 +65,6 @@
             "SignAssembly",
             "AssemblyOriginatorKeyFile",
             "SignManifests",
-            "ApplicationIcon",
             "ManifestCertificateThumbprint",
             "ManifestKeyFile",
             "GenerateManifests",
@@ -56,11 +77,8 @@
 
         public static string GetPropertyGroupName(string name)
         {
-            if (name.StartsWith("CodeContracts", StringComparison.OrdinalIgnoreCase))
-                return "CodeContracts";
-
-            if (name.StartsWith("Scc"))
-                return "Scc";
+            if (_globalProperties.Contains(name))
+                return "Global";
 
             if (_publishProperties.Contains(name))
                 return "Publish";
@@ -68,10 +86,19 @@
             if (_signingProperties.Contains(name))
                 return "Signing";
 
+            if (_debugProperties.Contains(name))
+                return "Debug";
+
+            if (name.StartsWith("CodeContracts", StringComparison.OrdinalIgnoreCase))
+                return "CodeContracts";
+
+            if (name.StartsWith("Scc"))
+                return "Scc";
+
             if (name.Contains("CodeAnalysis"))
                 return "CodeAnalysis";
 
-            return "Common";
+            return "Other";
         }
     }
 }

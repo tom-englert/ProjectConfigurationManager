@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.IO;
     using System.Linq;
 
     using TomsToolbox.Core;
@@ -52,6 +53,10 @@
         public string Name => _name;
 
         public string UniqueName => _uniqueName;
+
+        public string RelativePath => Path.GetDirectoryName(UniqueName);
+
+        public string SortKey => _name + " (" + RelativePath + ")";
 
         public string FullName => _fullName;
 

@@ -52,7 +52,7 @@
             _specificProjectConfigurations = Projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
             _solutionContexts = SolutionConfigurations.ObservableSelectMany(cfg => cfg.Contexts);
             _defaultProjectConfigurations = Projects.ObservableSelect(prj => prj.DefaultProjectConfiguration);
-            _projectConfigurations = new ObservableCompositeCollection<ProjectConfiguration>(_specificProjectConfigurations, _defaultProjectConfigurations);
+            _projectConfigurations = new ObservableCompositeCollection<ProjectConfiguration>(_defaultProjectConfigurations, _specificProjectConfigurations);
 
             _solutionEvents = Dte.Events.SolutionEvents;
 

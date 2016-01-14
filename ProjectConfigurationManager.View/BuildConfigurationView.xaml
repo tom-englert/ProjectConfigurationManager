@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              xmlns:view="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
+             xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model"
              d:DataContext="{d:DesignInstance view:BuildConfigurationViewModel}">
   <Grid Margin="10">
     <DataGrid x:Name="DataGrid" 
@@ -20,7 +21,16 @@
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Project" Binding="{Binding Project}" DisplayIndex="0" IsReadOnly="True"/>
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey" 
+                                dgx:DataGridFilterColumn.Template="{StaticResource {x:Static dgx:DataGridFilter.TextColumnFilterTemplateKey}}">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate DataType="model:ProjectConfiguration">
+              <TextBlock Margin="2"><Run Text="{Binding Project.Name, Mode=OneWay}"/>
+                <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}"/>)</Span>
+              </TextBlock>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
         <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True"/>
         <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True"/>
       </DataGrid.Columns>

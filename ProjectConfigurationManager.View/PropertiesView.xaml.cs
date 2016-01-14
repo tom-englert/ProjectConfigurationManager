@@ -5,6 +5,8 @@
     using System.Linq;
     using System.Windows.Controls;
 
+    using DataGridExtensions;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Wpf.Composition;
@@ -31,7 +33,7 @@
 
             var selectedGuids = listBox.SelectedItems.OfType<string>().ToArray();
 
-            DataGrid.Items.Filter = item => FilterPredicate(item as ProjectConfiguration, selectedGuids);
+            DataGridFilter.SetGlobalFilter(DataGrid, item => FilterPredicate(item as ProjectConfiguration, selectedGuids));
         }
     }
 }
