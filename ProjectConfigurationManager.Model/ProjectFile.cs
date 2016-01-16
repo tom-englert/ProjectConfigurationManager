@@ -26,9 +26,10 @@
         private readonly XDocument _document;
         private readonly Solution _solution;
         private readonly EnvDTE.Project _project;
-        private readonly ProjectPropertyGroup[] _propertyGroups;
         private readonly Guid _projectGuid;
         private readonly string _fullName;
+
+        private ProjectPropertyGroup[] _propertyGroups;
 
         public ProjectFile(Solution solution, EnvDTE.Project project)
         {
@@ -45,7 +46,7 @@
             try
             {
                 // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
-                _document = XDocument.Load(_fullName, LoadOptions.None);
+                _document = XDocument.Load(_fullName, LoadOptions.PreserveWhitespace);
 
                 _propertyGroups = _document
                     .Descendants(_propertyGroupNodeName)
@@ -71,6 +72,39 @@
         }
 
         public bool IsSaving { get; private set; }
+
+        internal bool CanEdit()
+        {
+            return IsSaved && CanCheckout() && IsWritable;
+        }
+
+        private bool CanCheckout()
+        {
+            var service = (IVsQueryEditQuerySave2)_solution.GetService(typeof(SVsQueryEditQuerySave));
+            if (service == null)
+                return true;
+
+            var files = new[] { _fullName };
+            uint editVerdict;
+            uint moreInfo;
+
+            return (0 == service.QueryEditFiles(0, files.Length, files, null, null, out editVerdict, out moreInfo))
+                && (editVerdict == (uint)tagVSQueryEditResult.QER_EditOK);
+        }
+
+        internal void DeleteConfiguration(string configuration, string platform)
+        {
+            var groupsToDelete = _propertyGroups.Where(group => group.MatchesConfiguration(configuration, platform)).ToArray();
+
+            _propertyGroups = _propertyGroups.Except(groupsToDelete).ToArray();
+
+            foreach (var group in groupsToDelete)
+            {
+                group.Delete();
+            }
+
+            SaveChanges();
+        }
 
         private void SaveChanges()
         {
@@ -137,28 +171,6 @@
             return projectGuid;
         }
 
-        public bool CanEdit()
-        {
-            if (!IsSaved)
-                return false;
-
-            var service = (IVsQueryEditQuerySave2)_solution.GetService(typeof(SVsQueryEditQuerySave));
-            if (service != null)
-            {
-                var files = new[] { _fullName };
-                uint editVerdict;
-                uint moreInfo;
-
-                if ((0 != service.QueryEditFiles(0, files.Length, files, null, null, out editVerdict, out moreInfo))
-                    || (editVerdict != (uint)tagVSQueryEditResult.QER_EditOK))
-                {
-                    return false;
-                }
-            }
-
-            return IsWritable;
-        }
-
         private bool IsWritable
         {
             get
@@ -206,7 +218,18 @@
             {
                 var node = new XElement(_xmlns.GetName(propertyName));
 
-                _propertyGroupNode.Add(node);
+                var lastNode = _propertyGroupNode.LastNode;
+
+                if (lastNode?.NodeType == XmlNodeType.Text)
+                {
+                    var lastDelimiter = lastNode.PreviousNode?.PreviousNode as XText;
+                    var whiteSpace = new XText(lastDelimiter?.Value ?? "\n    ");
+                    lastNode.AddBeforeSelf(whiteSpace, node);
+                }
+                else
+                {
+                    _propertyGroupNode.Add(node);
+                }
 
                 var property = new ProjectProperty(_projectFile, node);
 
@@ -233,6 +256,11 @@
                 var condition = string.Join("|", configuration, platform).Replace(" ", "");
 
                 return conditionExpression.Contains(condition);
+            }
+
+            public void Delete()
+            {
+                _propertyGroupNode.Remove();
             }
 
             [ContractInvariantMethod]

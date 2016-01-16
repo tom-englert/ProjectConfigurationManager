@@ -108,7 +108,7 @@
             return _serviceProvider.GetService(serviceType);
         }
 
-        internal void Update()
+        public void Update()
         {
             SynchronizeCollections();
 

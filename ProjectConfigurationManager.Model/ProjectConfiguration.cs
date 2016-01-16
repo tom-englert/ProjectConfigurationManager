@@ -38,6 +38,16 @@
 
         public IIndexer<string> PropertyValue { get; }
 
+        public void Delete()
+        {
+            _project.Delete(this);
+        }
+
+        public bool ShouldBuildInAnyConfiguration()
+        {
+            return Project.SolutionContexts.Any(ctx => (ctx.ConfigurationName == Configuration) && (ctx.PlatformName == Platform));
+        }
+
         internal void SetProjectFile(ProjectFile projectFile)
         {
             var properties = projectFile

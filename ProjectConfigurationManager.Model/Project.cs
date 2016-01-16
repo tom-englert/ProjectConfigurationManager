@@ -115,6 +115,14 @@
             return _projectFile.CreateProperty(propertyName, configuration, platform);
         }
 
+        internal void Delete(ProjectConfiguration configuration)
+        {
+            if (_internalSpecificProjectConfigurations.Remove(configuration))
+            {
+                _projectFile.DeleteConfiguration(configuration.Configuration, configuration.Platform);
+            }
+        }
+
         private string[] GetProjectTypeGuids()
         {
             return (_defaultProjectConfiguration.PropertyValue["ProjectTypeGuids"] ?? ProjectTypeGuid.Other)

@@ -1,12 +1,15 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
+    using System;
     using System.Collections;
     using System.Collections.Specialized;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
     using System.Windows.Data;
+    using System.Windows.Input;
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
@@ -93,7 +96,7 @@
 
         private static DataGridColumn CreateColumn(ProjectPropertyName projectPropertyName)
         {
-            var column = new DataGridTextColumn()
+            var column = new DataGridTextColumn
             {
                 Header = projectPropertyName.DisplayName,
                 Binding = new Binding(@"PropertyValue[" + projectPropertyName.Name + @"]")
@@ -102,9 +105,64 @@
                 }
             };
 
+            column.EnableMultilineEditing();
+
             column.SetValue(_projectConfigurationProperty, projectPropertyName);
 
             return column;
+        }
+
+        // TODO: Move to DGX
+        // ReSharper disable once SuggestBaseTypeForParameter : works only with text column!
+        private static void EnableMultilineEditing(this DataGridTextColumn column)
+        {
+            var textBoxStyle = new Style(typeof(TextBox), column.EditingElementStyle);
+            var setters = textBoxStyle.Setters;
+
+            setters.Add(new EventSetter(UIElement.PreviewKeyDownEvent, (KeyEventHandler)EditingElement_PreviewKeyDown));
+            setters.Add(new Setter(TextBoxBase.AcceptsReturnProperty, true));
+
+            textBoxStyle.Seal();
+
+            column.EditingElementStyle = textBoxStyle;
+        }
+
+        private static void EditingElement_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            Contract.Requires(sender != null);
+
+            if (e.Key != Key.Return)
+                return;
+
+            e.Handled = true;
+            var editingElement = (TextBox)sender;
+
+            if (IsKeyDown(Key.LeftCtrl) || IsKeyDown(Key.RightCtrl))
+            {
+                // Ctrl+Return adds a new line
+                editingElement.SelectedText = Environment.NewLine;
+                editingElement.SelectionLength = 0;
+                editingElement.SelectionStart += Environment.NewLine.Length;
+            }
+            else
+            {
+                // Return without Ctrl: Forward to parent, grid should move focused cell down.
+                var parent = (FrameworkElement)editingElement.Parent;
+                if (parent == null)
+                    return;
+
+                var args = new KeyEventArgs(e.KeyboardDevice, e.InputSource, e.Timestamp, Key.Return)
+                {
+                    RoutedEvent = UIElement.KeyDownEvent
+                };
+
+                parent.RaiseEvent(args);
+            }
+        }
+
+        private static bool IsKeyDown(this Key key)
+        {
+            return (Keyboard.GetKeyStates(key) & KeyStates.Down) != 0;
         }
     }
 }

@@ -1,13 +1,19 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.ComponentModel.Composition;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Windows.Input;
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
+    using TomsToolbox.Core;
     using TomsToolbox.Desktop;
+    using TomsToolbox.Wpf;
     using TomsToolbox.Wpf.Composition;
 
     [DisplayName("Build Configuration")]
@@ -15,6 +21,7 @@
     class BuildConfigurationViewModel : ObservableObject, IComposablePart
     {
         private readonly Solution _solution;
+        private readonly ICollection<ProjectConfiguration> _selectedConfigurations = new ObservableCollection<ProjectConfiguration>();
 
         [ImportingConstructor]
         public BuildConfigurationViewModel(Solution solution)
@@ -32,6 +39,34 @@
 
                 return _solution;
             }
+        }
+
+        public ICollection<ProjectConfiguration> SelectedConfigurations => _selectedConfigurations;
+
+        public ICommand DeleteCommand => new DelegateCommand(CanDelete, Delete);
+
+        private void Delete()
+        {
+            var configurations = _selectedConfigurations.ToArray();
+
+            configurations.ForEach(c => c.Delete());
+
+            _solution.Update();
+        }
+
+        private bool CanDelete()
+        {
+            var canEditAllFiles = _selectedConfigurations
+                .Select(cfg => cfg.Project)
+                .Distinct()
+                .All(prj => prj.CanEdit());
+
+            var shouldNotBuildAny = _selectedConfigurations
+                .All(cfg => !cfg.ShouldBuildInAnyConfiguration());
+
+            return _selectedConfigurations.Any()
+                   && canEditAllFiles
+                   && shouldNotBuildAny;
         }
 
         [ContractInvariantMethod]
