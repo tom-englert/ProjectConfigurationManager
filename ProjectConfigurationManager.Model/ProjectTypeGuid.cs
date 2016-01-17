@@ -5,7 +5,9 @@
 
     public class ProjectTypeGuid
     {
-        public const string Other = "{00000000-0000-0000-0000-000000000000}";
+        public const string Unspecified = "{00000000-0000-0000-0000-000000000000}";
+
+        // e.g. http://www.mztools.com/articles/2008/MZ2008017.aspx
 
         public static readonly Dictionary<string, string> WellKnown = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -24,11 +26,15 @@
             { "{AB322303-2255-48EF-A496-5904EB18DA55}", "Deployment Smart Device Cab"},
             { "{F135691A-BF7E-435D-8960-F99683D2D49C}", "Distributed System"},
             { "{BF6F8E12-879D-49E7-ADF0-5503146B24B8}", "Dynamics 2012 AX C# in AOT"},
+            { "{82B43B9B-A64C-4715-B499-D71E9CA2BD60}", "Extensibility"},
             { "{F2A71F9B-5D33-465A-A702-920D77279786}", "F#"},
             { "{E6FDF86B-F3D1-11D4-8576-0002A516ECE8}", "J#"},
+            { "{8BB0C5E8-0616-4F60-8E55-A43933E57E9C}", "LightSwitch"},
+            { "{581633EB-B896-402F-8E60-36F3DA191C85}", "LightSwitch Project"},
             { "{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}", "Mono for Android"},
             { "{6BC8ED88-2882-458C-8E55-DFD12B67127B}", "MonoTouch"},
             { "{F5B4F3BC-B597-4E2B-B552-EF5D8A32436F}", "MonoTouch Binding"},
+            { "{C1CDDADD-2546-481F-9697-4EA41081F2FC}", "Office/SharePoint App"},
             { "{786C830F-07A1-408B-BD7F-6EE04809D6DB}", "Portable Class Library"},
             { "{593B0543-81F6-4436-BA1E-4747859CAAE2}", "SharePoint (C#)"},
             { "{EC05E597-79D4-47f3-ADA0-324C4F7C7484}", "SharePoint (VB.NET)"},
@@ -44,18 +50,19 @@
             { "{BAA0C2D2-18E2-41B9-852F-F413020CAA33}", "VSTO"},
             { "{E24C65DC-7377-472B-9ABA-BC803B73C61A}", "Web Site"},
             { "{3D9AD99F-2412-4246-B90B-4EAA41C64699}", "WCF"},
-            { "{76F1466A-8B6D-4E39-A767-685A06062A39}", "Windows Phone 8/8.1 Blank/Hub/Webview App"},
-            { "{C089C8C0-30E0-4E22-80C0-CE093F111A43}", "Windows Phone 8/8.1 App (C#)"},
-            { "{DB03555F-0C8B-43BE-9FF9-57896B3C5E56}", "Windows Phone 8/8.1 App (VB.NET)"},
+            { "{76F1466A-8B6D-4E39-A767-685A06062A39}", "Store App WP 8.1"},
+            { "{C089C8C0-30E0-4E22-80C0-CE093F111A43}", "Store App WP 8.1 SL (C#)"},
+            { "{DB03555F-0C8B-43BE-9FF9-57896B3C5E56}", "Store App WP 8.1 SL (VB.NET)"},
             { "{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548}", "WPF"},
-            { "{BC8A1FFA-BEE3-4634-8014-F334798102B3}", "Windows Store (Metro) Apps & Components"},
+            { "{BC8A1FFA-BEE3-4634-8014-F334798102B3}", "Store App Win 8.1"},
+            { "{D954291E-2A0B-460D-934E-DC6B0785DB48}", "Store App Universal"},
             { "{14822709-B5A1-4724-98CA-57A101D1B079}", "Workflow (C#)"},
             { "{D59BE175-2ED0-4C54-BE3D-CDAA9F3214C8}", "Workflow (VB.NET)"},
             { "{32F31D43-81CC-4C15-9DE6-3FC5453562B6}", "Workflow Foundation"},
             { "{6D335F3A-9D43-41b4-9D22-F6F17C4BE596}", "XNA (Windows)"},
             { "{2DF5C3F4-5A5F-47a9-8E94-23B4456F55E2}", "XNA (XBox)"},
             { "{D399B71A-8929-442a-A9AC-8BEC78BB2433}", "XNA (Zune)"},
-            { Other, "Other"},
+            { Unspecified, "Unspecified"},
         };
     }
 }

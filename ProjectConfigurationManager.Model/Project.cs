@@ -125,7 +125,7 @@
 
         private string[] GetProjectTypeGuids()
         {
-            return (_defaultProjectConfiguration.PropertyValue["ProjectTypeGuids"] ?? ProjectTypeGuid.Other)
+            return (_defaultProjectConfiguration.PropertyValue["ProjectTypeGuids"] ?? ProjectTypeGuid.Unspecified)
                 .Split(';')
                 .Select(item => item.Trim())
                 .ToArray();

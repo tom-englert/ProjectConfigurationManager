@@ -122,14 +122,19 @@
             if (string.Equals(_fileSystemWatcher?.Path, solutionFolder, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            var watcher = new FileSystemWatcher(solutionFolder, "*.*")
-            {
-                EnableRaisingEvents = true,
-                NotifyFilter = NotifyFilters.LastWrite,
-                IncludeSubdirectories = true
-            };
+            FileSystemWatcher watcher = null;
 
-            watcher.Changed += Watcher_Changed;
+            if (solutionFolder != null)
+            {
+                watcher = new FileSystemWatcher(solutionFolder, "*.*")
+                {
+                    EnableRaisingEvents = true,
+                    NotifyFilter = NotifyFilters.LastWrite,
+                    IncludeSubdirectories = true
+                };
+
+                watcher.Changed += Watcher_Changed;
+            }
 
             Interlocked.Exchange(ref _fileSystemWatcher, watcher)?.Dispose();
         }
@@ -212,8 +217,10 @@
             {
                 if (!string.Equals(project.Kind, ItemKind.SolutionFolder, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!string.IsNullOrEmpty(project.FullName))
+                    if (!string.IsNullOrEmpty(project.FullName) && !string.IsNullOrEmpty(project.UniqueName))
+                    {
                         items.Add(project);
+                    }
 
                     return;
                 }
