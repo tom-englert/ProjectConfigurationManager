@@ -70,6 +70,8 @@
 
         public bool IsSaving => _projectFile.IsSaving;
 
+        public DateTime FileTime => _projectFile.FileTime;
+
         public bool CanEdit()
         {
             return _projectFile.CanEdit();

@@ -145,7 +145,7 @@
             {
                 var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
 
-                if ((project == null) || project.IsSaving)
+                if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
                     return;
 
                 try

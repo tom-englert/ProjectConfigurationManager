@@ -41,7 +41,9 @@
             _project = project;
             _fullName = project.FullName;
 
-            _projectGuid = GetProjectGuid(solution, project);
+            FileTime = File.GetLastWriteTime(_fullName);
+
+            _projectGuid = GetProjectGuid(solution, project.UniqueName);
 
             try
             {
@@ -72,6 +74,8 @@
         }
 
         public bool IsSaving { get; private set; }
+
+        public DateTime FileTime { get; private set; }
 
         internal bool CanEdit()
         {
@@ -115,7 +119,11 @@
         {
             IsSaving = true;
 
-            _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () => IsSaving = false);
+            _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () =>
+            {
+                IsSaving = false;
+                FileTime = File.GetLastWriteTime(_fullName);
+            });
 
             var projectGuid = _projectGuid;
             var solution = _solution.GetService(typeof(SVsSolution)) as IVsSolution4;
@@ -157,13 +165,13 @@
             }
         }
 
-        private static Guid GetProjectGuid(IServiceProvider serviceProvider, EnvDTE.Project project)
+        private static Guid GetProjectGuid(IServiceProvider serviceProvider, string uniqueName)
         {
             var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
             Contract.Assume(solution != null);
 
             IVsHierarchy projectHierarchy;
-            solution.GetProjectOfUniqueName(project.UniqueName, out projectHierarchy);
+            solution.GetProjectOfUniqueName(uniqueName, out projectHierarchy);
             Contract.Assume(projectHierarchy != null);
 
             Guid projectGuid;
@@ -260,6 +268,12 @@
 
             public void Delete()
             {
+                var previous = _propertyGroupNode.PreviousNode as XText;
+                if ((previous != null) && string.IsNullOrWhiteSpace(previous.Value))
+                {
+                    previous.Remove();
+                }
+
                 _propertyGroupNode.Remove();
             }
 
