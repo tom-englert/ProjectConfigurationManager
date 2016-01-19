@@ -12,6 +12,8 @@
             get;
             set;
         }
+
+        void Delete();
     }
 
     [ContractClassFor(typeof (IProjectProperty))]
@@ -36,6 +38,11 @@
             {
                 throw new System.NotImplementedException();
             }
+        }
+
+        public void Delete()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

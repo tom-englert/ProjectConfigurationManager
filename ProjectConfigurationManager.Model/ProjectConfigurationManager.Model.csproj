@@ -102,7 +102,7 @@
     <Compile Include="IIndexer.cs" />
     <Compile Include="ItemKind.cs" />
     <Compile Include="IVsServiceProvider.cs" />
-    <Compile Include="DteExtensions.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="ITracer.cs" />
     <Compile Include="OutputWindowTracer.cs" />
     <Compile Include="Project.cs" />

@@ -140,6 +140,12 @@
             return _project.CreateProperty(propertyName, _configuration, _platform);
         }
 
+        public void DeleteProperty(string propertyName)
+        {
+            _project.DeleteProperty(propertyName, _configuration, _platform);
+        }
+
+
         #region IEquatable implementation
 
         /// <summary>

@@ -94,6 +94,18 @@
               dgx:Tools.ApplyInitialSorting="True"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
               dgx:DataGridFilter.ContentFilterFactory="{StaticResource RegexContentFilterFactory}">
+      <DataGrid.Resources>
+        <ContextMenu x:Key="ContextMenu">
+          <MenuItem Header="Copy" Command="{Binding CopyCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+          <MenuItem Header="Paste" Command="{Binding PasteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+          <MenuItem Header="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+        </ContextMenu>
+      </DataGrid.Resources>
+      <DataGrid.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}" ContextMenu="{StaticResource ContextMenu}"/>
+        </ItemsPanelTemplate>
+      </DataGrid.ItemsPanel>
       <DataGrid.Columns>
         <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey" 
                                 dgx:DataGridFilterColumn.Template="{StaticResource {x:Static dgx:DataGridFilter.TextColumnFilterTemplateKey}}">

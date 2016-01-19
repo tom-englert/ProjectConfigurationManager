@@ -73,6 +73,15 @@
             return group?.AddProperty(propertyName);
         }
 
+        public void DeleteProperty(string propertyName, string configuration, string platform)
+        {
+            var item = GetPropertyGroups(configuration, platform)
+                .SelectMany(group => group.Properties)
+                .FirstOrDefault(property => property.Name == propertyName);
+
+            item?.Delete();
+        }
+
         public bool IsSaving { get; private set; }
 
         public DateTime FileTime { get; private set; }
@@ -268,13 +277,7 @@
 
             public void Delete()
             {
-                var previous = _propertyGroupNode.PreviousNode as XText;
-                if ((previous != null) && string.IsNullOrWhiteSpace(previous.Value))
-                {
-                    previous.Remove();
-                }
-
-                _propertyGroupNode.Remove();
+                _propertyGroupNode.RemoveSelfAndWhitespace();
             }
 
             [ContractInvariantMethod]
@@ -313,6 +316,12 @@
                     _node.Value = value;
                     _projectFile.SaveChanges();
                 }
+            }
+
+            public void Delete()
+            {
+                _node.RemoveSelfAndWhitespace();
+                _projectFile.SaveChanges();
             }
 
             [ContractInvariantMethod]

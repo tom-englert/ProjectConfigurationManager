@@ -117,6 +117,11 @@
             return _projectFile.CreateProperty(propertyName, configuration, platform);
         }
 
+        internal void DeleteProperty(string propertyName, string configuration, string platform)
+        {
+            _projectFile.DeleteProperty(propertyName, configuration, platform);
+        }
+
         internal void Delete(ProjectConfiguration configuration)
         {
             if (_internalSpecificProjectConfigurations.Remove(configuration))

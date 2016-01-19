@@ -11,13 +11,15 @@
     using System.Windows.Data;
     using System.Windows.Input;
 
+    using DataGridExtensions;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
 
     public static class ProperitesColumnsMananger
     {
-        private static readonly DependencyProperty _projectConfigurationProperty =
+        internal static readonly DependencyProperty ProjectConfigurationProperty =
             DependencyProperty.RegisterAttached("ProjectProperty", typeof(ProjectPropertyName), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
 
 
@@ -81,7 +83,7 @@
                         .ToArray();
 
                     var columnsToRemove = dataGrid.Columns
-                        .Where(col => (oldColumns?.Contains(col.GetValue(_projectConfigurationProperty))).GetValueOrDefault())
+                        .Where(col => (oldColumns?.Contains(col.GetValue(ProjectConfigurationProperty))).GetValueOrDefault())
                         .ToArray();
 
                     foreach (var column in columnsToRemove)
@@ -107,62 +109,9 @@
 
             column.EnableMultilineEditing();
 
-            column.SetValue(_projectConfigurationProperty, projectPropertyName);
+            column.SetValue(ProjectConfigurationProperty, projectPropertyName);
 
             return column;
-        }
-
-        // TODO: Move to DGX
-        // ReSharper disable once SuggestBaseTypeForParameter : works only with text column!
-        private static void EnableMultilineEditing(this DataGridTextColumn column)
-        {
-            var textBoxStyle = new Style(typeof(TextBox), column.EditingElementStyle);
-            var setters = textBoxStyle.Setters;
-
-            setters.Add(new EventSetter(UIElement.PreviewKeyDownEvent, (KeyEventHandler)EditingElement_PreviewKeyDown));
-            setters.Add(new Setter(TextBoxBase.AcceptsReturnProperty, true));
-
-            textBoxStyle.Seal();
-
-            column.EditingElementStyle = textBoxStyle;
-        }
-
-        private static void EditingElement_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            Contract.Requires(sender != null);
-
-            if (e.Key != Key.Return)
-                return;
-
-            e.Handled = true;
-            var editingElement = (TextBox)sender;
-
-            if (IsKeyDown(Key.LeftCtrl) || IsKeyDown(Key.RightCtrl))
-            {
-                // Ctrl+Return adds a new line
-                editingElement.SelectedText = Environment.NewLine;
-                editingElement.SelectionLength = 0;
-                editingElement.SelectionStart += Environment.NewLine.Length;
-            }
-            else
-            {
-                // Return without Ctrl: Forward to parent, grid should move focused cell down.
-                var parent = (FrameworkElement)editingElement.Parent;
-                if (parent == null)
-                    return;
-
-                var args = new KeyEventArgs(e.KeyboardDevice, e.InputSource, e.Timestamp, Key.Return)
-                {
-                    RoutedEvent = UIElement.KeyDownEvent
-                };
-
-                parent.RaiseEvent(args);
-            }
-        }
-
-        private static bool IsKeyDown(this Key key)
-        {
-            return (Keyboard.GetKeyStates(key) & KeyStates.Down) != 0;
         }
     }
 }
