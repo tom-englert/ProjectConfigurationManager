@@ -5,3 +5,7 @@ Color highlighting let's you verify at a glance if the configurations of your pr
 Initialize new projects by simply copy/paste defaults from other projects.
 
  Find more information on the [project page](http://tom-englert.github.io/ProjectConfigurationManager).
+
+![Project Properties](http://tom-englert.github.io/ProjectConfigurationManager/images/ProjectProperties.png)
+
+![Build Configuration](http://tom-englert.github.io/ProjectConfigurationManager/images/BuildConfiguration.png)
