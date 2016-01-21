@@ -9,3 +9,4 @@ Initialize new projects by simply copy/paste defaults from other projects.
 ![Project Properties](http://tom-englert.github.io/ProjectConfigurationManager/images/ProjectProperties.png)
 
 ![Build Configuration](http://tom-englert.github.io/ProjectConfigurationManager/images/BuildConfiguration.png)
+
