@@ -4,7 +4,7 @@ using System.Resources;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("tom-englert.de")]
-[assembly: AssemblyProduct("ProjectConfigurationManager")]
+[assembly: AssemblyProduct("Project Configuration Manager")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
