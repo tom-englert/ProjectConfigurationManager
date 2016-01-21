@@ -6,5 +6,6 @@ Initialize new projects by simply copy/paste defaults from other projects.
 
  Find more information on the [project page](http://tom-englert.github.io/ProjectConfigurationManager).
 
-![Build Configuration](http://tom-englert.github.io/ProjectConfigurationManager/images/BuildConfiguration.png)
+![Project Properties](http://tom-englert.github.io/ProjectConfigurationManager/images/ProjectProperties.png)
 
+![Build Configuration](http://tom-englert.github.io/ProjectConfigurationManager/images/BuildConfiguration.png)
