@@ -223,10 +223,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Package.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProjectConfigurationManager.Model\ProjectConfigurationManager.Model.csproj">
