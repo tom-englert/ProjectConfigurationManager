@@ -6,8 +6,8 @@
     <Description xml:space="preserve">A Visual Studio extension to ease management of solution and project configurations.</Description>
     <MoreInfo>http://tom-englert.github.io/ProjectConfigurationManager</MoreInfo>
     <Icon>Resources\Icon.png</Icon>
-    <PreviewImage>Resources\Icon.png</PreviewImage>
-    <Tags>Configuration;Soution;Project</Tags>
+    <PreviewImage>Resources\ScreenShot.png</PreviewImage>
+    <Tags>Configuration, ConfigurationManager, Solution Configuration, Configuration Manager, Project Configuration</Tags>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0,15.0)" />
