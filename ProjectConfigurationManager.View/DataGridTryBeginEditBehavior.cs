@@ -32,10 +32,10 @@
             Contract.Requires(e.Column != null);
 
             var dataGridRow = e.Row;
-            var configuration = (ProjectConfiguration)dataGridRow.Item;
-            var project = configuration.Project;
+            var configuration = dataGridRow.Item as ProjectConfiguration;
+            var project = configuration?.Project;
 
-            if (!project.CanEdit())
+            if (project == null || !project.CanEdit())
             {
                 e.Cancel = true;
             }

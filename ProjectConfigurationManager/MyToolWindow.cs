@@ -1,5 +1,6 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager
 {
+    using System;
     using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
     using System.ComponentModel.Composition.Registration;
@@ -29,6 +30,7 @@
     public class MyToolWindow : ToolWindowPane, IVsServiceProvider
     {
         private readonly ICompositionHost _compositionHost = new CompositionHost();
+        private readonly ITracer _tracer;
 
         /// <summary>
         /// Standard constructor for the tool window.
@@ -42,23 +44,30 @@
             BitmapIndex = 1;
 
             var path = Path.GetDirectoryName(GetType().Assembly.Location);
-            Contract.Assume(path != null);
 
-            var context = new RegistrationBuilder();
-            context.ForTypesDerivedFrom<FrameworkElement>().SetCreationPolicy(CreationPolicy.NonShared);
+            var context = CreateRegistrationContext();
 
             _compositionHost.AddCatalog(new DirectoryCatalog(path, "*.dll", context));
             _compositionHost.ComposeExportedValue((IVsServiceProvider)this);
+
+            _tracer = _compositionHost.GetExportedValue<ITracer>();
         }
 
         protected override void OnCreate()
         {
-            base.OnCreate();
+            try
+            {
+                base.OnCreate();
 
-            var view = _compositionHost.GetExportedValue<ShellView>();
-            view.Resources.MergedDictionaries.Add(DataTemplateManager.CreateDynamicDataTemplates(_compositionHost.Container));
+                var view = _compositionHost.GetExportedValue<ShellView>();
+                view.Resources.MergedDictionaries.Add(DataTemplateManager.CreateDynamicDataTemplates(_compositionHost.Container));
 
-            Content = view;
+                Content = view;
+            }
+            catch (Exception ex)
+            {
+                _tracer.TraceError(ex);
+            }
         }
 
         protected override void OnClose()
@@ -66,6 +75,16 @@
             base.OnClose();
 
             _compositionHost.Dispose();
+        }
+
+        [ContractVerification(false)]
+        private static RegistrationBuilder CreateRegistrationContext()
+        {
+            Contract.Ensures(Contract.Result<RegistrationBuilder>() != null);
+
+            var context = new RegistrationBuilder();
+            context.ForTypesDerivedFrom<FrameworkElement>().SetCreationPolicy(CreationPolicy.NonShared);
+            return context;
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows.Threading;
@@ -14,6 +15,9 @@
         private readonly string _configuration;
         private readonly string _platform;
         private readonly Project _project;
+        private readonly IIndexer<bool?> _shouldBuild;
+        private readonly IIndexer<string> _propertyValue;
+
         private IDictionary<string, IProjectProperty> _properties = new Dictionary<string, IProjectProperty>();
 
         internal ProjectConfiguration(Project project, string configuration, string platform)
@@ -24,23 +28,53 @@
             _configuration = configuration;
             _platform = platform;
 
-            ShouldBuild = new ShouldBuildIndexer(this);
-            PropertyValue = new PropertyValueIndexer(this);
+            _shouldBuild = new ShouldBuildIndexer(this);
+            _propertyValue = new PropertyValueIndexer(this);
         }
 
-        public Project Project => _project;
+        public Project Project
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Project>() != null);
+                return _project;
+            }
+        }
 
         public string Configuration => _configuration;
 
         public string Platform => _platform;
 
-        public IIndexer<bool?> ShouldBuild { get; }
+        public IIndexer<bool?> ShouldBuild
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IIndexer<bool?>>() != null);
+                return _shouldBuild;
+            }
+        }
 
-        public IIndexer<string> PropertyValue { get; }
+        public IIndexer<string> PropertyValue
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IIndexer<string>>() != null);
+                return _propertyValue;
+            }
+        }
+
+        internal IDictionary<string, IProjectProperty> PropertyLookup
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IDictionary<string, IProjectProperty>>() != null);
+                return _properties;
+            }
+        }
 
         public void Delete()
         {
-            _project.Delete(this);
+            Project.Delete(this);
         }
 
         public bool ShouldBuildInAnyConfiguration()
@@ -50,6 +84,8 @@
 
         internal void SetProjectFile(ProjectFile projectFile)
         {
+            Contract.Requires(projectFile != null);
+
             var properties = projectFile
                 .GetPropertyGroups(_configuration, _platform)
                 .SelectMany(group => group.Properties)
@@ -74,6 +110,8 @@
 
             public ShouldBuildIndexer(ProjectConfiguration projectConfiguration)
             {
+                Contract.Requires(projectConfiguration != null);
+
                 _projectConfiguration = projectConfiguration;
             }
 
@@ -91,7 +129,9 @@
                 set
                 {
                     var context = _projectConfiguration.Project.SolutionContexts
-                        .Single(ctx => (ctx.SolutionConfiguration.UniqueName == solutionConfiguration));
+                        .FirstOrDefault(ctx => (ctx.SolutionConfiguration.UniqueName == solutionConfiguration));
+
+                    Contract.Assume(context != null);
 
                     var configChanged = context.SetConfiguration(_projectConfiguration);
 
@@ -106,6 +146,13 @@
                     });
                 }
             }
+
+            [ContractInvariantMethod]
+            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+            private void ObjectInvariant()
+            {
+                Contract.Invariant(_projectConfiguration != null);
+            }
         }
 
         private class PropertyValueIndexer : IIndexer<string>
@@ -114,6 +161,8 @@
 
             public PropertyValueIndexer(ProjectConfiguration projectConfiguration)
             {
+                Contract.Requires(projectConfiguration != null);
+
                 _projectConfiguration = projectConfiguration;
             }
 
@@ -121,11 +170,11 @@
             {
                 get
                 {
-                    return _projectConfiguration._properties.GetValueOrDefault(propertyName)?.Value;
+                    return _projectConfiguration.PropertyLookup.GetValueOrDefault(propertyName)?.Value;
                 }
                 set
                 {
-                    var property = _projectConfiguration._properties.ForceValue(propertyName, _projectConfiguration.CreateProperty);
+                    var property = _projectConfiguration.PropertyLookup.ForceValue(propertyName, _projectConfiguration.CreateProperty);
 
                     if (property == null)
                         throw new ArgumentException("Unable to create property: " + propertyName, nameof(propertyName));
@@ -133,18 +182,24 @@
                     property.Value = value;
                 }
             }
+
+            [ContractInvariantMethod]
+            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+            private void ObjectInvariant()
+            {
+                Contract.Invariant(_projectConfiguration != null);
+            }
         }
 
         private IProjectProperty CreateProperty(string propertyName)
         {
-            return _project.CreateProperty(propertyName, _configuration, _platform);
+            return Project.CreateProperty(propertyName, _configuration, _platform);
         }
 
         public void DeleteProperty(string propertyName)
         {
-            _project.DeleteProperty(propertyName, _configuration, _platform);
+            Project.DeleteProperty(propertyName, _configuration, _platform);
         }
-
 
         #region IEquatable implementation
 
@@ -156,7 +211,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _project.GetHashCode() + (_configuration?.GetHashCode()).GetValueOrDefault() + (_platform?.GetHashCode()).GetValueOrDefault();
+            return Project.GetHashCode() + (_configuration?.GetHashCode()).GetValueOrDefault() + (_platform?.GetHashCode()).GetValueOrDefault();
         }
 
         /// <summary>
@@ -188,7 +243,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return (left._project == right._project)
+            return (left.Project == right.Project)
                    && (left._configuration == right._configuration)
                    && (left._platform == right._platform);
         }
@@ -210,5 +265,15 @@
         }
 
         #endregion
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_project != null);
+            Contract.Invariant(_shouldBuild != null);
+            Contract.Invariant(_propertyValue != null);
+            Contract.Invariant(_properties != null);
+        }
     }
 }

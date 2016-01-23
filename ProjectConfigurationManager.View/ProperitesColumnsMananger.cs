@@ -1,15 +1,12 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
-    using System;
     using System.Collections;
     using System.Collections.Specialized;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Controls.Primitives;
     using System.Windows.Data;
-    using System.Windows.Input;
 
     using DataGridExtensions;
 
@@ -26,19 +23,14 @@
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
         public static ICollection GetProperites(DependencyObject obj)
         {
+            Contract.Requires(obj != null);
             return (ICollection)obj.GetValue(ProperitesProperty);
         }
         public static void SetProperites(DependencyObject obj, ICollection value)
         {
+            Contract.Requires(obj != null);
             obj.SetValue(ProperitesProperty, value);
         }
-        /// <summary>
-        /// Identifies the <see cref="P:tomenglertde.ProjectConfigurationManager.View.ProperitesColumnsMananger.Properites"/> attached property
-        /// </summary>
-        /// <AttachedPropertyComments>
-        /// <summary>
-        /// </summary>
-        /// </AttachedPropertyComments>
         public static readonly DependencyProperty ProperitesProperty =
             DependencyProperty.RegisterAttached("Properites", typeof(ICollection), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null, Properties_Changed));
 
@@ -88,6 +80,8 @@
 
                     foreach (var column in columnsToRemove)
                     {
+                        Contract.Assume(column != null);
+                        // Hide first as a hint that this column is no longer valid => e.g. OnCopyingCellClipboardContent crashes when called for removed columns.
                         column.Visibility = Visibility.Collapsed;
                         dataGrid.Columns.Remove(column);
                     }
@@ -98,6 +92,8 @@
 
         private static DataGridColumn CreateColumn(ProjectPropertyName projectPropertyName)
         {
+            Contract.Requires(projectPropertyName != null);
+
             var column = new DataGridTextColumn
             {
                 Header = projectPropertyName.DisplayName,

@@ -29,15 +29,6 @@
             Contract.Requires(solution != null);
 
             _solution = solution;
-
-            // var propertyNames = solution.ProjectProperties.Select(p => p.Name).ToArray();
-
-            //_propertyGrouping.Groups = new[]
-            //{
-            //    new PropertyGroup { Name = "Global", Properties = new[] { "ProjectGuid", "OutputType" } },
-            //    new PropertyGroup { Name = "CodeContracts", Properties = propertyNames.Where(name => name.StartsWith("CodeContracts", StringComparison.Ordinal)).ToArray()},
-            //    new PropertyGroup { Name = "Publish", Properties = new[] { "" }},
-            //};
         }
 
         public Solution Solution
@@ -71,15 +62,14 @@
         private void Paste(DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
-            dataGrid.PasteCells(ClipboardHelper.GetClipboardDataAsTable());
+            var data = ClipboardHelper.GetClipboardDataAsTable();
+            if (data != null)
+                dataGrid.PasteCells(data);
         }
 
         private bool CanPaste(DataGrid dataGrid)
         {
-            if (dataGrid == null)
-                return false;
-
-            return Clipboard.ContainsText() && !dataGrid.SelectedCells.Any(cell => cell.Column.IsReadOnly);
+            return Clipboard.ContainsText() && (dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false);
         }
 
         public ICommand DeleteCommand => new DelegateCommand<DataGrid>(CanDelete, Delete);
@@ -87,21 +77,22 @@
         private void Delete(DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
+            Contract.Requires(dataGrid.SelectedCells != null);
+
             foreach (var cell in dataGrid.SelectedCells)
             {
                 var configuration = (ProjectConfiguration)cell.Item;
                 var propertyName = (ProjectPropertyName)cell.Column.GetValue(ProperitesColumnsMananger.ProjectConfigurationProperty);
-
-                configuration.DeleteProperty(propertyName.Name);
+                if (propertyName != null)
+                {
+                    configuration.DeleteProperty(propertyName.Name);
+                }
             }
         }
 
         private bool CanDelete(DataGrid dataGrid)
         {
-            if (dataGrid == null)
-                return false;
-
-            return !dataGrid.SelectedCells.Any(cell => cell.Column.IsReadOnly);
+            return dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false;
         }
 
         [ContractInvariantMethod]

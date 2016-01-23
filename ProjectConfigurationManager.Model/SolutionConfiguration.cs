@@ -14,30 +14,63 @@
         private readonly Solution _solution;
         private readonly EnvDTE80.SolutionConfiguration2 _solutionConfiguration;
         private readonly ObservableCollection<SolutionContext> _contexts = new ObservableCollection<SolutionContext>();
+        private readonly string _name;
+        private readonly string _platformName;
 
         internal SolutionConfiguration(Solution solution, EnvDTE80.SolutionConfiguration2 solutionConfiguration)
         {
             Contract.Requires(solution != null);
             Contract.Requires(solutionConfiguration != null);
+            Contract.Assume(solutionConfiguration.SolutionContexts != null);
 
             _solution = solution;
             _solutionConfiguration = solutionConfiguration;
+            _name = _solutionConfiguration.Name;
+            _platformName = _solutionConfiguration.PlatformName;
 
             Update();
         }
 
-        public string Name => _solutionConfiguration.Name;
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _name;
+            }
+        }
 
-        public string PlatformName => _solutionConfiguration.PlatformName;
+        public string PlatformName
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _platformName;
+            }
+        }
 
-        public string UniqueName => Name + "|" + PlatformName;
+        public string UniqueName
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return Name + "|" + PlatformName;
+            }
+        }
 
-        public ObservableCollection<SolutionContext> Contexts => _contexts;
+        public ObservableCollection<SolutionContext> Contexts
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ObservableCollection<SolutionContext>>() != null);
+                return _contexts;
+            }
+        }
 
         internal void Update()
         {
-            _contexts.SynchronizeWith(_solutionConfiguration.SolutionContexts
-                .OfType<EnvDTE.SolutionContext>()
+            _contexts.SynchronizeWith(_solutionConfiguration
+                .SolutionContexts.OfType<EnvDTE.SolutionContext>()
                 .Select(ctx => new SolutionContext(_solution, this, ctx))
                 .ToArray());
         }
@@ -111,7 +144,11 @@
         {
             Contract.Invariant(_solution != null);
             Contract.Invariant(_solutionConfiguration != null);
+            Contract.Invariant(_name != null);
+            Contract.Invariant(_platformName != null);
+            Contract.Invariant(_contexts != null);
             Contract.Invariant(Contexts != null);
+            Contract.Invariant(_solutionConfiguration.SolutionContexts != null);
         }
     }
 }

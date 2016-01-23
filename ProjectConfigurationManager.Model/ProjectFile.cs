@@ -13,25 +13,26 @@
 
     using Microsoft.VisualStudio.Shell.Interop;
 
+    using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
     class ProjectFile
     {
+        private const string ConditionAttributeName = "Condition";
+
         private static readonly XNamespace _xmlns = XNamespace.Get(@"http://schemas.microsoft.com/developer/msbuild/2003");
         private static readonly XName _propertyGroupNodeName = _xmlns.GetName("PropertyGroup");
-        private const string _conditionAttributeName = "Condition";
 
         private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
         private readonly DispatcherThrottle _deferredSaveThrottle;
         private readonly XDocument _document;
         private readonly Solution _solution;
-        private readonly EnvDTE.Project _project;
+        private readonly Project _project;
         private readonly Guid _projectGuid;
-        private readonly string _fullName;
 
         private ProjectPropertyGroup[] _propertyGroups;
 
-        public ProjectFile(Solution solution, EnvDTE.Project project)
+        public ProjectFile(Solution solution, Project project)
         {
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
@@ -39,35 +40,31 @@
             _deferredSaveThrottle = new DispatcherThrottle(SaveProjectFile);
             _solution = solution;
             _project = project;
-            _fullName = project.FullName;
 
-            FileTime = File.GetLastWriteTime(_fullName);
+            FileTime = File.GetLastWriteTime(project.FullName);
 
             _projectGuid = GetProjectGuid(solution, project.UniqueName);
 
-            try
-            {
-                // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
-                _document = XDocument.Load(_fullName, LoadOptions.PreserveWhitespace);
+            // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
+            _document = XDocument.Load(project.FullName, LoadOptions.PreserveWhitespace);
 
-                _propertyGroups = _document
-                    .Descendants(_propertyGroupNodeName)
-                    .Where(node => node.Parent?.Name.LocalName == "Project")
-                    .Select(node => new ProjectPropertyGroup(this, node))
-                    .ToArray();
-            }
-            catch
-            {
-            }
+            _propertyGroups = _document
+                .Descendants(_propertyGroupNodeName)
+                .Where(node => node.Parent?.Name.LocalName == "Project")
+                .Select(node => new ProjectPropertyGroup(this, node))
+                .ToArray();
         }
 
         public IEnumerable<IProjectPropertyGroup> GetPropertyGroups(string configuration, string platform)
         {
+            Contract.Ensures(Contract.Result<IEnumerable<IProjectPropertyGroup>>() != null);
             return _propertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
         }
 
         public IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
         {
+            Contract.Requires(propertyName != null);
+
             var group = GetPropertyGroups(configuration, platform).FirstOrDefault();
 
             return group?.AddProperty(propertyName);
@@ -75,6 +72,8 @@
 
         public void DeleteProperty(string propertyName, string configuration, string platform)
         {
+            Contract.Requires(propertyName != null);
+
             var item = GetPropertyGroups(configuration, platform)
                 .SelectMany(group => group.Properties)
                 .FirstOrDefault(property => property.Name == propertyName);
@@ -88,7 +87,7 @@
 
         internal bool CanEdit()
         {
-            return IsSaved && CanCheckout() && IsWritable;
+            return CanCheckout() && IsWritable;
         }
 
         private bool CanCheckout()
@@ -97,7 +96,7 @@
             if (service == null)
                 return true;
 
-            var files = new[] { _fullName };
+            var files = new[] { _project.FullName };
             uint editVerdict;
             uint moreInfo;
 
@@ -111,10 +110,7 @@
 
             _propertyGroups = _propertyGroups.Except(groupsToDelete).ToArray();
 
-            foreach (var group in groupsToDelete)
-            {
-                group.Delete();
-            }
+            groupsToDelete.ForEach(group => group.Delete());
 
             SaveChanges();
         }
@@ -131,7 +127,7 @@
             _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () =>
             {
                 IsSaving = false;
-                FileTime = File.GetLastWriteTime(_fullName);
+                FileTime = File.GetLastWriteTime(_project.FullName);
             });
 
             var projectGuid = _projectGuid;
@@ -139,7 +135,7 @@
 
             Contract.Assume(solution != null);
 
-            if (!IsSaved)
+            if (!_project.IsSaved)
                 return;
 
             solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
@@ -150,7 +146,7 @@
                 IndentChars = "  "
             };
 
-            using (var writer = XmlWriter.Create(_fullName, settings))
+            using (var writer = XmlWriter.Create(_project.FullName, settings))
             {
                 _document.WriteTo(writer);
             }
@@ -158,24 +154,11 @@
             solution.ReloadProject(ref projectGuid);
         }
 
-        private bool IsSaved
-        {
-            get
-            {
-                try
-                {
-                    return _project.Saved;
-                }
-                catch
-                {
-                    // project is currently unloaded...
-                    return true;
-                }
-            }
-        }
-
         private static Guid GetProjectGuid(IServiceProvider serviceProvider, string uniqueName)
         {
+            Contract.Requires(serviceProvider != null);
+            Contract.Requires(uniqueName != null);
+
             var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
             Contract.Assume(solution != null);
 
@@ -194,10 +177,10 @@
             {
                 try
                 {
-                    if ((File.GetAttributes(_fullName) & (FileAttributes.ReadOnly | FileAttributes.System)) != 0)
+                    if ((File.GetAttributes(_project.FullName) & (FileAttributes.ReadOnly | FileAttributes.System)) != 0)
                         return false;
 
-                    using (File.Open(_fullName, FileMode.Open, FileAccess.Write))
+                    using (File.Open(_project.FullName, FileMode.Open, FileAccess.Write))
                     {
                         return true;
                     }
@@ -225,7 +208,7 @@
 
                 _properties = new ObservableCollection<ProjectProperty>(
                     _propertyGroupNode.Elements()
-                        .Where(node => node.GetAttribute(_conditionAttributeName) == null)
+                        .Where(node => node.GetAttribute(ConditionAttributeName) == null)
                         .Select(node => new ProjectProperty(projectFile, node)));
             }
 
@@ -257,7 +240,7 @@
 
             public bool MatchesConfiguration(string configuration, string platform)
             {
-                var conditionExpression = _propertyGroupNode.GetAttribute(_conditionAttributeName);
+                var conditionExpression = _propertyGroupNode.GetAttribute(ConditionAttributeName);
 
                 if (string.IsNullOrEmpty(conditionExpression))
                     return string.IsNullOrEmpty(configuration) && string.IsNullOrEmpty(platform);

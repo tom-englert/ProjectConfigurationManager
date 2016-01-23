@@ -8,11 +8,8 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Windows.Threading;
-
-    using tomenglertde.ResXManager.Model;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -54,13 +51,15 @@
             _defaultProjectConfigurations = Projects.ObservableSelect(prj => prj.DefaultProjectConfiguration);
             _projectConfigurations = new ObservableCompositeCollection<ProjectConfiguration>(_defaultProjectConfigurations, _specificProjectConfigurations);
 
-            _solutionEvents = Dte.Events.SolutionEvents;
-
-            _solutionEvents.Opened += Solution_Changed;
-            _solutionEvents.AfterClosing += Solution_Changed;
-            _solutionEvents.ProjectAdded += _ => Solution_Changed();
-            _solutionEvents.ProjectRemoved += _ => Solution_Changed();
-            _solutionEvents.ProjectRenamed += (_, __) => Solution_Changed();
+            _solutionEvents = Dte?.Events?.SolutionEvents;
+            if (_solutionEvents != null)
+            {
+                _solutionEvents.Opened += Solution_Changed;
+                _solutionEvents.AfterClosing += Solution_Changed;
+                _solutionEvents.ProjectAdded += _ => Solution_Changed();
+                _solutionEvents.ProjectRemoved += _ => Solution_Changed();
+                _solutionEvents.ProjectRenamed += (_, __) => Solution_Changed();
+            }
 
             Update();
         }
@@ -70,19 +69,68 @@
             _deferredUpdateThrottle.Tick();
         }
 
-        public ObservableCollection<Project> Projects => _projects;
+        public ObservableCollection<Project> Projects
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ObservableCollection<Project>>() != null);
+                return _projects;
+            }
+        }
 
-        public ObservableCollection<SolutionConfiguration> SolutionConfigurations => _configurations;
+        public ObservableCollection<SolutionConfiguration> SolutionConfigurations
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ObservableCollection<SolutionConfiguration>>() != null);
+                return _configurations;
+            }
+        }
 
-        public IObservableCollection<SolutionContext> SolutionContexts => _solutionContexts;
+        public IObservableCollection<SolutionContext> SolutionContexts
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IObservableCollection<SolutionContext>>() != null);
+                return _solutionContexts;
+            }
+        }
 
-        public IObservableCollection<ProjectConfiguration> ProjectConfigurations => _projectConfigurations;
+        public IObservableCollection<ProjectConfiguration> ProjectConfigurations
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IObservableCollection<ProjectConfiguration>>() != null);
+                return _projectConfigurations;
+            }
+        }
 
-        public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
+        public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IObservableCollection<ProjectConfiguration>>() != null);
+                return _specificProjectConfigurations;
+            }
+        }
 
-        public ObservableCollection<ProjectPropertyName> ProjectProperties => _projectProperties;
+        public ObservableCollection<ProjectPropertyName> ProjectProperties
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ObservableCollection<ProjectPropertyName>>() != null);
+                return _projectProperties;
+            }
+        }
 
-        public ObservableCollection<string> ProjectTypeGuids => _projectTypeGuids;
+        public ObservableCollection<string> ProjectTypeGuids
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ObservableCollection<string>>() != null);
+                return _projectTypeGuids;
+            }
+        }
 
         public string SolutionFolder
         {
@@ -110,51 +158,66 @@
 
         public void Update()
         {
-            SynchronizeCollections();
+            try
+            {
+                SynchronizeCollections();
 
-            SetupFileSystemWatcher();
+                SetupFileSystemWatcher();
+            }
+            catch (Exception ex)
+            {
+                _tracer.TraceError(ex);
+            }
         }
 
         private void SetupFileSystemWatcher()
         {
-            var solutionFolder = SolutionFolder;
-
-            if (string.Equals(_fileSystemWatcher?.Path, solutionFolder, StringComparison.OrdinalIgnoreCase))
-                return;
-
-            FileSystemWatcher watcher = null;
-
-            if (solutionFolder != null)
+            try
             {
-                watcher = new FileSystemWatcher(solutionFolder, "*.*")
+                var solutionFolder = SolutionFolder;
+
+                if (string.Equals(_fileSystemWatcher?.Path, solutionFolder, StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                FileSystemWatcher watcher = null;
+
+                if (solutionFolder != null)
                 {
-                    EnableRaisingEvents = true,
-                    NotifyFilter = NotifyFilters.LastWrite,
-                    IncludeSubdirectories = true
-                };
+                    watcher = new FileSystemWatcher(solutionFolder, "*.*")
+                    {
+                        EnableRaisingEvents = true,
+                        NotifyFilter = NotifyFilters.LastWrite,
+                        IncludeSubdirectories = true
+                    };
 
-                watcher.Changed += Watcher_Changed;
+                    watcher.Changed += Watcher_Changed;
+                }
+
+                Interlocked.Exchange(ref _fileSystemWatcher, watcher)?.Dispose();
             }
-
-            Interlocked.Exchange(ref _fileSystemWatcher, watcher)?.Dispose();
+            catch (Exception ex)
+            {
+                _tracer.TraceError(ex);
+            }
         }
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             Dispatcher.BeginInvoke(() =>
             {
-                var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
-
-                if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
-                    return;
-
                 try
                 {
+                    var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
+
+                    if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
+                        return;
+
                     project.Reload();
                     SynchronizeCollections();
                 }
-                catch (ExternalException)
+                catch (Exception ex)
                 {
+                    _tracer.TraceError(ex);
                 }
             });
         }
@@ -174,18 +237,21 @@
         {
             Contract.Ensures(Contract.Result<IEnumerable<SolutionConfiguration>>() != null);
 
-            return DteSolution?.SolutionBuild.SolutionConfigurations
-                .OfType<EnvDTE80.SolutionConfiguration2>()
+            return DteSolution?.SolutionBuild?.SolutionConfigurations?.OfType<EnvDTE80.SolutionConfiguration2>()
                 .Select(item => new SolutionConfiguration(this, item)) ?? Enumerable.Empty<SolutionConfiguration>();
         }
 
         private IEnumerable<Project> GetProjects()
         {
+            Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
+
             return GetDteProjects().Select(project => new Project(this, project));
         }
 
         private IEnumerable<EnvDTE.Project> GetDteProjects()
         {
+            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
+
             var items = new List<EnvDTE.Project>();
 
             var projects = DteSolution?.Projects;
@@ -210,6 +276,8 @@
 
         private void GetProjectOrSubProjects(ICollection<EnvDTE.Project> items, EnvDTE.Project project)
         {
+            Contract.Requires(items != null);
+
             if (project == null)
                 return;
 
@@ -225,7 +293,10 @@
                     return;
                 }
 
-                foreach (var projectItem in project.ProjectItems.OfType<EnvDTE.ProjectItem>())
+                var projectItems = project.ProjectItems;
+                Contract.Assume(projectItems != null);
+
+                foreach (var projectItem in projectItems.OfType<EnvDTE.ProjectItem>())
                 {
                     try
                     {
@@ -245,6 +316,8 @@
 
         private IEnumerable<ProjectPropertyName> GetProjectProperties()
         {
+            Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyName>>() != null);
+
             return Projects
                 .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties))
                 .Select(prop => prop.Name)
@@ -276,6 +349,7 @@
             Contract.Invariant(_serviceProvider != null);
             Contract.Invariant(_projects != null);
             Contract.Invariant(_configurations != null);
+            Contract.Invariant(Projects != null);
         }
     }
 }

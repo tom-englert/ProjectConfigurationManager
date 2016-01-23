@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
     using System.Windows;
@@ -56,6 +57,9 @@
 
         private static string GetColumnText(DataGridColumn column, object dataContext)
         {
+            Contract.Requires(column != null);
+            Contract.Requires(dataContext != null);
+
             try
             {
                 if (column.Visibility != Visibility.Visible)

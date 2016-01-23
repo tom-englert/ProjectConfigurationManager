@@ -1,7 +1,7 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
-    using System.Linq;
+    using System.Diagnostics.Contracts;
 
     using TomsToolbox.Desktop;
 
@@ -13,6 +13,10 @@
 
         public SolutionContext(Solution solution, SolutionConfiguration solutionConfiguration, EnvDTE.SolutionContext ctx)
         {
+            Contract.Requires(solution != null);
+            Contract.Requires(solutionConfiguration != null);
+            Contract.Requires(ctx != null);
+
             _solution = solution;
             _solutionConfiguration = solutionConfiguration;
             _ctx = ctx;
@@ -24,13 +28,15 @@
 
         public bool SetConfiguration(ProjectConfiguration configuration)
         {
+            Contract.Requires(configuration != null);
+
             if ((_ctx.ConfigurationName == configuration.Configuration) && (_ctx.PlatformName == configuration.Platform))
                 return false;
 
             _ctx.ConfigurationName = configuration.Configuration + "|" + configuration.Platform;
 
-            OnPropertyChanged(() => ConfigurationName);
-            OnPropertyChanged(() => PlatformName);
+            OnPropertyChanged(nameof(ConfigurationName));
+            OnPropertyChanged(nameof(PlatformName));
 
             return true;
         }
@@ -50,9 +56,14 @@
             }
         }
 
-        public SolutionConfiguration SolutionConfiguration => _solutionConfiguration;
-
-        public Project Project => _solution.Projects.FirstOrDefault(p => p.UniqueName == _ctx.ProjectName);
+        public SolutionConfiguration SolutionConfiguration
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<SolutionConfiguration>() != null);
+                return _solutionConfiguration;
+            }
+        }
 
         #region IEquatable implementation
 
@@ -115,5 +126,14 @@
         }
 
         #endregion
+
+        [ContractInvariantMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_solution != null);
+            Contract.Invariant(_solutionConfiguration != null);
+            Contract.Invariant(_ctx != null);
+        }
     }
 }

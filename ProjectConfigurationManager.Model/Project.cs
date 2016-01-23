@@ -32,6 +32,8 @@
         {
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
+            Contract.Requires(!string.IsNullOrEmpty(project.FullName));
+            Contract.Requires(!string.IsNullOrEmpty(project.UniqueName));
 
             _solution = solution;
             _project = project;
@@ -39,7 +41,7 @@
             _name = _project.Name;
             _fullName = _project.FullName;
 
-            _projectFile = new ProjectFile(solution, project);
+            _projectFile = new ProjectFile(solution, this);
 
             _defaultProjectConfiguration = new ProjectConfiguration(this, null, null);
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
@@ -48,38 +50,124 @@
             Update();
         }
 
-        public Solution Solution => _solution;
+        public Solution Solution
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Solution>() != null);
+                return _solution;
+            }
+        }
 
-        public string Name => _name;
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _name;
+            }
+        }
 
-        public string UniqueName => _uniqueName;
+        public string UniqueName
+        {
+            get
+            {
+                Contract.Ensures(!string.IsNullOrEmpty(Contract.Result<string>()));
+                return _uniqueName;
+            }
+        }
 
-        public string RelativePath => Path.GetDirectoryName(UniqueName);
+        public string RelativePath
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return Path.GetDirectoryName(UniqueName);
+            }
+        }
 
-        public string SortKey => _name + " (" + RelativePath + ")";
+        public string SortKey
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _name + " (" + RelativePath + ")";
+            }
+        }
 
-        public string FullName => _fullName;
+        public string FullName
+        {
+            get
+            {
+                Contract.Ensures(!string.IsNullOrEmpty(Contract.Result<string>()));
+                return _fullName;
+            }
+        }
 
-        public string[] ProjectTypeGuids => GetProjectTypeGuids();
+        public string[] ProjectTypeGuids
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string[]>() != null);
+                return RetrieveProjectTypeGuids();
+            }
+        }
 
-        public IObservableCollection<SolutionContext> SolutionContexts => _solutionContexts;
+        public IObservableCollection<SolutionContext> SolutionContexts
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IObservableCollection<SolutionContext>>() != null);
+                return _solutionContexts;
+            }
+        }
 
-        public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations => _specificProjectConfigurations;
+        public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ReadOnlyObservableCollection<ProjectConfiguration>>() != null);
+                return _specificProjectConfigurations;
+            }
+        }
 
-        public ProjectConfiguration DefaultProjectConfiguration => _defaultProjectConfiguration;
+        public ProjectConfiguration DefaultProjectConfiguration
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ProjectConfiguration>() != null);
+                return _defaultProjectConfiguration;
+            }
+        }
 
         public bool IsSaving => _projectFile.IsSaving;
 
         public DateTime FileTime => _projectFile.FileTime;
 
+        internal bool IsSaved
+        {
+            get
+            {
+                try
+                {
+                    return _project.Saved;
+                }
+                catch
+                {
+                    // project is currently unloaded...
+                    return true;
+                }
+            }
+        }
+
         public bool CanEdit()
         {
-            return _projectFile.CanEdit();
+            return IsSaved && _projectFile.CanEdit();
         }
 
         public void Reload()
         {
-            _projectFile = new ProjectFile(_solution, _project);
+            _projectFile = new ProjectFile(_solution, this);
 
             Update();
         }
@@ -106,32 +194,38 @@
 
             _defaultProjectConfiguration.SetProjectFile(_projectFile);
 
-            foreach (var config in _internalSpecificProjectConfigurations)
-            {
-                config.SetProjectFile(_projectFile);
-            }
+            _internalSpecificProjectConfigurations.ForEach(config => config.SetProjectFile(_projectFile));
+
         }
 
         internal IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
         {
+            Contract.Requires(propertyName != null);
+
             return _projectFile.CreateProperty(propertyName, configuration, platform);
         }
 
         internal void DeleteProperty(string propertyName, string configuration, string platform)
         {
+            Contract.Requires(propertyName != null);
+
             _projectFile.DeleteProperty(propertyName, configuration, platform);
         }
 
         internal void Delete(ProjectConfiguration configuration)
         {
+            Contract.Requires(configuration != null);
+
             if (_internalSpecificProjectConfigurations.Remove(configuration))
             {
                 _projectFile.DeleteConfiguration(configuration.Configuration, configuration.Platform);
             }
         }
 
-        private string[] GetProjectTypeGuids()
+        private string[] RetrieveProjectTypeGuids()
         {
+            Contract.Ensures(Contract.Result<string[]>() != null);
+
             return (_defaultProjectConfiguration.PropertyValue["ProjectTypeGuids"] ?? ProjectTypeGuid.Unspecified)
                 .Split(';')
                 .Select(item => item.Trim())
@@ -202,16 +296,21 @@
 
         public override string ToString()
         {
-            return Name;
+            return _name;
         }
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         private void ObjectInvariant()
         {
+            Contract.Invariant(_name != null);
+            Contract.Invariant(!string.IsNullOrEmpty(_fullName));
+            Contract.Invariant(!string.IsNullOrEmpty(_uniqueName));
             Contract.Invariant(_solution != null);
             Contract.Invariant(_project != null);
             Contract.Invariant(_projectFile != null);
+            Contract.Invariant(_defaultProjectConfiguration != null);
+            Contract.Invariant(_solutionContexts != null);
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿namespace tomenglertde.ResXManager.Model
+﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
+    using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
 
@@ -25,6 +26,14 @@
             Contract.Requires(format != null);
             Contract.Requires(args != null);
             tracer.WriteLine(string.Format(CultureInfo.CurrentCulture, format, args));
+        }
+
+        public static void TraceError(this ITracer tracer, Exception ex)
+        {
+            Contract.Requires(tracer != null);
+            Contract.Requires(ex != null);
+
+            tracer.WriteLine(ex.ToString());
         }
     }
 }

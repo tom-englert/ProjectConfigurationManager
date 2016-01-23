@@ -22,12 +22,16 @@
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
         public static ICollection GetConfigurations(DependencyObject obj)
         {
+            Contract.Requires(obj != null);
             return (ICollection)obj.GetValue(ConfigurationsProperty);
         }
+
         public static void SetConfigurations(DependencyObject obj, ICollection value)
         {
+            Contract.Requires(obj != null);
             obj.SetValue(ConfigurationsProperty, value);
         }
+
         /// <summary>
         /// Identifies the <see cref="P:tomenglertde.ProjectConfigurationManager.View.BuildConfigurationColumnsManager.Configurations"/> attached property
         /// </summary>
@@ -55,6 +59,7 @@
             ((INotifyCollectionChanged)configurations).CollectionChanged += (sender, e) => SolutionConfigurations_CollectionChanged(dataGrid, e);
         }
 
+        [ContractVerification(false)]
         private static void SolutionConfigurations_CollectionChanged(DataGrid dataGrid, NotifyCollectionChangedEventArgs e)
         {
             Contract.Requires(dataGrid != null);
@@ -63,7 +68,8 @@
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    dataGrid.Columns.Add(CreateColumn((SolutionConfiguration)e.NewItems[0]));
+                    var solutionConfiguration = (SolutionConfiguration)e.NewItems[0];
+                    dataGrid.Columns.Add(CreateColumn(solutionConfiguration));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -74,6 +80,9 @@
 
         private static DataGridColumn CreateColumn(SolutionConfiguration solutionConfiguration)
         {
+            Contract.Requires(solutionConfiguration != null);
+            Contract.Ensures(Contract.Result<DataGridColumn>() != null);
+
             var column = new DataGridCheckBoxColumn
             {
                 IsThreeState = true,

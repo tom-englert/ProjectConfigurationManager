@@ -1,4 +1,9 @@
 using System.Reflection;
 
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion(Product.Version)]
+[assembly: AssemblyFileVersion(Product.Version)]
+
+class Product
+{
+    public const string Version = "1.0.0.0";
+}

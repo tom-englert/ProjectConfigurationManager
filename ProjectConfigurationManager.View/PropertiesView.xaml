@@ -57,6 +57,7 @@
       <Setter Property="ItemsPanel" Value="{StaticResource FilterItemsPanelTemplate}" />
     </Style>
     <dgx:RegexContentFilterFactory x:Key="RegexContentFilterFactory" />
+    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error"/>
   </UserControl.Resources>
 
   <DockPanel>
@@ -96,9 +97,9 @@
               dgx:DataGridFilter.ContentFilterFactory="{StaticResource RegexContentFilterFactory}">
       <DataGrid.Resources>
         <ContextMenu x:Key="ContextMenu">
-          <MenuItem Header="Copy" Command="{Binding CopyCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
-          <MenuItem Header="Paste" Command="{Binding PasteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
-          <MenuItem Header="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+          <MenuItem Header="Copy" Command="{Binding CopyCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}, Converter={StaticResource ErrorHandlerCommandConverter}}" />
+          <MenuItem Header="Paste" Command="{Binding PasteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}, Converter={StaticResource ErrorHandlerCommandConverter}}" />
+          <MenuItem Header="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}, Converter={StaticResource ErrorHandlerCommandConverter}}" />
         </ContextMenu>
       </DataGrid.Resources>
       <DataGrid.ItemsPanel>

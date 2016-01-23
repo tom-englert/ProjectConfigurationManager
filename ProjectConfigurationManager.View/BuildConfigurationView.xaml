@@ -8,6 +8,9 @@
              xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model"
              xmlns:toms="urn:TomsToolbox"
              d:DataContext="{d:DesignInstance view:BuildConfigurationViewModel}">
+  <UserControl.Resources>
+    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error"/>
+  </UserControl.Resources>
   <Grid Margin="10">
     <DataGrid x:Name="DataGrid"
               ItemsSource="{Binding Solution.SpecificProjectConfigurations}"
@@ -23,7 +26,7 @@
           <VirtualizingStackPanel>
             <VirtualizingStackPanel.ContextMenu>
               <ContextMenu>
-                <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                <MenuItem Header="Delete" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}"/>
               </ContextMenu>
             </VirtualizingStackPanel.ContextMenu>
           </VirtualizingStackPanel>

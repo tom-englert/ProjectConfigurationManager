@@ -32,10 +32,12 @@
         {
             get
             {
+                Contract.Ensures(Contract.Result<string>() != null);
                 throw new System.NotImplementedException();
             }
             set
             {
+                Contract.Requires(value != null);
                 throw new System.NotImplementedException();
             }
         }

@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
+    using System.Diagnostics.Contracts;
 
     public static class PropertyGrouping
     {
@@ -77,6 +77,9 @@
 
         public static string GetPropertyGroupName(string name)
         {
+            Contract.Requires(name != null);
+            Contract.Ensures(Contract.Result<string>() != null);
+
             if (_globalProperties.Contains(name))
                 return "Global";
 

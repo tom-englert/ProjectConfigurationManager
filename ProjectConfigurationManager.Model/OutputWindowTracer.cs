@@ -1,4 +1,4 @@
-﻿namespace tomenglertde.ProjectConfigurationManager
+﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
     using System.ComponentModel.Composition;
@@ -6,9 +6,6 @@
     using System.Diagnostics.Contracts;
 
     using Microsoft.VisualStudio.Shell.Interop;
-
-    using tomenglertde.ProjectConfigurationManager.Model;
-    using tomenglertde.ResXManager.Model;
 
     [Export(typeof(ITracer))]
     public class OutputWindowTracer : ITracer
@@ -33,16 +30,13 @@
             IVsOutputWindowPane pane;
             var errorCode = outputWindow.GetPane(ref outputPaneGuid, out pane);
 
-            if (pane == null)
+            if ((errorCode < 0) || pane == null)
             {
-                outputWindow.CreatePane(ref outputPaneGuid, "PCM", Convert.ToInt32(true), Convert.ToInt32(false));
+                outputWindow.CreatePane(ref outputPaneGuid, "Project Configuration Manager", Convert.ToInt32(true), Convert.ToInt32(false));
                 outputWindow.GetPane(ref outputPaneGuid, out pane);
             }
 
-            if (pane != null)
-            {
-                pane.OutputString(value);
-            }
+            pane?.OutputString(value);
         }
 
         public void TraceError(string value)

@@ -22,16 +22,41 @@
 
         private static bool HasGroupNamePrefix(string name, string groupName)
         {
+            Contract.Requires(name != null);
+            Contract.Requires(groupName != null);
+            Contract.Ensures((Contract.Result<bool>() == false) || (name.Length > groupName.Length));
+
             var length = groupName.Length;
 
             return name.Length > length && name.StartsWith(groupName) && char.IsUpper(name[length]);
         }
 
-        public string Name => _name;
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _name;
+            }
+        }
 
-        public string GroupName => _groupName;
+        public string GroupName
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _groupName;
+            }
+        }
 
-        public string DisplayName => _displayName;
+        public string DisplayName
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _displayName;
+            }
+        }
 
         #region IEquatable implementation
 
