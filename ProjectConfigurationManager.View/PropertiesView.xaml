@@ -123,6 +123,7 @@
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
+          <Setter Property="BorderThickness" Value="2"/>
           <Setter Property="Background">
             <Setter.Value>
               <MultiBinding Converter="{StaticResource CellToBackgroundBrushConverter}">
@@ -135,7 +136,6 @@
           <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
               <Setter Property="BorderBrush" Value="Gray" />
-              <Setter Property="Foreground" Value="Black" />
             </Trigger>
           </Style.Triggers>
         </Style>
