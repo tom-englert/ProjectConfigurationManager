@@ -13,7 +13,6 @@
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
-    using TomsToolbox.Wpf;
 
     public static class ProperitesColumnsMananger
     {

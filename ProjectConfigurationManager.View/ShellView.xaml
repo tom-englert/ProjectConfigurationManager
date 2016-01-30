@@ -6,11 +6,22 @@
              xmlns:toms="urn:TomsToolbox"
              xmlns:view="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
-  <TabControl toms:VisualComposition.RegionId="{x:Static view:GlobalId.ShellRegion}">
-    <TabControl.ItemTemplate>
-      <DataTemplate>
-        <TextBlock Text="{Binding Converter={x:Static toms:ObjectToDisplayNameConverter.Default}}"/>
-      </DataTemplate>
-    </TabControl.ItemTemplate>
-  </TabControl>
+  <Grid>
+    <TabControl toms:VisualComposition.RegionId="{x:Static view:GlobalId.ShellRegion}">
+      <TabControl.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Converter={x:Static toms:ObjectToDisplayNameConverter.Default}}"/>
+        </DataTemplate>
+      </TabControl.ItemTemplate>
+    </TabControl>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="3">
+      <Button>
+        <Button.Template>
+          <ControlTemplate TargetType="Button">
+            <TextBlock><Hyperlink NavigateUri="https://github.com/tom-englert/ProjectConfigurationManager/wiki">Help</Hyperlink></TextBlock>
+          </ControlTemplate>
+        </Button.Template>
+      </Button>
+    </StackPanel>
+  </Grid>
 </UserControl>
