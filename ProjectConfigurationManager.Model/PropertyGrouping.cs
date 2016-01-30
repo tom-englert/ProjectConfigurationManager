@@ -26,6 +26,13 @@
             "OutputPath",
             "DefineConstants",
             "PlatformTarget",
+            "ErrorReport",
+            "AllowUnsafeBlocks",
+            "NoWarn",
+            "TreatWarningsAsErrors",
+            "WarningsAsErrors",
+            "DocumentationFile",
+            "GenerateSerializationAssemblies",
         };
 
         private static readonly HashSet<string> _debugProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
