@@ -13,6 +13,7 @@
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
+    using TomsToolbox.Wpf;
 
     public static class ProperitesColumnsMananger
     {
@@ -96,7 +97,8 @@
 
             var column = new DataGridTextColumn
             {
-                Header = projectPropertyName.DisplayName,
+                Header = new TextBlock { Text = projectPropertyName.DisplayName },
+                Width = new DataGridLength(1, DataGridLengthUnitType.Star),
                 Binding = new Binding(@"PropertyValue[" + projectPropertyName.Name + @"]")
                 {
                     Mode = BindingMode.TwoWay

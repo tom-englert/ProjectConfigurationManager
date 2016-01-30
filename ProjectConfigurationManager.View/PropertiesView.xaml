@@ -57,7 +57,7 @@
       <Setter Property="ItemsPanel" Value="{StaticResource FilterItemsPanelTemplate}" />
     </Style>
     <dgx:RegexContentFilterFactory x:Key="RegexContentFilterFactory" />
-    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error"/>
+    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" />
   </UserControl.Resources>
 
   <DockPanel>
@@ -101,29 +101,42 @@
           <MenuItem Header="Paste" Command="{Binding PasteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}, Converter={StaticResource ErrorHandlerCommandConverter}}" />
           <MenuItem Header="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}, Converter={StaticResource ErrorHandlerCommandConverter}}" />
         </ContextMenu>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Static toms:ResourceKeys.AutoToolTipTextBoxStyle}}">
+          <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
       </DataGrid.Resources>
       <DataGrid.ItemsPanel>
         <ItemsPanelTemplate>
-          <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}" ContextMenu="{StaticResource ContextMenu}"/>
+          <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}" ContextMenu="{StaticResource ContextMenu}" />
         </ItemsPanelTemplate>
       </DataGrid.ItemsPanel>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey" 
-                                dgx:DataGridFilterColumn.Template="{StaticResource {x:Static dgx:DataGridFilter.TextColumnFilterTemplateKey}}">
+        <DataGridTemplateColumn DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey" Width="150">
+          <DataGridColumn.Header>
+            <TextBlock Text="Project" />
+          </DataGridColumn.Header>
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate DataType="model:ProjectConfiguration">
-              <TextBlock Margin="2"><Run Text="{Binding Project.Name, Mode=OneWay}"/>
-                <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}"/>)</Span>
+              <TextBlock Margin="2"><Run Text="{Binding Project.Name, Mode=OneWay}" />
+                <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}" />)</Span>
               </TextBlock>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" />
-        <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" />
+        <DataGridTextColumn Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" Width="100">
+          <DataGridColumn.Header>
+            <TextBlock Text="Configuration" />
+          </DataGridColumn.Header>
+        </DataGridTextColumn>
+        <DataGridTextColumn Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" Width="80">
+          <DataGridColumn.Header>
+            <TextBlock Text="Platform" />
+          </DataGridColumn.Header>
+        </DataGridTextColumn>
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
-          <Setter Property="BorderThickness" Value="2"/>
+          <Setter Property="BorderThickness" Value="2" />
           <Setter Property="Background">
             <Setter.Value>
               <MultiBinding Converter="{StaticResource CellToBackgroundBrushConverter}">
@@ -143,7 +156,8 @@
       <i:Interaction.Behaviors>
         <dgx:BeginEditOnCtrlEnterBehavior />
         <local:DataGridTryBeginEditBehavior />
-        <toms:ZoomFontSizeOnMouseWheelBehavior/>
+        <toms:ZoomFontSizeOnMouseWheelBehavior />
+        <dgx:ExtendedStarSizeBehavior />
       </i:Interaction.Behaviors>
     </DataGrid>
   </DockPanel>
