@@ -34,7 +34,7 @@
             InitializeComponent();
         }
 
-        private bool FilterPredicate(ProjectConfiguration item, IEnumerable<string> selectedGuids)
+        private static bool FilterPredicate(ProjectConfiguration item, IEnumerable<string> selectedGuids)
         {
             Contract.Requires(selectedGuids != null);
 
@@ -56,7 +56,7 @@
         {
             var listBox = (ListBox)sender;
 
-            this.BeginInvoke(() => listBox.SelectAll());
+            listBox.BeginInvoke(() => listBox.SelectAll());
         }
 
         private void ConfirmedCommandConverter_Error(object sender, ErrorEventArgs e)

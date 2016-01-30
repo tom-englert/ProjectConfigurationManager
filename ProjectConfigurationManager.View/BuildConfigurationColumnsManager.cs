@@ -6,12 +6,14 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
     using System.Windows.Data;
     using System.Windows.Media;
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
+    using TomsToolbox.Wpf.Composition;
 
     static class BuildConfigurationColumnsManager
     {
@@ -83,18 +85,29 @@
             Contract.Requires(solutionConfiguration != null);
             Contract.Ensures(Contract.Result<DataGridColumn>() != null);
 
-            var column = new DataGridCheckBoxColumn
+            var binding = new Binding(@"ShouldBuild[" + solutionConfiguration.UniqueName + @"]")
             {
-                IsThreeState = true,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Mode = BindingMode.TwoWay
+            };
+
+            var visualTree = new FrameworkElementFactory(typeof(CheckBox));
+            visualTree.SetValue(ToggleButton.IsThreeStateProperty, true);
+            visualTree.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+            visualTree.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            visualTree.SetBinding(ToggleButton.IsCheckedProperty, binding);
+
+            var column = new DataGridTemplateColumn
+            {
+                IsReadOnly = true,
                 Header = new TextBlock
                 {
                     Text = solutionConfiguration.UniqueName,
                     LayoutTransform = new RotateTransform(-90),
                 },
-                Binding = new Binding(@"ShouldBuild[" + solutionConfiguration.UniqueName + @"]")
+                CellTemplate = new DataTemplate(typeof(ProjectConfiguration))
                 {
-                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                    Mode = BindingMode.TwoWay
+                    VisualTree = visualTree
                 }
             };
 

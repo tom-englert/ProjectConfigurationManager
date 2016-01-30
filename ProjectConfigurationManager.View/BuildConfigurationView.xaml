@@ -11,7 +11,22 @@
   <UserControl.Resources>
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error"/>
   </UserControl.Resources>
-  <Grid Margin="10">
+  <DockPanel Margin="10">
+    <Border DockPanel.Dock="Right" Margin="5">
+      <StackPanel IsHitTestVisible="False" MaxWidth="150" Margin="10">
+        <CheckBox>
+          <TextBlock Text="Project does not build in this configuration." TextWrapping="Wrap"/>
+        </CheckBox>
+        <Decorator Height="5"/>
+        <CheckBox IsThreeState="True" IsChecked="{x:Null}" >
+          <TextBlock Text="Project is the default for this configuration but does not build." TextWrapping="Wrap"/>
+        </CheckBox>
+        <Decorator Height="5"/>
+        <CheckBox IsChecked="True">
+          <TextBlock Text="Project builds in this configuration." TextWrapping="Wrap"/>
+        </CheckBox>
+      </StackPanel>
+    </Border>
     <DataGrid x:Name="DataGrid"
               ItemsSource="{Binding Solution.SpecificProjectConfigurations}"
               AutoGenerateColumns="False"
@@ -53,5 +68,5 @@
         <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True"/>
       </DataGrid.Columns>
     </DataGrid>
-  </Grid>
+  </DockPanel>
 </UserControl>
