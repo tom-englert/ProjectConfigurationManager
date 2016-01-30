@@ -77,7 +77,8 @@
       <GroupBox Header="Show projects:">
         <ListBox ItemsSource="{Binding Solution.ProjectTypeGuids}"
                  Style="{StaticResource FilterListBoxStyle}"
-                 SelectionChanged="ProjectTypeGuids_SelectionChanged">
+                 SelectionChanged="ProjectTypeGuids_SelectionChanged"
+                 Loaded="ProjectTypeGuids_Loaded">
           <ListBox.ItemTemplate>
             <DataTemplate>
               <TextBlock Text="{Binding Converter={StaticResource ProjectTypeGuidToDisplayNameConverter}}" />
@@ -123,12 +124,12 @@
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
-        <DataGridTextColumn Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" Width="100">
+        <DataGridTextColumn Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" Width="110">
           <DataGridColumn.Header>
             <TextBlock Text="Configuration" />
           </DataGridColumn.Header>
         </DataGridTextColumn>
-        <DataGridTextColumn Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" Width="80">
+        <DataGridTextColumn Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" Width="85">
           <DataGridColumn.Header>
             <TextBlock Text="Platform" />
           </DataGridColumn.Header>

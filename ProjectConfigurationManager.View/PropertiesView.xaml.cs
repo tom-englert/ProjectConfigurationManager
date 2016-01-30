@@ -7,12 +7,14 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Windows;
     using System.Windows.Controls;
 
     using DataGridExtensions;
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
+    using TomsToolbox.Wpf;
     using TomsToolbox.Wpf.Composition;
 
     /// <summary>
@@ -36,7 +38,7 @@
         {
             Contract.Requires(selectedGuids != null);
 
-            return (item != null) && item.Project.ProjectTypeGuids.Any(guid => selectedGuids.Contains(guid, StringComparer.OrdinalIgnoreCase));
+            return (item != null) && item.Project.ProjectTypeGuids.All(guid => selectedGuids.Contains(guid, StringComparer.OrdinalIgnoreCase));
         }
 
         private void ProjectTypeGuids_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -48,6 +50,13 @@
             var selectedGuids = listBox.SelectedItems.OfType<string>().ToArray();
 
             DataGridFilter.SetGlobalFilter(DataGrid, item => FilterPredicate(item as ProjectConfiguration, selectedGuids));
+        }
+
+        private void ProjectTypeGuids_Loaded(object sender, RoutedEventArgs e)
+        {
+            var listBox = (ListBox)sender;
+
+            this.BeginInvoke(() => listBox.SelectAll());
         }
 
         private void ConfirmedCommandConverter_Error(object sender, ErrorEventArgs e)
