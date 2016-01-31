@@ -54,6 +54,8 @@
 
         private void ProjectTypeGuids_Loaded(object sender, RoutedEventArgs e)
         {
+            Contract.Requires(sender != null);
+
             var listBox = (ListBox)sender;
 
             listBox.BeginInvoke(() => listBox.SelectAll());

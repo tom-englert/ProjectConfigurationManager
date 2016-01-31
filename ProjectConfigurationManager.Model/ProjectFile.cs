@@ -25,11 +25,11 @@
 
         private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
         private readonly DispatcherThrottle _deferredSaveThrottle;
-        private readonly XDocument _document;
         private readonly Solution _solution;
         private readonly Project _project;
         private readonly Guid _projectGuid;
 
+        private XDocument _document;
         private ProjectPropertyGroup[] _propertyGroups;
 
         public ProjectFile(Solution solution, Project project)
@@ -44,21 +44,12 @@
             FileTime = File.GetLastWriteTime(project.FullName);
 
             _projectGuid = GetProjectGuid(solution, project.UniqueName);
-
-            // Can't use msbuild or vs interfaces here, they are much too slow: parse XML directly....
-            _document = XDocument.Load(project.FullName, LoadOptions.PreserveWhitespace);
-
-            _propertyGroups = _document
-                .Descendants(_propertyGroupNodeName)
-                .Where(node => node.Parent?.Name.LocalName == "Project")
-                .Select(node => new ProjectPropertyGroup(this, node))
-                .ToArray();
         }
 
         public IEnumerable<IProjectPropertyGroup> GetPropertyGroups(string configuration, string platform)
         {
             Contract.Ensures(Contract.Result<IEnumerable<IProjectPropertyGroup>>() != null);
-            return _propertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
+            return PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
         }
 
         public IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
@@ -106,14 +97,14 @@
 
         internal bool HasConfiguration(string configuration, string platform)
         {
-            return _propertyGroups.Any(group => group.MatchesConfiguration(configuration, platform));
+            return PropertyGroups.Any(group => group.MatchesConfiguration(configuration, platform));
         }
 
         internal void DeleteConfiguration(string configuration, string platform)
         {
-            var groupsToDelete = _propertyGroups.Where(group => group.MatchesConfiguration(configuration, platform)).ToArray();
+            var groupsToDelete = PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform)).ToArray();
 
-            _propertyGroups = _propertyGroups.Except(groupsToDelete).ToArray();
+            _propertyGroups = PropertyGroups.Except(groupsToDelete).ToArray();
 
             groupsToDelete.ForEach(group => group.Delete());
 
@@ -153,7 +144,7 @@
 
             using (var writer = XmlWriter.Create(_project.FullName, settings))
             {
-                _document.WriteTo(writer);
+                Document.WriteTo(writer);
             }
 
             solution.ReloadProject(ref projectGuid);
@@ -195,6 +186,32 @@
 
                 return false;
             }
+        }
+
+        private XDocument Document
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<XDocument>() != null);
+                return _document ?? (_document = XDocument.Load(_project.FullName, LoadOptions.PreserveWhitespace));
+            }
+        }
+
+        private IEnumerable<ProjectPropertyGroup> PropertyGroups
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyGroup>>() != null);
+                return _propertyGroups ?? (_propertyGroups = GeneratePropertyGroups());
+            }
+        }
+
+        private ProjectPropertyGroup[] GeneratePropertyGroups()
+        {
+            return Document.Descendants(_propertyGroupNodeName)
+                .Where(node => node.Parent?.Name.LocalName == "Project")
+                .Select(node => new ProjectPropertyGroup(this, node))
+                .ToArray();
         }
 
         private class ProjectPropertyGroup : IProjectPropertyGroup
@@ -329,9 +346,7 @@
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_document != null);
             Contract.Invariant(_project != null);
-            Contract.Invariant(_propertyGroups != null);
         }
     }
 }

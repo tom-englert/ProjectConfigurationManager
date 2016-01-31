@@ -164,6 +164,18 @@
 
                 SetupFileSystemWatcher();
             }
+            catch (IOException ex)
+            {
+                if (ex.GetType() != typeof(IOException))
+                {
+                    _tracer.TraceError(ex);
+                }
+                else
+                {
+                    // could not access the project file, retry later...
+                    Dispatcher.BeginInvoke(DispatcherPriority.Background, Update);
+                }
+            }
             catch (Exception ex)
             {
                 _tracer.TraceError(ex);
@@ -203,23 +215,37 @@
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Dispatcher.BeginInvoke(() =>
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e));
+        }
+
+        private void DeferredOnWatcherChanged(FileSystemEventArgs e)
+        {
+            try
             {
-                try
-                {
-                    var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
+                var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
 
-                    if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
-                        return;
+                if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
+                    return;
 
-                    project.Reload();
-                    SynchronizeCollections();
-                }
-                catch (Exception ex)
+                project.Reload();
+                SynchronizeCollections();
+            }
+            catch (IOException ex)
+            {
+                if (ex.GetType() != typeof (IOException))
                 {
                     _tracer.TraceError(ex);
                 }
-            });
+                else
+                {
+                    // could not access the project file, retry later...
+                    Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e));
+                }
+            }
+            catch (Exception ex)
+            {
+                _tracer.TraceError(ex);
+            }
         }
 
         private void SynchronizeCollections()
