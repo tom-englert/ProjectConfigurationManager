@@ -84,7 +84,8 @@
             Contract.Requires(solutionConfiguration != null);
             Contract.Ensures(Contract.Result<DataGridColumn>() != null);
 
-            var binding = new Binding(@"ShouldBuild[" + solutionConfiguration.UniqueName + @"]")
+            var path = @"ShouldBuild[" + solutionConfiguration.UniqueName + @"]";
+            var binding = new Binding(path)
             {
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
                 Mode = BindingMode.TwoWay
@@ -99,6 +100,7 @@
             var column = new DataGridTemplateColumn
             {
                 IsReadOnly = true,
+                SortMemberPath = path,
                 Header = new TextBlock
                 {
                     Text = solutionConfiguration.UniqueName,
