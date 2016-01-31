@@ -97,7 +97,6 @@
 
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidProjectConfigurationManager" value="0x0100" />
-      <IDSymbol name="cmdidProjectConfigurationManager" value="0x0101" />
     </GuidSymbol>
     
     
