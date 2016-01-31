@@ -60,6 +60,9 @@
             if ((ConfigurationName == configuration.Configuration) && (PlatformName == configuration.Platform))
                 return false;
 
+            if (!ContextIsValid())
+                return false;
+
             _ctx.ConfigurationName = configuration.Configuration + "|" + configuration.Platform;
 
             ConfigurationName = _ctx.ConfigurationName;
@@ -77,11 +80,15 @@
         {
             get
             {
-                return _ctx.ShouldBuild;
+                return ContextIsValid() && _ctx.ShouldBuild;
             }
             set
             {
+                if (!ContextIsValid())
+                    return;
+
                 _ctx.ShouldBuild = value;
+
                 OnPropertyChanged();
             }
         }
@@ -93,6 +100,17 @@
                 Contract.Ensures(Contract.Result<SolutionConfiguration>() != null);
                 return _solutionConfiguration;
             }
+        }
+
+        private bool ContextIsValid()
+        {
+            // Check if the owning collection is valid - accessing other properites would throw an AccessViolationException!
+            if (_ctx.Collection?.Count != 0)
+                return true;
+
+            // This context is no longer valid, schedule a solution update and return false...
+            Dispatcher.BeginInvoke(() => _solution.Update());
+            return false;
         }
 
         #region IEquatable implementation
