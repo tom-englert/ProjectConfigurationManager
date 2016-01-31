@@ -104,6 +104,11 @@
                 && (editVerdict == (uint)tagVSQueryEditResult.QER_EditOK);
         }
 
+        internal bool HasConfiguration(string configuration, string platform)
+        {
+            return _propertyGroups.Any(group => group.MatchesConfiguration(configuration, platform));
+        }
+
         internal void DeleteConfiguration(string configuration, string platform)
         {
             var groupsToDelete = _propertyGroups.Where(group => group.MatchesConfiguration(configuration, platform)).ToArray();

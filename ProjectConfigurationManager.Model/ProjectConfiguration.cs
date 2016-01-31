@@ -129,7 +129,7 @@
                 set
                 {
                     var context = _projectConfiguration.Project.SolutionContexts
-                        .FirstOrDefault(ctx => (ctx.SolutionConfiguration.UniqueName == solutionConfiguration));
+                        .FirstOrDefault(ctx => ctx.SolutionConfiguration.UniqueName == solutionConfiguration);
 
                     Contract.Assume(context != null);
 
