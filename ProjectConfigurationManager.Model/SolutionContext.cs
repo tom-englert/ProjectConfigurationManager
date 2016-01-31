@@ -10,6 +10,8 @@
         private readonly Solution _solution;
         private readonly SolutionConfiguration _solutionConfiguration;
         private readonly EnvDTE.SolutionContext _ctx;
+        private string _configurationName;
+        private string _platformName;
 
         public SolutionContext(Solution solution, SolutionConfiguration solutionConfiguration, EnvDTE.SolutionContext ctx)
         {
@@ -20,28 +22,56 @@
             _solution = solution;
             _solutionConfiguration = solutionConfiguration;
             _ctx = ctx;
+
+            _configurationName = ctx.ConfigurationName;
+            _platformName = ctx.PlatformName;
+
+            ProjectName = ctx.ProjectName;
         }
 
-        public string ConfigurationName => _ctx.ConfigurationName;
+        public string ConfigurationName
+        {
+            get
+            {
+                return _configurationName;
+            }
+            set
+            {
+                SetProperty(ref _configurationName, value);
+            }
+        }
 
-        public string PlatformName => _ctx.PlatformName;
+        public string PlatformName
+        {
+            get
+            {
+                return _platformName;
+            }
+            set
+            {
+                SetProperty(ref _platformName, value);
+            }
+        }
 
         public bool SetConfiguration(ProjectConfiguration configuration)
         {
             Contract.Requires(configuration != null);
 
-            if ((_ctx.ConfigurationName == configuration.Configuration) && (_ctx.PlatformName == configuration.Platform))
+            if ((ConfigurationName == configuration.Configuration) && (PlatformName == configuration.Platform))
                 return false;
 
             _ctx.ConfigurationName = configuration.Configuration + "|" + configuration.Platform;
 
-            OnPropertyChanged(nameof(ConfigurationName));
-            OnPropertyChanged(nameof(PlatformName));
+            ConfigurationName = _ctx.ConfigurationName;
+            PlatformName = _ctx.PlatformName;
 
             return true;
         }
 
-        public string ProjectName => _ctx.ProjectName;
+        public string ProjectName
+        {
+            get;
+        }
 
         public bool ShouldBuild
         {

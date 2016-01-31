@@ -245,17 +245,21 @@
                 if (string.IsNullOrEmpty(conditionExpression))
                     return string.IsNullOrEmpty(configuration) && string.IsNullOrEmpty(platform);
 
-                if (string.IsNullOrEmpty(configuration) || string.IsNullOrEmpty(platform))
+                if (string.IsNullOrEmpty(configuration))
                     return false;
 
                 conditionExpression = conditionExpression.Replace(" ", "");
 
-                if (!conditionExpression.Contains("$(Configuration)|$(Platform)"))
+                if (!conditionExpression.Contains("$(Configuration)") || !conditionExpression.Contains("=="))
                     return false;
 
-                var condition = string.Join("|", configuration, platform).Replace(" ", "");
+                if (!conditionExpression.Contains(configuration))
+                    return false;
 
-                return conditionExpression.Contains(condition);
+                if (!conditionExpression.Contains("$(Platform)"))
+                    return platform == "Any CPU";
+
+                return conditionExpression.Contains(platform.Replace(" ", ""));
             }
 
             public void Delete()
