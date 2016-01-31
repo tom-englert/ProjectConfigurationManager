@@ -186,7 +186,9 @@
                 if ((configurationNames != null) && (platformNames != null))
                 {
                     projectConfigurations = configurationNames
-                        .SelectMany(configuration => platformNames.Select(platform => new ProjectConfiguration(this, configuration, platform)));
+                        .SelectMany(configuration => platformNames
+                            .Where(platform => _projectFile.HasConfiguration(configuration, platform))
+                            .Select(platform => new ProjectConfiguration(this, configuration, platform)));
                 }
             }
 
