@@ -13,6 +13,7 @@
 
   <UserControl.Resources>
     <local:CellToBackgroundBrushConverter x:Key="CellToBackgroundBrushConverter" />
+    <local:CellToToolTipConverter x:Key="CellToToolTipConverter" />
     <local:ProjectTypeGuidToDisplayNameConverter x:Key="ProjectTypeGuidToDisplayNameConverter" />
     <CollectionViewSource x:Key="PropertiesSource" Source="{Binding Solution.ProjectProperties}">
       <CollectionViewSource.GroupDescriptions>
@@ -137,7 +138,15 @@
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
-          <Setter Property="BorderThickness" Value="2" />
+          <Setter Property="ToolTip">
+              <Setter.Value>
+                  <MultiBinding Converter="{StaticResource CellToToolTipConverter}">
+                      <Binding RelativeSource="{RelativeSource Self}" />
+                      <Binding />
+                  </MultiBinding>
+              </Setter.Value>
+          </Setter>
+        <Setter Property="BorderThickness" Value="2" />
           <Setter Property="Background">
             <Setter.Value>
               <MultiBinding Converter="{StaticResource CellToBackgroundBrushConverter}">
