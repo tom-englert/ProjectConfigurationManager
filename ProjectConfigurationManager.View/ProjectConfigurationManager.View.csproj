@@ -29,13 +29,20 @@
     <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
     <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
-    <CodeContractsBaseLineFile></CodeContractsBaseLineFile>
-    <CodeContractsSQLServerOption></CodeContractsSQLServerOption>
-    <CodeContractsExtraAnalysisOptions></CodeContractsExtraAnalysisOptions>
-    <CodeContractsExtraRewriteOptions></CodeContractsExtraRewriteOptions>
-    <CodeContractsLibPaths></CodeContractsLibPaths>
-    <CodeContractsCustomRewriterClass></CodeContractsCustomRewriterClass>
-    <CodeContractsCustomRewriterAssembly></CodeContractsCustomRewriterAssembly>
+    <CodeContractsBaseLineFile>
+    </CodeContractsBaseLineFile>
+    <CodeContractsSQLServerOption>
+    </CodeContractsSQLServerOption>
+    <CodeContractsExtraAnalysisOptions>
+    </CodeContractsExtraAnalysisOptions>
+    <CodeContractsExtraRewriteOptions>
+    </CodeContractsExtraRewriteOptions>
+    <CodeContractsLibPaths>
+    </CodeContractsLibPaths>
+    <CodeContractsCustomRewriterClass>
+    </CodeContractsCustomRewriterClass>
+    <CodeContractsCustomRewriterAssembly>
+    </CodeContractsCustomRewriterAssembly>
     <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
     <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
@@ -79,13 +86,20 @@
     <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
     <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
-    <CodeContractsBaseLineFile></CodeContractsBaseLineFile>
-    <CodeContractsSQLServerOption></CodeContractsSQLServerOption>
-    <CodeContractsExtraAnalysisOptions></CodeContractsExtraAnalysisOptions>
-    <CodeContractsExtraRewriteOptions></CodeContractsExtraRewriteOptions>
-    <CodeContractsLibPaths></CodeContractsLibPaths>
-    <CodeContractsCustomRewriterClass></CodeContractsCustomRewriterClass>
-    <CodeContractsCustomRewriterAssembly></CodeContractsCustomRewriterAssembly>
+    <CodeContractsBaseLineFile>
+    </CodeContractsBaseLineFile>
+    <CodeContractsSQLServerOption>
+    </CodeContractsSQLServerOption>
+    <CodeContractsExtraAnalysisOptions>
+    </CodeContractsExtraAnalysisOptions>
+    <CodeContractsExtraRewriteOptions>
+    </CodeContractsExtraRewriteOptions>
+    <CodeContractsLibPaths>
+    </CodeContractsLibPaths>
+    <CodeContractsCustomRewriterClass>
+    </CodeContractsCustomRewriterClass>
+    <CodeContractsCustomRewriterAssembly>
+    </CodeContractsCustomRewriterAssembly>
     <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
     <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
@@ -178,6 +192,7 @@
     <Compile Include="..\Version.cs">
       <Link>Properties\Version.cs</Link>
     </Compile>
+    <Compile Include="CellToToolTipConverter.cs" />
     <Compile Include="DataGridTryBeginEditBehavior.cs" />
     <Compile Include="ProjectTypeGuidToDisplayNameConverter.cs" />
     <Compile Include="ProperitesColumnsMananger.cs" />
