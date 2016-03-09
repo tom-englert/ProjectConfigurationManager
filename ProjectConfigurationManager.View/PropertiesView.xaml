@@ -137,6 +137,26 @@
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
+          <Setter Property="ToolTip">
+            <Setter.Value>
+              <ToolTip>
+                <StackPanel d:DataContext="{d:DesignInstance model:ProjectConfiguration}">
+                  <Decorator Height="2"/>
+                  <TextBlock Text="{Binding Column.Header.Text}" DataContext="{Binding PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType=ToolTip}}" d:DataContext="{d:DesignInstance DataGridCell}" />
+                  <Decorator Height="4" />
+                  <TextBlock Foreground="Gray">
+                    <TextBlock.Text>
+                      <MultiBinding StringFormat="{}{0} | {1} | {2}">
+                        <Binding Path="Project.Name" />
+                        <Binding Path="Configuration" TargetNullValue="-" />
+                        <Binding Path="Platform" TargetNullValue="-" />
+                      </MultiBinding>
+                    </TextBlock.Text>
+                  </TextBlock>
+                </StackPanel>
+              </ToolTip>
+            </Setter.Value>
+          </Setter>
           <Setter Property="BorderThickness" Value="2" />
           <Setter Property="Background">
             <Setter.Value>
@@ -150,6 +170,7 @@
           <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
               <Setter Property="BorderBrush" Value="Gray" />
+              <Setter Property="Foreground" Value="Black" />
             </Trigger>
           </Style.Triggers>
         </Style>
