@@ -2,6 +2,7 @@
 {
     using System.Collections;
     using System.Collections.Specialized;
+    using System.ComponentModel;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows;
@@ -45,6 +46,9 @@
             Contract.Requires(dataGrid != null);
 
             if (propertieGroups == null)
+                return;
+
+            if (DesignerProperties.GetIsInDesignMode(dataGrid))
                 return;
 
             dataGrid.Columns.AddRange(propertieGroups.OfType<CollectionViewGroup>().SelectMany(group => group.Items.Cast<ProjectPropertyName>()).Select(CreateColumn));

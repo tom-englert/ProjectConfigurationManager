@@ -13,7 +13,7 @@
   </UserControl.Resources>
   <DockPanel Margin="10">
     <Border DockPanel.Dock="Right" Margin="5">
-      <StackPanel IsHitTestVisible="False" MaxWidth="150" Margin="10">
+      <StackPanel IsHitTestVisible="False" MaxWidth="180" Margin="10">
         <CheckBox>
           <TextBlock Text="Project does not build in this configuration." TextWrapping="Wrap"/>
         </CheckBox>
@@ -25,6 +25,9 @@
         <CheckBox IsChecked="True">
           <TextBlock Text="Project builds in this configuration." TextWrapping="Wrap"/>
         </CheckBox>
+        <Decorator Height="25"/>
+        <TextBlock TextWrapping="Wrap">Use the context menu to delete unused project configurations from the project files.<LineBreak/><LineBreak/>You can only delete project configurations which are not selected in any solution configuration.</TextBlock>
+
       </StackPanel>
     </Border>
     <DataGrid x:Name="DataGrid"

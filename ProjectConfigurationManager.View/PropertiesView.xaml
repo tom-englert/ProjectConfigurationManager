@@ -170,7 +170,7 @@
           <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
               <Setter Property="BorderBrush" Value="Gray" />
-              <Setter Property="Foreground" Value="Black" />
+              <Setter Property="Foreground" Value="{x:Static SystemColors.ControlTextBrush}"/>
             </Trigger>
           </Style.Triggers>
         </Style>
