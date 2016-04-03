@@ -1,3 +1,7 @@
+1.0.3.0
+* Add cell tooltip to ease navigation when the grid is dense.
+* Fix co-existens problems with other plugins using DGX
+
 1.0.2.0
 * Fix copy/paste of complex cells.
 * Improve robustness.
