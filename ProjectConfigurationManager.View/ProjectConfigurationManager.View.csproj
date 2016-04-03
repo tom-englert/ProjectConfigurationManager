@@ -29,13 +29,20 @@
     <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
     <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
-    <CodeContractsBaseLineFile></CodeContractsBaseLineFile>
-    <CodeContractsSQLServerOption></CodeContractsSQLServerOption>
-    <CodeContractsExtraAnalysisOptions></CodeContractsExtraAnalysisOptions>
-    <CodeContractsExtraRewriteOptions></CodeContractsExtraRewriteOptions>
-    <CodeContractsLibPaths></CodeContractsLibPaths>
-    <CodeContractsCustomRewriterClass></CodeContractsCustomRewriterClass>
-    <CodeContractsCustomRewriterAssembly></CodeContractsCustomRewriterAssembly>
+    <CodeContractsBaseLineFile>
+    </CodeContractsBaseLineFile>
+    <CodeContractsSQLServerOption>
+    </CodeContractsSQLServerOption>
+    <CodeContractsExtraAnalysisOptions>
+    </CodeContractsExtraAnalysisOptions>
+    <CodeContractsExtraRewriteOptions>
+    </CodeContractsExtraRewriteOptions>
+    <CodeContractsLibPaths>
+    </CodeContractsLibPaths>
+    <CodeContractsCustomRewriterClass>
+    </CodeContractsCustomRewriterClass>
+    <CodeContractsCustomRewriterAssembly>
+    </CodeContractsCustomRewriterAssembly>
     <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
     <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
@@ -79,13 +86,20 @@
     <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
     <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
-    <CodeContractsBaseLineFile></CodeContractsBaseLineFile>
-    <CodeContractsSQLServerOption></CodeContractsSQLServerOption>
-    <CodeContractsExtraAnalysisOptions></CodeContractsExtraAnalysisOptions>
-    <CodeContractsExtraRewriteOptions></CodeContractsExtraRewriteOptions>
-    <CodeContractsLibPaths></CodeContractsLibPaths>
-    <CodeContractsCustomRewriterClass></CodeContractsCustomRewriterClass>
-    <CodeContractsCustomRewriterAssembly></CodeContractsCustomRewriterAssembly>
+    <CodeContractsBaseLineFile>
+    </CodeContractsBaseLineFile>
+    <CodeContractsSQLServerOption>
+    </CodeContractsSQLServerOption>
+    <CodeContractsExtraAnalysisOptions>
+    </CodeContractsExtraAnalysisOptions>
+    <CodeContractsExtraRewriteOptions>
+    </CodeContractsExtraRewriteOptions>
+    <CodeContractsLibPaths>
+    </CodeContractsLibPaths>
+    <CodeContractsCustomRewriterClass>
+    </CodeContractsCustomRewriterClass>
+    <CodeContractsCustomRewriterAssembly>
+    </CodeContractsCustomRewriterAssembly>
     <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
     <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
@@ -124,8 +138,8 @@
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DataGridExtensions, Version=1.0.27.0, Culture=neutral, PublicKeyToken=43de855f87de903a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DataGridExtensions.1.0.27.0\lib\net40-Client\DataGridExtensions.dll</HintPath>
+    <Reference Include="DataGridExtensions, Version=1.0.31.0, Culture=neutral, PublicKeyToken=43de855f87de903a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DataGridExtensions.1.0.31.0\lib\net40-Client\DataGridExtensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=9.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -151,20 +165,20 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="TomsToolbox.Core, Version=1.0.32.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
-      <HintPath>..\packages\TomsToolbox.Core.1.0.32.0\lib\net40-Client\TomsToolbox.Core.dll</HintPath>
+    <Reference Include="TomsToolbox.Core, Version=1.0.43.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
+      <HintPath>..\packages\TomsToolbox.Core.1.0.43.0\lib\net40-Client\TomsToolbox.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TomsToolbox.Desktop, Version=1.0.32.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
-      <HintPath>..\packages\TomsToolbox.Desktop.1.0.32.0\lib\net45\TomsToolbox.Desktop.dll</HintPath>
+    <Reference Include="TomsToolbox.Desktop, Version=1.0.43.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
+      <HintPath>..\packages\TomsToolbox.Desktop.1.0.43.0\lib\net45\TomsToolbox.Desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TomsToolbox.ObservableCollections, Version=1.0.32.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
-      <HintPath>..\packages\TomsToolbox.ObservableCollections.1.0.32.0\lib\net40-Client\TomsToolbox.ObservableCollections.dll</HintPath>
+    <Reference Include="TomsToolbox.ObservableCollections, Version=1.0.43.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
+      <HintPath>..\packages\TomsToolbox.ObservableCollections.1.0.43.0\lib\net40-Client\TomsToolbox.ObservableCollections.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TomsToolbox.Wpf, Version=1.0.32.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
-      <HintPath>..\packages\TomsToolbox.Wpf.1.0.32.0\lib\net40-Client\TomsToolbox.Wpf.dll</HintPath>
+    <Reference Include="TomsToolbox.Wpf, Version=1.0.43.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
+      <HintPath>..\packages\TomsToolbox.Wpf.1.0.43.0\lib\net40-Client\TomsToolbox.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />
@@ -192,6 +206,8 @@
       <DependentUpon>ShellView.xaml</DependentUpon>
     </Compile>
     <Compile Include="CellToBackgroundBrushConverter.cs" />
+    <Compile Include="Themes\ResourceKeys.cs" />
+    <Compile Include="Themes\ResourceLocator.cs" />
     <Page Include="BuildConfigurationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -205,6 +221,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ShellView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

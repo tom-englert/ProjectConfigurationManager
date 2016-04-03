@@ -8,6 +8,7 @@
              xmlns:toms="urn:TomsToolbox"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model"
+             xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
              d:DataContext="{d:DesignInstance local:PropertiesViewModel}"
              Padding="10">
 
@@ -95,6 +96,7 @@
               AutoGenerateColumns="False" FrozenColumnCount="3"
               dgx:Tools.ApplyInitialSorting="True"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
+              dgx:DataGridFilter.ResourceLocator="{toms:Import dgx:IResourceLocator}"
               dgx:DataGridFilter.ContentFilterFactory="{StaticResource RegexContentFilterFactory}">
       <DataGrid.Resources>
         <ContextMenu x:Key="ContextMenu">
@@ -102,7 +104,7 @@
           <MenuItem Header="Paste" Command="{Binding PasteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}, Converter={StaticResource ErrorHandlerCommandConverter}}" />
           <MenuItem Header="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}, Converter={StaticResource ErrorHandlerCommandConverter}}" />
         </ContextMenu>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Static toms:ResourceKeys.AutoToolTipTextBoxStyle}}">
+        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Static themes:ResourceKeys.AutoToolTipTextBoxStyle}}">
           <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         </Style>
       </DataGrid.Resources>
@@ -179,7 +181,7 @@
         <dgx:BeginEditOnCtrlEnterBehavior />
         <local:DataGridTryBeginEditBehavior />
         <toms:ZoomFontSizeOnMouseWheelBehavior />
-        <dgx:ExtendedStarSizeBehavior />
+        <dgx:ExtendedStarSizeBehavior ResourceLocator="{toms:Import dgx:IResourceLocator}"/>
       </i:Interaction.Behaviors>
     </DataGrid>
   </DockPanel>

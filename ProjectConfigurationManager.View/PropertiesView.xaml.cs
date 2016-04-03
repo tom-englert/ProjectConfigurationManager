@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
@@ -26,9 +27,12 @@
         private readonly ITracer _tracer;
 
         [ImportingConstructor]
-        public PropertiesView(ITracer tracer)
+        public PropertiesView(ExportProvider exportProvider, ITracer tracer)
         {
+            Contract.Requires(exportProvider != null);
             Contract.Requires(tracer != null);
+
+            this.SetExportProvider(exportProvider);
             _tracer = tracer;
 
             InitializeComponent();

@@ -69,7 +69,7 @@
                 var view = _compositionHost.GetExportedValue<ShellView>();
                 view.Resources.MergedDictionaries.Add(DataTemplateManager.CreateDynamicDataTemplates(_compositionHost.Container));
 
-                EventManager.RegisterClassHandler(typeof(ShellView), ButtonBase.ClickEvent, new RoutedEventHandler(Navigate_Click));
+                view.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(Navigate_Click));
 
                 Content = view;
             }

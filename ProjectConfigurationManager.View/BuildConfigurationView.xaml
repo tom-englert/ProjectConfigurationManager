@@ -57,8 +57,7 @@
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey"
-                                dgx:DataGridFilterColumn.Template="{StaticResource {x:Static dgx:DataGridFilter.TextColumnFilterTemplateKey}}">
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate DataType="model:ProjectConfiguration">
               <TextBlock Margin="2"><Run Text="{Binding Project.Name, Mode=OneWay}"/>
