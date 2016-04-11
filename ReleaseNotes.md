@@ -1,3 +1,7 @@
+1.0.4.0
+* Fix context menu in properties grid.
+* Enable filtering in the build configuration grid.
+
 1.0.3.0
 * Add cell tooltip to ease navigation when the grid is dense.
 * Fix co-existens problems with other plugins using DGX
