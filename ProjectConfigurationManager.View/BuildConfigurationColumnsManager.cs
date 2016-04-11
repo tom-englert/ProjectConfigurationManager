@@ -2,6 +2,7 @@
 {
     using System.Collections;
     using System.Collections.Specialized;
+    using System.ComponentModel;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows;
@@ -9,6 +10,8 @@
     using System.Windows.Controls.Primitives;
     using System.Windows.Data;
     using System.Windows.Media;
+
+    using DataGridExtensions;
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
@@ -52,7 +55,8 @@
         private static void Register(DataGrid dataGrid, ICollection configurations)
         {
             Contract.Requires(dataGrid != null);
-            if (configurations == null)
+
+            if ((configurations == null) || DesignerProperties.GetIsInDesignMode(dataGrid))
                 return;
 
             dataGrid.Columns.AddRange(configurations.OfType<SolutionConfiguration>().Select(CreateColumn));
@@ -112,6 +116,7 @@
                 }
             };
 
+            column.SetIsFilterVisible(false);
             column.SetValue(_solutionConfigurationProperty, solutionConfiguration);
 
             return column;

@@ -45,7 +45,7 @@
         {
             Contract.Requires(dataGrid != null);
 
-            if (propertieGroups == null)
+            if ((propertieGroups == null) || DesignerProperties.GetIsInDesignMode(dataGrid))
                 return;
 
             if (DesignerProperties.GetIsInDesignMode(dataGrid))

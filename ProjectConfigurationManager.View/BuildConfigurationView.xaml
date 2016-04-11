@@ -37,6 +37,7 @@
               CanUserAddRows="False" CanUserResizeColumns="False" CanUserResizeRows="False"
               view:BuildConfigurationColumnsManager.Configurations="{Binding Solution.SolutionConfigurations}"
               toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedConfigurations}"
+              dgx:DataGridFilter.IsAutoFilterEnabled="True"
               dgx:Tools.ApplyInitialSorting="True"
               FrozenColumnCount="3">
       <DataGrid.ItemsPanel>
@@ -54,6 +55,7 @@
       <DataGrid.ColumnHeaderStyle>
         <Style TargetType="DataGridColumnHeader">
           <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.Columns>
