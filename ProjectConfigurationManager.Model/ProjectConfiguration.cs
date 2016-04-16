@@ -174,7 +174,15 @@
                 }
                 set
                 {
-                    var property = _projectConfiguration.PropertyLookup.ForceValue(propertyName, _projectConfiguration.CreateProperty);
+                    IProjectProperty property;
+
+                    if (!_projectConfiguration.PropertyLookup.TryGetValue(propertyName, out property) || (property == null))
+                    {
+                        if (string.IsNullOrEmpty(value)) // do not create empty entries.
+                            return;
+
+                        property = _projectConfiguration.PropertyLookup.ForceValue(propertyName, _projectConfiguration.CreateProperty);
+                    }
 
                     if (property == null)
                         throw new ArgumentException("Unable to create property: " + propertyName, nameof(propertyName));
