@@ -1,3 +1,8 @@
+1.0.5.0
+* Do not create empty entries
+* Commit changes to DataGrid after paste. (Last line was never updated)
+* Show a wait cursor on lengthy operations
+ 
 1.0.4.0
 * Fix context menu in properties grid.
 * Enable filtering in the build configuration grid.
