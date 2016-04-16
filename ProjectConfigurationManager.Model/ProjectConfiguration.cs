@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -63,12 +64,13 @@
             }
         }
 
-        internal IDictionary<string, IProjectProperty> PropertyLookup
+        internal IDictionary<string, IProjectProperty> Properties
         {
             get
             {
                 Contract.Ensures(Contract.Result<IDictionary<string, IProjectProperty>>() != null);
-                return _properties;
+
+                return new ReadOnlyDictionary<string, IProjectProperty>(_properties);
             }
         }
 
@@ -96,8 +98,6 @@
 
             OnPropertyChanged(nameof(PropertyValue));
         }
-
-        internal IEnumerable<IProjectProperty> Properties => _properties.Values;
 
         private void InvalidateShouldBuild()
         {
@@ -170,18 +170,18 @@
             {
                 get
                 {
-                    return _projectConfiguration.PropertyLookup.GetValueOrDefault(propertyName)?.Value;
+                    return _projectConfiguration.Properties.GetValueOrDefault(propertyName)?.Value;
                 }
                 set
                 {
                     IProjectProperty property;
 
-                    if (!_projectConfiguration.PropertyLookup.TryGetValue(propertyName, out property) || (property == null))
+                    if (!_projectConfiguration.Properties.TryGetValue(propertyName, out property) || (property == null))
                     {
                         if (string.IsNullOrEmpty(value)) // do not create empty entries.
                             return;
 
-                        property = _projectConfiguration.PropertyLookup.ForceValue(propertyName, _projectConfiguration.CreateProperty);
+                        property = _projectConfiguration.CreateProperty(propertyName);
                     }
 
                     if (property == null)
@@ -201,7 +201,11 @@
 
         private IProjectProperty CreateProperty(string propertyName)
         {
-            return Project.CreateProperty(propertyName, _configuration, _platform);
+            var property = Project.CreateProperty(propertyName, _configuration, _platform);
+
+            _properties.Add(propertyName, property);
+
+            return property;
         }
 
         public void DeleteProperty(string propertyName)

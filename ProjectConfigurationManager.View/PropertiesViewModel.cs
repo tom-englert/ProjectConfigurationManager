@@ -19,7 +19,7 @@
 
     [DisplayName("Properties")]
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 2)]
-    class PropertiesViewModel : ObservableObject, IComposablePart
+    class PropertiesViewModel : ObservableObject
     {
         private readonly Solution _solution;
 
@@ -43,38 +43,40 @@
 
         public ICommand CopyCommand => new DelegateCommand<DataGrid>(CanCopy, Copy);
 
-        private void Copy(DataGrid dataGrid)
+        private static void Copy(DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
+
             dataGrid.GetCellSelection().SetClipboardData();
         }
 
-        private bool CanCopy(DataGrid dataGrid)
+        private static bool CanCopy(DataGrid dataGrid)
         {
-            if (dataGrid == null)
-                return false;
-
-            return dataGrid.HasRectangularCellSelection();
+            return dataGrid?.HasRectangularCellSelection() ?? false;
         }
 
         public ICommand PasteCommand => new DelegateCommand<DataGrid>(CanPaste, Paste);
 
-        private void Paste(DataGrid dataGrid)
+        private static void Paste(DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
+
             var data = ClipboardHelper.GetClipboardDataAsTable();
-            if (data != null)
-                dataGrid.PasteCells(data);
+            if (data == null)
+                return;
+
+            dataGrid.PasteCells(data);
+            dataGrid.CommitEdit();
         }
 
-        private bool CanPaste(DataGrid dataGrid)
+        private static bool CanPaste(DataGrid dataGrid)
         {
             return Clipboard.ContainsText() && (dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false);
         }
 
         public ICommand DeleteCommand => new DelegateCommand<DataGrid>(CanDelete, Delete);
 
-        private void Delete(DataGrid dataGrid)
+        private static void Delete(DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
             Contract.Requires(dataGrid.SelectedCells != null);
@@ -90,7 +92,7 @@
             }
         }
 
-        private bool CanDelete(DataGrid dataGrid)
+        private static bool CanDelete(DataGrid dataGrid)
         {
             return dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false;
         }

@@ -322,6 +322,9 @@
                 }
                 set
                 {
+                    if (string.Equals(_node.Value, value))
+                        return;
+
                     _node.Value = value;
                     _projectFile.SaveChanges();
                 }

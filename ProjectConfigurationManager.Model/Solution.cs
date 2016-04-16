@@ -345,7 +345,7 @@
             Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyName>>() != null);
 
             return Projects
-                .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties))
+                .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties.Values))
                 .Select(prop => prop.Name)
                 .Distinct()
                 .Where(PropertyGrouping.IsNotProjectSpecific)
