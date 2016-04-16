@@ -58,7 +58,7 @@
       <Setter Property="ItemsPanel" Value="{StaticResource FilterItemsPanelTemplate}" />
     </Style>
     <dgx:RegexContentFilterFactory x:Key="RegexContentFilterFactory" />
-    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" />
+    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" Executing="ConfirmedCommandConverter_OnExecuting" />
   </UserControl.Resources>
 
   <DockPanel>

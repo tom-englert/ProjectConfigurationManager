@@ -10,6 +10,7 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Threading;
 
     using DataGridExtensions;
 
@@ -17,6 +18,7 @@
 
     using TomsToolbox.Wpf;
     using TomsToolbox.Wpf.Composition;
+    using TomsToolbox.Wpf.Converters;
 
     /// <summary>
     /// Interaction logic for PropertiesView.xaml
@@ -68,6 +70,11 @@
         private void ConfirmedCommandConverter_Error(object sender, ErrorEventArgs e)
         {
             _tracer.TraceError(e.GetException());
+        }
+
+        private void ConfirmedCommandConverter_OnExecuting(object sender, ConfirmedCommandEventArgs e)
+        {
+            WaitCursor.StartLocal(this);
         }
 
         [ContractInvariantMethod]
