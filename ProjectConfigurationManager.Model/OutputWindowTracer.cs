@@ -25,7 +25,7 @@
             if (outputWindow == null)
                 return;
 
-            var outputPaneGuid = new Guid("{C49C2D45-A34D-4255-9382-40CE2BDAD575}");
+            var outputPaneGuid = new Guid("{4FDC5538-066E-4942-A1FC-15BCB6602D30}");
 
             IVsOutputWindowPane pane;
             var errorCode = outputWindow.GetPane(ref outputPaneGuid, out pane);

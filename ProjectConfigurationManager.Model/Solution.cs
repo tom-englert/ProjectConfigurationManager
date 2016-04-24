@@ -21,6 +21,7 @@
         private readonly DispatcherThrottle _deferredUpdateThrottle;
         private readonly ITracer _tracer;
         private readonly IVsServiceProvider _serviceProvider;
+        private readonly PerformanceTracer _performanceTracer;
 
         private readonly ObservableCollection<Project> _projects = new ObservableCollection<Project>();
         private readonly ObservableCollection<SolutionConfiguration> _configurations = new ObservableCollection<SolutionConfiguration>();
@@ -36,15 +37,17 @@
         private FileSystemWatcher _fileSystemWatcher;
 
         [ImportingConstructor]
-        public Solution(ITracer tracer, IVsServiceProvider serviceProvider)
+        public Solution(ITracer tracer, IVsServiceProvider serviceProvider, PerformanceTracer performanceTracer)
         {
             Contract.Requires(tracer != null);
             Contract.Requires(serviceProvider != null);
+            Contract.Requires(performanceTracer != null);
 
             _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ContextIdle, Update);
 
             _tracer = tracer;
             _serviceProvider = serviceProvider;
+            _performanceTracer = performanceTracer;
 
             _specificProjectConfigurations = Projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
             _solutionContexts = SolutionConfigurations.ObservableSelectMany(cfg => cfg.Contexts);
@@ -54,18 +57,19 @@
             _solutionEvents = Dte?.Events?.SolutionEvents;
             if (_solutionEvents != null)
             {
-                _solutionEvents.Opened += Solution_Changed;
-                _solutionEvents.AfterClosing += Solution_Changed;
-                _solutionEvents.ProjectAdded += _ => Solution_Changed();
-                _solutionEvents.ProjectRemoved += _ => Solution_Changed();
-                _solutionEvents.ProjectRenamed += (_, __) => Solution_Changed();
+                _solutionEvents.Opened += () => Solution_Changed("Solution opened");
+                _solutionEvents.AfterClosing += () => Solution_Changed("Solution after closing");
+                _solutionEvents.ProjectAdded += _ => Solution_Changed("Project added");
+                _solutionEvents.ProjectRemoved += _ => Solution_Changed("Project removed");
+                _solutionEvents.ProjectRenamed += (_, __) => Solution_Changed("Project renamed");
             }
 
             Update();
         }
 
-        private void Solution_Changed()
+        private void Solution_Changed(string action)
         {
+            _tracer.WriteLine(action);
             _deferredUpdateThrottle.Tick();
         }
 
@@ -158,27 +162,30 @@
 
         public void Update()
         {
-            try
+            using (_performanceTracer.Start("Update"))
             {
-                SynchronizeCollections();
+                try
+                {
+                    SynchronizeCollections();
 
-                SetupFileSystemWatcher();
-            }
-            catch (IOException ex)
-            {
-                if (ex.GetType() != typeof(IOException))
+                    SetupFileSystemWatcher();
+                }
+                catch (IOException ex)
+                {
+                    if (ex.GetType() != typeof (IOException))
+                    {
+                        _tracer.TraceError(ex);
+                    }
+                    else
+                    {
+                        // could not access the project file, retry later...
+                        Dispatcher.BeginInvoke(DispatcherPriority.Background, Update);
+                    }
+                }
+                catch (Exception ex)
                 {
                     _tracer.TraceError(ex);
                 }
-                else
-                {
-                    // could not access the project file, retry later...
-                    Dispatcher.BeginInvoke(DispatcherPriority.Background, Update);
-                }
-            }
-            catch (Exception ex)
-            {
-                _tracer.TraceError(ex);
             }
         }
 
@@ -373,6 +380,7 @@
         {
             Contract.Invariant(_tracer != null);
             Contract.Invariant(_serviceProvider != null);
+            Contract.Invariant(_performanceTracer != null);
             Contract.Invariant(_projects != null);
             Contract.Invariant(_configurations != null);
             Contract.Invariant(Projects != null);

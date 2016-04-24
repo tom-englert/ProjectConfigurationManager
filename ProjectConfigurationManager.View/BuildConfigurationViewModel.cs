@@ -18,7 +18,7 @@
 
     [DisplayName("Build Configuration")]
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 1)]
-    class BuildConfigurationViewModel : ObservableObject, IComposablePart
+    class BuildConfigurationViewModel : ObservableObject
     {
         private readonly Solution _solution;
         private readonly ICollection<ProjectConfiguration> _selectedConfigurations = new ObservableCollection<ProjectConfiguration>();

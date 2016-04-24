@@ -8,6 +8,7 @@
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Windows;
     using System.Windows.Controls.Primitives;
@@ -36,6 +37,11 @@
     [Guid("01a9a1a2-ea6f-4cb6-ae33-996b06435a62")]
     public class MyToolWindow : ToolWindowPane, IVsServiceProvider
     {
+        private const string _introMessage = "Project Configuration Manager loaded."
+            + "\nHome: https://github.com/tom-englert/ProjectConfigurationManager"
+            + "\nReport issues: https://github.com/tom-englert/ProjectConfigurationManager/issues"
+            + "\nSupport the project by adding a short review: https://visualstudiogallery.msdn.microsoft.com/cf7efe17-ae87-40fe-a1e2-f2d61907f043/view/Reviews";
+
         private readonly ICompositionHost _compositionHost = new CompositionHost();
         private readonly ITracer _tracer;
 
@@ -65,6 +71,15 @@
             try
             {
                 base.OnCreate();
+
+                _tracer.WriteLine(_introMessage);
+
+                var executingAssembly = Assembly.GetExecutingAssembly();
+                var folder = Path.GetDirectoryName(executingAssembly.Location);
+
+                _tracer.WriteLine("Assembly location: {0}", folder);
+                _tracer.WriteLine("Version: {0}", new AssemblyName(executingAssembly.FullName).Version);
+
 
                 var view = _compositionHost.GetExportedValue<ShellView>();
                 view.Resources.MergedDictionaries.Add(DataTemplateManager.CreateDynamicDataTemplates(_compositionHost.Container));

@@ -186,6 +186,7 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="ITracer.cs" />
     <Compile Include="OutputWindowTracer.cs" />
+    <Compile Include="PerformanceTracer.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectConfiguration.cs" />
     <Compile Include="ProjectFile.cs" />
