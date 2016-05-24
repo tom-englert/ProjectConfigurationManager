@@ -172,7 +172,7 @@
                 }
                 catch (IOException ex)
                 {
-                    if (ex.GetType() != typeof (IOException))
+                    if (ex.GetType() != typeof(IOException))
                     {
                         _tracer.TraceError(ex);
                     }
@@ -239,7 +239,7 @@
             }
             catch (IOException ex)
             {
-                if (ex.GetType() != typeof (IOException))
+                if (ex.GetType() != typeof(IOException))
                 {
                     _tracer.TraceError(ex);
                 }
@@ -278,7 +278,9 @@
         {
             Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
 
-            return GetDteProjects().Select(project => new Project(this, project));
+            return GetDteProjects()
+                .Select(project => Project.Create(this, project, _tracer))
+                .Where(project => project != null);
         }
 
         private IEnumerable<EnvDTE.Project> GetDteProjects()

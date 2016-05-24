@@ -28,7 +28,7 @@
 
         private ProjectFile _projectFile;
 
-        internal Project(Solution solution, EnvDTE.Project project)
+        private Project(Solution solution, EnvDTE.Project project)
         {
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
@@ -48,6 +48,26 @@
             _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);
 
             Update();
+        }
+
+        internal static Project Create(Solution solution, EnvDTE.Project project, ITracer tracer)
+        {
+            try
+            {
+                Uri projectUri;
+
+                // Skip web pojects, we can't edit them.
+                if (Uri.TryCreate(project.FullName, UriKind.Absolute, out projectUri) && projectUri.IsFile)
+                {
+                    return new Project(solution, project);
+                }
+            }
+            catch (Exception ex)
+            {
+                tracer.TraceError(ex);
+            }
+
+            return null;
         }
 
         public Solution Solution
