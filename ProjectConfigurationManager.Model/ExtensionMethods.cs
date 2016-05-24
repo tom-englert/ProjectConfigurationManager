@@ -9,13 +9,24 @@
         {
             Contract.Requires(element != null);
 
-            var previous = element.PreviousNode as XText;
-            if ((previous != null) && string.IsNullOrWhiteSpace(previous.Value))
+            while (true)
             {
-                previous.Remove();
-            }
+                var previous = element.PreviousNode as XText;
 
-            element.Remove();
+                if ((previous != null) && string.IsNullOrWhiteSpace(previous.Value))
+                {
+                    previous.Remove();
+                }
+
+                var parent = element.Parent;
+
+                element.Remove();
+
+                if ((parent == null) || parent.HasElements)
+                    return;
+
+                element = parent;
+            }
         }
     }
 }
