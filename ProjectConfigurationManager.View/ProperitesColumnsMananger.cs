@@ -21,6 +21,19 @@
             DependencyProperty.RegisterAttached("ProjectProperty", typeof(ProjectPropertyName), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
 
 
+        public static string GetPropertyName(DependencyObject obj)
+        {
+            return (string)obj.GetValue(PropertyNameProperty);
+        }
+        public static void SetPropertyName(DependencyObject obj, string value)
+        {
+            obj.SetValue(PropertyNameProperty, value);
+        }
+        public static readonly DependencyProperty PropertyNameProperty =
+            DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
+
+
+
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
         public static ICollection GetProperites(DependencyObject obj)
         {
@@ -51,7 +64,11 @@
             if (DesignerProperties.GetIsInDesignMode(dataGrid))
                 return;
 
-            dataGrid.Columns.AddRange(propertieGroups.OfType<CollectionViewGroup>().SelectMany(group => group.Items.Cast<ProjectPropertyName>()).Select(CreateColumn));
+            var columns = propertieGroups.OfType<CollectionViewGroup>()
+                .SelectMany(group => group.Items.Cast<ProjectPropertyName>())
+                .Select(CreateColumn);
+
+            dataGrid.Columns.AddRange(columns);
 
             ((INotifyCollectionChanged)propertieGroups).CollectionChanged += (sender, e) => ProjectProperties_CollectionChanged(dataGrid, e);
         }
@@ -111,6 +128,7 @@
             column.EnableMultilineEditing();
 
             column.SetValue(ProjectConfigurationProperty, projectPropertyName);
+            column.SetValue(PropertyNameProperty, projectPropertyName.Name);
 
             return column;
         }
