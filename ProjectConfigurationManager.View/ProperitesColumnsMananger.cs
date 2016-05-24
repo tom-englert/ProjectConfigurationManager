@@ -1,6 +1,8 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System.Collections;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Diagnostics.Contracts;
@@ -14,19 +16,27 @@
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
+    using TomsToolbox.ObservableCollections;
 
     public static class ProperitesColumnsMananger
     {
+        private static readonly DependencyProperty _columnsProperty =
+            DependencyProperty.RegisterAttached("_columns", typeof(IObservableCollection<object>), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
+
+
         internal static readonly DependencyProperty ProjectConfigurationProperty =
             DependencyProperty.RegisterAttached("ProjectProperty", typeof(ProjectPropertyName), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
 
 
+
         public static string GetPropertyName(DependencyObject obj)
         {
+            Contract.Requires(obj != null);
             return (string)obj.GetValue(PropertyNameProperty);
         }
         public static void SetPropertyName(DependencyObject obj, string value)
         {
+            Contract.Requires(obj != null);
             obj.SetValue(PropertyNameProperty, value);
         }
         public static readonly DependencyProperty PropertyNameProperty =
@@ -48,13 +58,14 @@
         public static readonly DependencyProperty ProperitesProperty =
             DependencyProperty.RegisterAttached("Properites", typeof(ICollection), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null, Properties_Changed));
 
+
         private static void Properties_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var dataGrid = (DataGrid)d;
-            Register(dataGrid, (ICollection)e.NewValue);
+            Register(dataGrid, e.NewValue as IList<object>);
         }
 
-        private static void Register(DataGrid dataGrid, ICollection propertieGroups)
+        private static void Register(DataGrid dataGrid, IList<object> propertieGroups)
         {
             Contract.Requires(dataGrid != null);
 
@@ -64,13 +75,12 @@
             if (DesignerProperties.GetIsInDesignMode(dataGrid))
                 return;
 
-            var columns = propertieGroups.OfType<CollectionViewGroup>()
-                .SelectMany(group => group.Items.Cast<ProjectPropertyName>())
-                .Select(CreateColumn);
+            var columns = propertieGroups.ObservableSelectMany(group => ((CollectionViewGroup)group).Items);
+            dataGrid.SetValue(_columnsProperty, columns); // need to hold a reference...
 
-            dataGrid.Columns.AddRange(columns);
+            dataGrid.Columns.AddRange(columns.OfType<ProjectPropertyName>().Select(CreateColumn));
 
-            ((INotifyCollectionChanged)propertieGroups).CollectionChanged += (sender, e) => ProjectProperties_CollectionChanged(dataGrid, e);
+            columns.CollectionChanged += (sender, e) => ProjectProperties_CollectionChanged(dataGrid, e);
         }
 
         private static void ProjectProperties_CollectionChanged(DataGrid dataGrid, NotifyCollectionChangedEventArgs e)
@@ -82,8 +92,7 @@
             {
                 case NotifyCollectionChangedAction.Add:
                     var newColumns = e.NewItems?
-                        .OfType<CollectionViewGroup>()
-                        .SelectMany(group => group.Items.Cast<ProjectPropertyName>());
+                        .OfType<ProjectPropertyName>();
 
                     if (newColumns != null)
                         dataGrid.Columns.AddRange(newColumns.Select(CreateColumn));
@@ -91,8 +100,7 @@
 
                 case NotifyCollectionChangedAction.Remove:
                     var oldColumns = e.OldItems?
-                        .OfType<CollectionViewGroup>()
-                        .SelectMany(group => group.Items.Cast<ProjectPropertyName>())
+                        .OfType<ProjectPropertyName>()
                         .ToArray();
 
                     var columnsToRemove = dataGrid.Columns
