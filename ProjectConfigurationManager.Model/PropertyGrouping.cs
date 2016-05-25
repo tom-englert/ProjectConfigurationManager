@@ -13,6 +13,7 @@
             "AppDesignerFolder",
             "RootNamespace",
             "AssemblyName",
+            "Tags"
         };
 
         private static readonly HashSet<string> _globalProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)

@@ -125,7 +125,7 @@
         </DataGridTemplateColumn>
         <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" Width="110"/>
         <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" Width="85"/>
-        <DataGridTextColumn Header="Tags" Binding="{Binding PropertyValue[Tags]}" DisplayIndex="3" local:ProperitesColumnsMananger.PropertyName="Tags" />
+        <DataGridTextColumn Header="Tags" Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}" DisplayIndex="3" local:ProperitesColumnsMananger.PropertyName="Tags" />
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
