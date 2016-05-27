@@ -2,7 +2,7 @@ namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System.Diagnostics.Contracts;
 
-    [ContractClass(typeof(Indexer<>))]
+    [ContractClass(typeof(IndexerContract<>))]
     public interface IIndexer<T>
     {
         T this[string key]
@@ -13,7 +13,7 @@ namespace tomenglertde.ProjectConfigurationManager.Model
     }
 
     [ContractClassFor(typeof(IIndexer<>))]
-    abstract class Indexer<T> : IIndexer<T>
+    abstract class IndexerContract<T> : IIndexer<T>
     {
         public T this[string key]
         {

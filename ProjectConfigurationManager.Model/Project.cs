@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
@@ -14,6 +15,7 @@
 
     public class Project : ObservableObject, IEquatable<Project>
     {
+        private const string ProjectTypeGuidsPropertyKey = "ProjectTypeGuids";
         private readonly EnvDTE.Project _project;
 
         private readonly Solution _solution;
@@ -26,6 +28,7 @@
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
         private readonly ProjectConfiguration _defaultProjectConfiguration;
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
+        private readonly IIndexer<bool> _isProjectTypeGuidSelected;
 
         private ProjectFile _projectFile;
 
@@ -48,6 +51,7 @@
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
             _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);
             _projectConfigurations = ObservableCompositeCollection.FromSingleItemAndList(_defaultProjectConfiguration, _internalSpecificProjectConfigurations);
+            _isProjectTypeGuidSelected = new ProjectTypeGuidIndexer(this);
 
             Update();
         }
@@ -139,6 +143,10 @@
                 Contract.Ensures(Contract.Result<string[]>() != null);
                 return RetrieveProjectTypeGuids();
             }
+            set
+            {
+                SetProjectTypeGuids(value);
+            }
         }
 
         public IObservableCollection<SolutionContext> SolutionContexts
@@ -176,6 +184,8 @@
                 return _projectConfigurations;
             }
         }
+
+        public IIndexer<bool> IsProjectTypeGuidSelected => _isProjectTypeGuidSelected;
 
         public bool IsSaving => _projectFile.IsSaving;
 
@@ -281,10 +291,48 @@
         {
             Contract.Ensures(Contract.Result<string[]>() != null);
 
-            return (_defaultProjectConfiguration.PropertyValue["ProjectTypeGuids"] ?? ProjectTypeGuid.Unspecified)
+            return (_defaultProjectConfiguration.PropertyValue[ProjectTypeGuidsPropertyKey] ?? ProjectTypeGuid.Unspecified)
                 .Split(';')
                 .Select(item => item.Trim())
                 .ToArray();
+        }
+
+        private void SetProjectTypeGuids(IEnumerable<string> value)
+        {
+            _defaultProjectConfiguration.PropertyValue[ProjectTypeGuidsPropertyKey] = string.Join(";", value);
+        }
+
+        private class ProjectTypeGuidIndexer : IIndexer<bool>
+        {
+            private readonly Project _project;
+
+            public ProjectTypeGuidIndexer(Project project)
+            {
+                Contract.Requires(project != null);
+
+                _project = project;
+            }
+
+            public bool this[string projectTypeGuid]
+            {
+                get
+                {
+                    return _project.ProjectTypeGuids.Contains(projectTypeGuid, StringComparer.OrdinalIgnoreCase);
+                }
+                set
+                {
+                    _project.SetProjectTypeGuids(value
+                        ? _project.ProjectTypeGuids.Concat(new[] { projectTypeGuid }).Distinct(StringComparer.OrdinalIgnoreCase)
+                        : _project.ProjectTypeGuids.Where(item => !item.Equals(projectTypeGuid, StringComparison.OrdinalIgnoreCase)));
+                }
+            }
+
+            [ContractInvariantMethod]
+            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+            private void ObjectInvariant()
+            {
+                Contract.Invariant(_project != null);
+            }
         }
 
         #region IEquatable implementation

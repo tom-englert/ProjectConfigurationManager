@@ -29,13 +29,11 @@
             Contract.Requires(obj != null);
             return (ICollection)obj.GetValue(ConfigurationsProperty);
         }
-
         public static void SetConfigurations(DependencyObject obj, ICollection value)
         {
             Contract.Requires(obj != null);
             obj.SetValue(ConfigurationsProperty, value);
         }
-
         /// <summary>
         /// Identifies the <see cref="P:tomenglertde.ProjectConfigurationManager.View.BuildConfigurationColumnsManager.Configurations"/> attached property
         /// </summary>

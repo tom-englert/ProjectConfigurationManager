@@ -1,4 +1,5 @@
-﻿namespace tomenglertde.ProjectConfigurationManager
+﻿using System.Diagnostics.Contracts;
+namespace tomenglertde.ProjectConfigurationManager
 {
     using System;
     using System.ComponentModel;
@@ -8,6 +9,7 @@
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Windows;
@@ -158,7 +160,17 @@
 
             var context = new RegistrationBuilder();
             context.ForTypesDerivedFrom<FrameworkElement>().SetCreationPolicy(CreationPolicy.NonShared);
+            context.ForTypesDerivedFrom<object>().SelectConstructor(SelectConstructor);
+
             return context;
+        }
+
+        private static ConstructorInfo SelectConstructor(ConstructorInfo[] constructors)
+        {
+            Contract.Requires(constructors != null);
+
+            return constructors.SingleOrDefault(c => c.GetCustomAttributes<ImportingConstructorAttribute>().Any())
+                   ?? constructors.OrderByDescending(c => c.GetParameters().Length).FirstOrDefault();
         }
     }
 }
