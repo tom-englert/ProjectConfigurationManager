@@ -120,10 +120,13 @@
         {
             IsSaving = true;
 
+            var outputFileName = _project.FullName;
+            var projectName = _project.Name;
+
             _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () =>
             {
                 IsSaving = false;
-                FileTime = File.GetLastWriteTime(_project.FullName);
+                FileTime = File.GetLastWriteTime(outputFileName);
             });
 
             var projectGuid = _projectGuid;
@@ -139,15 +142,40 @@
             var settings = new XmlWriterSettings
             {
                 Indent = true,
-                IndentChars = "  "
+                IndentChars = "  ",
             };
 
-            using (var writer = XmlWriter.Create(_project.FullName, settings))
+            var backup = File.ReadAllBytes(outputFileName);
+
+            using (var writer = XmlWriter.Create(outputFileName, settings))
             {
                 Document.WriteTo(writer);
             }
 
-            solution.ReloadProject(ref projectGuid);
+            var result = solution.ReloadProject(ref projectGuid);
+
+            if (result == 0)
+                return;
+
+            _solution.Tracer.TraceError("Loading project {0} failed after saving - reverting changes.", projectName);
+            File.WriteAllBytes(outputFileName, backup);
+
+            ReloadProject(_dispatcher, solution, 0, projectGuid);
+        }
+
+        private static void ReloadProject(Dispatcher dispatcher, IVsSolution4 solution, int retry, Guid projectGuid)
+        {
+            Contract.Requires(dispatcher != null);
+            Contract.Requires(solution != null);
+
+            var hr = solution.ReloadProject(ref projectGuid);
+            if (hr == 0)
+                return;
+
+            if (retry < 3)
+            {
+                dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () => ReloadProject(dispatcher, solution, retry + 1, projectGuid));
+            }
         }
 
         private static Guid GetProjectGuid(IServiceProvider serviceProvider, string uniqueName)

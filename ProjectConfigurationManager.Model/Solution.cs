@@ -26,7 +26,6 @@
         private readonly ObservableCollection<Project> _projects = new ObservableCollection<Project>();
         private readonly ObservableCollection<SolutionConfiguration> _configurations = new ObservableCollection<SolutionConfiguration>();
         private readonly IObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
-        private readonly IObservableCollection<ProjectConfiguration> _defaultProjectConfigurations;
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
         private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
@@ -43,16 +42,15 @@
             Contract.Requires(serviceProvider != null);
             Contract.Requires(performanceTracer != null);
 
-            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ContextIdle, Update);
+            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ApplicationIdle, Update);
 
             _tracer = tracer;
             _serviceProvider = serviceProvider;
             _performanceTracer = performanceTracer;
 
-            _specificProjectConfigurations = Projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
+            _specificProjectConfigurations = _projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
             _solutionContexts = SolutionConfigurations.ObservableSelectMany(cfg => cfg.Contexts);
-            _defaultProjectConfigurations = Projects.ObservableSelect(prj => prj.DefaultProjectConfiguration);
-            _projectConfigurations = new ObservableCompositeCollection<ProjectConfiguration>(_defaultProjectConfigurations, _specificProjectConfigurations);
+            _projectConfigurations = _projects.ObservableSelectMany(prj => prj.ProjectConfigurations);
 
             _solutionEvents = Dte?.Events?.SolutionEvents;
             if (_solutionEvents != null)
@@ -109,6 +107,15 @@
             }
         }
 
+        public ITracer Tracer
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ITracer>() != null);
+                return _tracer;
+            }
+        }
+
         public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations
         {
             get
@@ -162,25 +169,23 @@
 
         public void Update()
         {
+            Update(0);
+        }
+
+        public void Update(int retry)
+        {
             using (_performanceTracer.Start("Update"))
             {
                 try
                 {
-                    SynchronizeCollections();
-
+                    SynchronizeCollections(retry < 5);
                     SetupFileSystemWatcher();
                 }
-                catch (IOException ex)
+                catch (RetryException)
                 {
-                    if (ex.GetType() != typeof(IOException))
-                    {
-                        _tracer.TraceError(ex);
-                    }
-                    else
-                    {
-                        // could not access the project file, retry later...
-                        Dispatcher.BeginInvoke(DispatcherPriority.Background, Update);
-                    }
+                    _tracer.WriteLine("Retry Update...");
+                    // could not access the project file, retry later...
+                    Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () => Update(retry + 1));
                 }
                 catch (Exception ex)
                 {
@@ -222,42 +227,51 @@
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e));
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e, 0));
         }
 
-        private void DeferredOnWatcherChanged(FileSystemEventArgs e)
+        private void DeferredOnWatcherChanged(FileSystemEventArgs e, int retry)
         {
             try
             {
-                var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
+                var project = _projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
 
                 if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
                     return;
 
-                project.Reload();
-                SynchronizeCollections();
-            }
-            catch (IOException ex)
-            {
-                if (ex.GetType() != typeof(IOException))
+                using (_performanceTracer.Start("Update"))
                 {
-                    _tracer.TraceError(ex);
-                }
-                else
-                {
-                    // could not access the project file, retry later...
-                    Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e));
+                    try
+                    {
+                        project.Reload();
+                    }
+                    catch (Exception ex)
+                    {
+                        if ((retry >= 3) || (ex.GetType() != typeof(IOException)))
+                            throw;
+
+                        // could not access the project file, retry later...
+                        Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e, retry + 1));
+                        return;
+                    }
+
+                    SynchronizeCollections(retry < 3);
                 }
             }
             catch (Exception ex)
             {
+                if (ex is RetryException)
+                {
+                    Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e, retry + 1));
+                }
+
                 _tracer.TraceError(ex);
             }
         }
 
-        private void SynchronizeCollections()
+        private void SynchronizeCollections(bool retryOnErrors)
         {
-            _projects.SynchronizeWith(GetProjects().ToArray());
+            _projects.SynchronizeWith(GetProjects(retryOnErrors).ToArray());
 
             _configurations.SynchronizeWith(GetConfigurations().ToArray());
 
@@ -274,78 +288,97 @@
                 .Select(item => new SolutionConfiguration(this, item)) ?? Enumerable.Empty<SolutionConfiguration>();
         }
 
-        private IEnumerable<Project> GetProjects()
+        private IEnumerable<Project> GetProjects(bool retryOnErrors)
         {
             Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
 
-            return GetDteProjects()
-                .Select(project => Project.Create(this, project, _tracer))
+            return GetDteProjects(retryOnErrors)
+                .Select(project => Project.Create(this, project, retryOnErrors, _tracer))
                 .Where(project => project != null);
         }
 
-        private IEnumerable<EnvDTE.Project> GetDteProjects()
+        private IEnumerable<EnvDTE.Project> GetDteProjects(bool retryOnErrors)
         {
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
 
             var items = new List<EnvDTE.Project>();
 
-            var projects = DteSolution?.Projects;
-
-            if (projects == null)
-                return items;
-
-            for (var i = 1; i <= projects.Count; i++)
-            {
-                try
-                {
-                    GetProjectOrSubProjects(items, projects.Item(i));
-                }
-                catch (Exception ex)
-                {
-                    _tracer.TraceError("Error loading a project: " + ex.Message);
-                }
-            }
+            GetDteProjects(DteSolution?.Projects)
+                .ForEach(project => GetProjectOrSubProjects(items, project, retryOnErrors));
 
             return items;
         }
 
-        private void GetProjectOrSubProjects(ICollection<EnvDTE.Project> items, EnvDTE.Project project)
+        private void GetProjectOrSubProjects(ICollection<EnvDTE.Project> items, EnvDTE.Project project, bool retryOnErrors)
         {
             Contract.Requires(items != null);
 
             if (project == null)
                 return;
 
+            if (string.Equals(project.Kind, ItemKind.SolutionFolder, StringComparison.OrdinalIgnoreCase))
+            {
+                GetSubProjects(project).ForEach(p => GetProjectOrSubProjects(items, p, retryOnErrors));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(project.UniqueName))
+                return;
+
             try
             {
-                if (!string.Equals(project.Kind, ItemKind.SolutionFolder, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(project.FullName))
                 {
-                    if (!string.IsNullOrEmpty(project.FullName) && !string.IsNullOrEmpty(project.UniqueName))
-                    {
-                        items.Add(project);
-                    }
-
-                    return;
-                }
-
-                var projectItems = project.ProjectItems;
-                Contract.Assume(projectItems != null);
-
-                foreach (var projectItem in projectItems.OfType<EnvDTE.ProjectItem>())
-                {
-                    try
-                    {
-                        GetProjectOrSubProjects(items, projectItem.SubProject);
-                    }
-                    catch (Exception ex)
-                    {
-                        _tracer.TraceError("Error loading a project: " + ex.Message);
-                    }
+                    items.Add(project);
                 }
             }
             catch (Exception ex)
             {
+                if (ex is NotImplementedException)
+                    if (retryOnErrors)
+                        throw new RetryException(ex);
+
                 _tracer.TraceError("Error loading a project: " + ex.Message);
+            }
+        }
+
+        public IEnumerable<EnvDTE.Project> GetSubProjects(EnvDTE.Project project)
+        {
+            try
+            {
+                var projectItems = project?.ProjectItems;
+
+                if (projectItems != null)
+                    return projectItems.OfType<EnvDTE.ProjectItem>().Select(item => item.SubProject);
+            }
+            catch (Exception ex)
+            {
+                _tracer.TraceError("Error loading sub projects: " + ex.Message);
+            }
+
+            return Enumerable.Empty<EnvDTE.Project>();
+        }
+
+        public IEnumerable<EnvDTE.Project> GetDteProjects(EnvDTE.Projects projects)
+        {
+            if (projects == null)
+                yield break;
+
+            for (var i = 1; i <= projects.Count; i++)
+            {
+                EnvDTE.Project item;
+
+                try
+                {
+                    item = projects.Item(i);
+                }
+                catch (Exception ex)
+                {
+                    _tracer.TraceError("Error loading a project: " + ex.Message);
+                    continue;
+                }
+
+                yield return item;
             }
         }
 
@@ -353,7 +386,7 @@
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyName>>() != null);
 
-            return Projects
+            return _projects
                 .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties.Values))
                 .Select(prop => prop.Name)
                 .Distinct()
@@ -385,7 +418,6 @@
             Contract.Invariant(_performanceTracer != null);
             Contract.Invariant(_projects != null);
             Contract.Invariant(_configurations != null);
-            Contract.Invariant(Projects != null);
         }
     }
 }

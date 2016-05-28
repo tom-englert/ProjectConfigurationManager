@@ -25,6 +25,7 @@
         private readonly ReadOnlyObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
         private readonly ProjectConfiguration _defaultProjectConfiguration;
+        private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
 
         private ProjectFile _projectFile;
 
@@ -46,12 +47,16 @@
             _defaultProjectConfiguration = new ProjectConfiguration(this, null, null);
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
             _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);
+            _projectConfigurations = ObservableCompositeCollection.FromSingleItemAndList(_defaultProjectConfiguration, _internalSpecificProjectConfigurations);
 
             Update();
         }
 
-        internal static Project Create(Solution solution, EnvDTE.Project project, ITracer tracer)
+        internal static Project Create(Solution solution, EnvDTE.Project project, bool retryOnErrors, ITracer tracer)
         {
+            if (project == null)
+                return null;
+
             try
             {
                 Uri projectUri;
@@ -64,6 +69,9 @@
             }
             catch (Exception ex)
             {
+                if (retryOnErrors && (ex.GetType() == typeof(IOException)))
+                    throw new RetryException(ex);
+
                 tracer.TraceError(ex);
             }
 
@@ -160,6 +168,15 @@
             }
         }
 
+        public IObservableCollection<ProjectConfiguration> ProjectConfigurations
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IObservableCollection<ProjectConfiguration>>() != null);
+                return _projectConfigurations;
+            }
+        }
+
         public bool IsSaving => _projectFile.IsSaving;
 
         public DateTime FileTime => _projectFile.FileTime;
@@ -176,6 +193,22 @@
                 {
                     // project is currently unloaded...
                     return true;
+                }
+            }
+        }
+
+        internal bool IsLoaded
+        {
+            get
+            {
+                try
+                {
+                    return _project.Saved || _project.IsDirty;
+                }
+                catch
+                {
+                    // project is currently unloaded...
+                    return false;
                 }
             }
         }
@@ -333,6 +366,9 @@
             Contract.Invariant(_projectFile != null);
             Contract.Invariant(_defaultProjectConfiguration != null);
             Contract.Invariant(_solutionContexts != null);
+            Contract.Invariant(_internalSpecificProjectConfigurations != null);
+            Contract.Invariant(_specificProjectConfigurations != null);
+            Contract.Invariant(_projectConfigurations != null);
         }
     }
 }

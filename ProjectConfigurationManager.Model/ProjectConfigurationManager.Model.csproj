@@ -195,6 +195,7 @@
     <Compile Include="IProjectPropertyGroup.cs" />
     <Compile Include="ProjectTypeGuid.cs" />
     <Compile Include="PropertyGrouping.cs" />
+    <Compile Include="RetryException.cs" />
     <Compile Include="Solution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
