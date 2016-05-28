@@ -51,7 +51,7 @@
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
             _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);
             _projectConfigurations = ObservableCompositeCollection.FromSingleItemAndList(_defaultProjectConfiguration, _internalSpecificProjectConfigurations);
-            _isProjectTypeGuidSelected = new ProjectTypeGuidIndexer(this);
+            _isProjectTypeGuidSelected = new ProjectTypeGuidIndexer(_defaultProjectConfiguration);
 
             Update();
         }
@@ -142,10 +142,6 @@
             {
                 Contract.Ensures(Contract.Result<string[]>() != null);
                 return RetrieveProjectTypeGuids();
-            }
-            set
-            {
-                SetProjectTypeGuids(value);
             }
         }
 
@@ -294,44 +290,56 @@
             return (_defaultProjectConfiguration.PropertyValue[ProjectTypeGuidsPropertyKey] ?? ProjectTypeGuid.Unspecified)
                 .Split(';')
                 .Select(item => item.Trim())
+                .Where(item => !string.IsNullOrEmpty(item))
                 .ToArray();
-        }
-
-        private void SetProjectTypeGuids(IEnumerable<string> value)
-        {
-            _defaultProjectConfiguration.PropertyValue[ProjectTypeGuidsPropertyKey] = string.Join(";", value);
         }
 
         private class ProjectTypeGuidIndexer : IIndexer<bool>
         {
-            private readonly Project _project;
+            private readonly ProjectConfiguration _configuration;
 
-            public ProjectTypeGuidIndexer(Project project)
+            public ProjectTypeGuidIndexer(ProjectConfiguration configuration)
             {
-                Contract.Requires(project != null);
+                Contract.Requires(configuration != null);
 
-                _project = project;
+                _configuration = configuration;
             }
 
             public bool this[string projectTypeGuid]
             {
                 get
                 {
-                    return _project.ProjectTypeGuids.Contains(projectTypeGuid, StringComparer.OrdinalIgnoreCase);
+                    return ProjectTypeGuids.Contains(projectTypeGuid, StringComparer.OrdinalIgnoreCase);
                 }
                 set
                 {
-                    _project.SetProjectTypeGuids(value
-                        ? _project.ProjectTypeGuids.Concat(new[] { projectTypeGuid }).Distinct(StringComparer.OrdinalIgnoreCase)
-                        : _project.ProjectTypeGuids.Where(item => !item.Equals(projectTypeGuid, StringComparison.OrdinalIgnoreCase)));
+                    ProjectTypeGuids = value
+                        ? new[] { projectTypeGuid }.Concat(ProjectTypeGuids).Distinct(StringComparer.OrdinalIgnoreCase)
+                        : ProjectTypeGuids.Where(item => !item.Equals(projectTypeGuid, StringComparison.OrdinalIgnoreCase));
                 }
             }
+
+            private IEnumerable<string> ProjectTypeGuids
+            {
+                get
+                {
+                    return _configuration.PropertyValue[ProjectTypeGuidsPropertyKey]
+                        ?.Split(';')
+                        .Select(item => item.Trim())
+                        .Where(item => !string.IsNullOrEmpty(item)) ?? Enumerable.Empty<string>();
+                }
+                set
+                {
+                    _configuration.PropertyValue[ProjectTypeGuidsPropertyKey] = string.Join(";", value);
+                }
+            }
+
 
             [ContractInvariantMethod]
             [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
             private void ObjectInvariant()
             {
-                Contract.Invariant(_project != null);
+                Contract.Invariant(_configuration != null);
             }
         }
 
