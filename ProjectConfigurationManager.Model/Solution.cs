@@ -178,7 +178,7 @@
             {
                 try
                 {
-                    SynchronizeCollections(retry < 5);
+                    SynchronizeCollections(retry < 3);
                     SetupFileSystemWatcher();
                 }
                 catch (RetryException)
@@ -278,6 +278,34 @@
             _projectProperties.SynchronizeWith(GetProjectProperties().ToArray());
 
             _projectTypeGuids.SynchronizeWith(_projects.SelectMany(p => p.ProjectTypeGuids ?? Enumerable.Empty<string>()).ToArray());
+
+            UpdateReferences();
+        }
+
+        private void UpdateReferences()
+        {
+            var dependencies = new Dictionary<Project, IList<Project>>();
+
+            foreach (var project in _projects)
+            {
+                project.UpdateReferences();
+            }
+
+            foreach (var project in _projects)
+            {
+                Contract.Assume(project != null);
+                foreach (var dependency in project.References)
+                {
+                    Contract.Assume(dependency != null);
+                    dependencies.ForceValue(dependency, _ => new List<Project>()).Add(project);
+                }
+            }
+
+            foreach (var project in _projects)
+            {
+                Contract.Assume(project != null);
+                project.ReferencedBy.SynchronizeWith(dependencies.ForceValue(project, _ => new List<Project>()));
+            }
         }
 
         private IEnumerable<SolutionConfiguration> GetConfigurations()

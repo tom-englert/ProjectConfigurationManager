@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="tomenglertde.ProjectConfigurationManager.View.ProjectDependenciesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
+             xmlns:local="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
+             d:DataContext="{d:DesignInstance local:ProjectDependenciesViewModel}">
+  <UserControl.Resources>
+
+    <HierarchicalDataTemplate DataType="{x:Type local:ProjectDependency}" ItemsSource="{Binding Children}">
+      <TextBlock Margin="1"><Run Text="{Binding Project.Name, Mode=OneWay}" />
+        <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}" />)</Span>
+      </TextBlock>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type local:ProjectDependencyGroup}" ItemsSource="{Binding Items}">
+      <TextBlock Margin="3" Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" />
+    </HierarchicalDataTemplate>
+
+    <Style x:Key="ItemContainerStyle" TargetType="TreeViewItem">
+      <Setter Property="IsSelected" Value="{Binding Path=(local:ProjectDependency.IsSelected)}"/>
+      <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded"/>
+      <EventSetter Event="Collapsed" Handler="TreeViewItem_Collapsed"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Path=(local:ProjectDependency.Level), FallbackValue=0}" Value="0">
+          <Setter Property="IsExpanded" Value="True"/>
+          <Setter Property="Background" Value="#F0F0F0"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Path=(local:ProjectDependency.Level)}" Value="{x:Null}">
+          <Setter Property="Background" Value="Transparent"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Path=(local:ProjectDependency.IsProjectSelected)}" Value="True">
+          <Setter Property="Background" Value="LightSkyBlue"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <TreeView Margin="5" ItemsSource="{Binding Groups}" ItemContainerStyle="{StaticResource ItemContainerStyle}">
+      <TreeView.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+      </TreeView.ItemsPanel>
+    </TreeView>
+  </Grid>
+</UserControl>

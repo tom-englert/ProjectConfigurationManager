@@ -193,6 +193,10 @@
       <Link>Properties\Version.cs</Link>
     </Compile>
     <Compile Include="DataGridTryBeginEditBehavior.cs" />
+    <Compile Include="ProjectDependenciesView.xaml.cs">
+      <DependentUpon>ProjectDependenciesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectDependenciesViewModel.cs" />
     <Compile Include="ProjectTypeGuidToDisplayNameConverter.cs" />
     <Compile Include="ProjectTypesColumnManager.cs" />
     <Compile Include="ProjectTypesView.xaml.cs">
@@ -221,6 +225,10 @@
       <DependentUpon>BuildConfigurationView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ProjectDependenciesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ProjectTypesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

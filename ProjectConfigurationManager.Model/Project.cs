@@ -8,6 +8,7 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -17,6 +18,7 @@
     {
         private const string ProjectTypeGuidsPropertyKey = "ProjectTypeGuids";
         private readonly EnvDTE.Project _project;
+        private readonly VSLangProj.VSProject _vsProject;
 
         private readonly Solution _solution;
         private readonly string _uniqueName;
@@ -29,6 +31,8 @@
         private readonly ProjectConfiguration _defaultProjectConfiguration;
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
         private readonly IIndexer<bool> _isProjectTypeGuidSelected;
+        private readonly ObservableCollection<Project> _referencedBy = new ObservableCollection<Project>();
+        private readonly ObservableCollection<Project> _references = new ObservableCollection<Project>();
 
         private ProjectFile _projectFile;
 
@@ -41,6 +45,7 @@
 
             _solution = solution;
             _project = project;
+            _vsProject = project.Object as VSLangProj.VSProject;
             _uniqueName = _project.UniqueName;
             _name = _project.Name;
             _fullName = _project.FullName;
@@ -187,6 +192,73 @@
 
         public DateTime FileTime => _projectFile.FileTime;
 
+        public ObservableCollection<Project> References
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ObservableCollection<Project>>() != null);
+
+                return _references;
+            }
+        }
+
+        public ObservableCollection<Project> ReferencedBy
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ObservableCollection<Project>>() != null);
+
+                return _referencedBy;
+            }
+        }
+
+        private IEnumerable<VSLangProj.Reference> GetReferences()
+        {
+            Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
+
+            return VsProjectReferences ?? MpfProjectReferences;
+        }
+
+        private IEnumerable<VSLangProj.Reference> MpfProjectReferences
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
+                try
+                {
+                    var projectItems = _project.ProjectItems;
+                    Contract.Assume(projectItems != null);
+
+                    return projectItems
+                        .Cast<EnvDTE.ProjectItem>()
+                        .Select(p => p.Object)
+                        .OfType<VSLangProj.References>()
+                        .Take(1)
+                        .SelectMany(references => references.Cast<VSLangProj.Reference>());
+                }
+                catch (ExternalException)
+                {
+                }
+
+                return null;
+            }
+        }
+
+        private IEnumerable<VSLangProj.Reference> VsProjectReferences
+        {
+            get
+            {
+                try
+                {
+                    return _vsProject?.References?.Cast<VSLangProj.Reference>();
+                }
+                catch (ExternalException)
+                {
+                    return Enumerable.Empty<VSLangProj.Reference>();
+                }
+            }
+        }
+
         internal bool IsSaved
         {
             get
@@ -256,7 +328,18 @@
             _defaultProjectConfiguration.SetProjectFile(_projectFile);
 
             _internalSpecificProjectConfigurations.ForEach(config => config.SetProjectFile(_projectFile));
+        }
 
+        internal void UpdateReferences()
+        {
+            var projectReferences = GetReferences()
+                .Where(reference => reference.GetSourceProject() != null)
+                .Where(reference => reference.CopyLocal)
+                .Select(reference => _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, reference.SourceProject.UniqueName, StringComparison.OrdinalIgnoreCase)))
+                .Where(project => project != null)
+                .ToArray();
+
+            _references.SynchronizeWith(projectReferences);
         }
 
         internal IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
@@ -425,6 +508,8 @@
             Contract.Invariant(_internalSpecificProjectConfigurations != null);
             Contract.Invariant(_specificProjectConfigurations != null);
             Contract.Invariant(_projectConfigurations != null);
+            Contract.Invariant(_referencedBy != null);
+            Contract.Invariant(_references != null);
         }
     }
 }

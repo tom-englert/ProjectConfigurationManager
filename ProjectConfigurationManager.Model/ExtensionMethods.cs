@@ -1,9 +1,10 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
+    using System;
     using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
-    public static class ExtensionMethods
+    internal static class ExtensionMethods
     {
         public static void RemoveSelfAndWhitespace(this XElement element)
         {
@@ -26,6 +27,20 @@
                     return;
 
                 element = parent;
+            }
+        }
+
+        public static EnvDTE.Project GetSourceProject(this VSLangProj.Reference reference)
+        {
+            Contract.Requires(reference != null);
+
+            try
+            {
+                return reference.SourceProject;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }
