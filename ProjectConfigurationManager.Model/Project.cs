@@ -216,14 +216,15 @@
         {
             Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
 
-            return VsProjectReferences ?? MpfProjectReferences;
+            return VsProjectReferences ?? MpfProjectReferences ?? Enumerable.Empty<VSLangProj.Reference>();
         }
 
+
+        [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> MpfProjectReferences
         {
             get
             {
-                Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
                 try
                 {
                     var projectItems = _project.ProjectItems;
@@ -244,6 +245,7 @@
             }
         }
 
+        [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> VsProjectReferences
         {
             get
@@ -254,7 +256,7 @@
                 }
                 catch (ExternalException)
                 {
-                    return Enumerable.Empty<VSLangProj.Reference>();
+                    return null;
                 }
             }
         }
@@ -413,7 +415,7 @@
                 }
                 set
                 {
-                    _configuration.PropertyValue[ProjectTypeGuidsPropertyKey] = string.Join(";", value);
+                    _configuration.PropertyValue[ProjectTypeGuidsPropertyKey] = value == null ? null : string.Join(";", value);
                 }
             }
 

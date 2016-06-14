@@ -246,6 +246,7 @@
             return InternalEquals(this, other);
         }
 
+        [ContractVerification(false)]
         private static bool InternalEquals(ProjectConfiguration left, ProjectConfiguration right)
         {
             if (ReferenceEquals(left, right))

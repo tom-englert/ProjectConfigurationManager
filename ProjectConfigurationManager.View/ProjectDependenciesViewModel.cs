@@ -1,9 +1,11 @@
-﻿namespace tomenglertde.ProjectConfigurationManager.View
+﻿using System.Diagnostics.Contracts;
+namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
 
@@ -35,9 +37,6 @@
             };
         }
 
-        public IObservableCollection<ProjectDependency> References => _references;
-        public IObservableCollection<ProjectDependency> ReferencedBy => _referencedBy;
-
         public ICollection<ProjectDependencyGroup> Groups { get; }
 
         public void UpdateSelection(Project project, bool value)
@@ -45,6 +44,14 @@
             _references.Concat(_referencedBy)
                 .SelectMany(p => p.DescendantsAndSelf)
                 .ForEach(p => p.IsProjectSelected = value && (p.Project == project));
+        }
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_references != null);
+            Contract.Invariant(_referencedBy != null);
         }
     }
 
@@ -77,8 +84,7 @@
             Level = (parent?.Level ?? -1) + 1;
             Project = project;
 
-            var childProjects = getChildProjectsCallback(project);
-            Children = childProjects.ObservableSelect(p => new ProjectDependency(_model, this, p, getChildProjectsCallback));
+            Children = GetChildren(project, getChildProjectsCallback);
         }
 
         public Project Project { get; }
@@ -130,9 +136,25 @@
 
         }
 
+        [ContractVerification(false)]
+        private IObservableCollection<ProjectDependency> GetChildren(Project project, Func<Project, IList<Project>> getChildProjectsCallback)
+        {
+            Contract.Requires(project != null);
+            Contract.Requires(getChildProjectsCallback != null);
+
+            return getChildProjectsCallback(project)?.ObservableSelect(p => new ProjectDependency(_model, this, p, getChildProjectsCallback));
+        }
+
         public override string ToString()
         {
             return Project.Name;
+        }
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(Project != null);
         }
     }
 }

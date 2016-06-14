@@ -1,4 +1,5 @@
-﻿namespace tomenglertde.ProjectConfigurationManager.Model
+﻿using System.Diagnostics.Contracts;
+namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
     using System.Collections.Generic;
@@ -297,14 +298,16 @@
                 foreach (var dependency in project.References)
                 {
                     Contract.Assume(dependency != null);
-                    dependencies.ForceValue(dependency, _ => new List<Project>()).Add(project);
+                    dependencies.ForceValue(dependency, _ => new List<Project>())?.Add(project);
                 }
             }
 
             foreach (var project in _projects)
             {
                 Contract.Assume(project != null);
-                project.ReferencedBy.SynchronizeWith(dependencies.ForceValue(project, _ => new List<Project>()));
+                var dependentProjects = dependencies.ForceValue(project, _ => new List<Project>());
+                Contract.Assume(dependentProjects != null);
+                project.ReferencedBy.SynchronizeWith(dependentProjects);
             }
         }
 
