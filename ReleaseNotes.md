@@ -1,3 +1,8 @@
+1.0.7.0
+* Undo changes if project fails to load after saving.
+* Add project types view
+* Add dependencies view
+
 1.0.6.0
 * Fix #9: Add "Tag" column
 * Fix #8: Remove empty columns
