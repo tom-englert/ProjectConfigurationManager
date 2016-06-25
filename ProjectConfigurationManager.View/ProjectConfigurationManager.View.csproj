@@ -130,6 +130,7 @@
     <CodeContractsRuntimeOnlyPublicSurface>True</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\CodeContracts.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>True</SignAssembly>
@@ -203,7 +204,7 @@
       <DependentUpon>ProjectTypesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProjectTypesViewModel.cs" />
-    <Compile Include="ProperitesColumnsMananger.cs" />
+    <Compile Include="PropertiesColumnsManager.cs" />
     <Compile Include="PropertiesView.xaml.cs">
       <DependentUpon>PropertiesView.xaml</DependentUpon>
     </Compile>
@@ -279,6 +280,11 @@
       <Project>{821890ac-a0be-41e6-b1ca-ff0e1075265f}</Project>
       <Name>ProjectConfigurationManager.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+      <Link>CustomDictionary.xml</Link>
+    </CodeAnalysisDictionary>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

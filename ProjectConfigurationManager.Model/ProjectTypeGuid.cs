@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    public class ProjectTypeGuid
+    public static class ProjectTypeGuid
     {
         public const string Unspecified = "{00000000-0000-0000-0000-000000000000}";
 

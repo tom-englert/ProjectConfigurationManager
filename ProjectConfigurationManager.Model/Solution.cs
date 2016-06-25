@@ -349,7 +349,7 @@ namespace tomenglertde.ProjectConfigurationManager.Model
 
             if (string.Equals(project.Kind, ItemKind.SolutionFolder, StringComparison.OrdinalIgnoreCase))
             {
-                GetSubProjects(project).ForEach(p => GetProjectOrSubProjects(items, p, retryOnErrors));
+                GetSubprojects(project).ForEach(p => GetProjectOrSubProjects(items, p, retryOnErrors));
                 return;
             }
 
@@ -373,7 +373,7 @@ namespace tomenglertde.ProjectConfigurationManager.Model
             }
         }
 
-        public IEnumerable<EnvDTE.Project> GetSubProjects(EnvDTE.Project project)
+        public IEnumerable<EnvDTE.Project> GetSubprojects(EnvDTE.Project project)
         {
             try
             {

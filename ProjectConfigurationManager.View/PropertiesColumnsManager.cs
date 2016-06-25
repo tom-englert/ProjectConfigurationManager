@@ -2,7 +2,6 @@
 {
     using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Diagnostics.Contracts;
@@ -18,14 +17,14 @@
     using TomsToolbox.Core;
     using TomsToolbox.ObservableCollections;
 
-    public static class ProperitesColumnsMananger
+    public static class PropertiesColumnsManager
     {
         private static readonly DependencyProperty _columnsProperty =
-            DependencyProperty.RegisterAttached("_columns", typeof(IObservableCollection<object>), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
+            DependencyProperty.RegisterAttached("_columns", typeof(IObservableCollection<object>), typeof(PropertiesColumnsManager), new FrameworkPropertyMetadata(null));
 
 
         internal static readonly DependencyProperty ProjectConfigurationProperty =
-            DependencyProperty.RegisterAttached("ProjectProperty", typeof(ProjectPropertyName), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
+            DependencyProperty.RegisterAttached("ProjectProperty", typeof(ProjectPropertyName), typeof(PropertiesColumnsManager), new FrameworkPropertyMetadata(null));
 
 
 
@@ -40,23 +39,23 @@
             obj.SetValue(PropertyNameProperty, value);
         }
         public static readonly DependencyProperty PropertyNameProperty =
-            DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null));
+            DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(PropertiesColumnsManager), new FrameworkPropertyMetadata(null));
 
 
 
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
-        public static ICollection GetProperites(DependencyObject obj)
+        public static ICollection GetProperties(DependencyObject obj)
         {
             Contract.Requires(obj != null);
-            return (ICollection)obj.GetValue(ProperitesProperty);
+            return (ICollection)obj.GetValue(PropertiesProperty);
         }
-        public static void SetProperites(DependencyObject obj, ICollection value)
+        public static void SetProperties(DependencyObject obj, ICollection value)
         {
             Contract.Requires(obj != null);
-            obj.SetValue(ProperitesProperty, value);
+            obj.SetValue(PropertiesProperty, value);
         }
-        public static readonly DependencyProperty ProperitesProperty =
-            DependencyProperty.RegisterAttached("Properites", typeof(ICollection), typeof(ProperitesColumnsMananger), new FrameworkPropertyMetadata(null, Properties_Changed));
+        public static readonly DependencyProperty PropertiesProperty =
+            DependencyProperty.RegisterAttached("Properties", typeof(ICollection), typeof(PropertiesColumnsManager), new FrameworkPropertyMetadata(null, Properties_Changed));
 
 
         private static void Properties_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)

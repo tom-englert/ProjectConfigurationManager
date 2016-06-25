@@ -16,7 +16,7 @@
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
-    public class ProjectTypesColumnManager
+    public static class ProjectTypesColumnManager
     {
         public static bool GetIsAttached(DependencyObject obj)
         {

@@ -141,11 +141,11 @@
             }
         }
 
-        public string[] ProjectTypeGuids
+        public IList<string> ProjectTypeGuids
         {
             get
             {
-                Contract.Ensures(Contract.Result<string[]>() != null);
+                Contract.Ensures(Contract.Result<IList<string>>() != null);
                 return RetrieveProjectTypeGuids();
             }
         }

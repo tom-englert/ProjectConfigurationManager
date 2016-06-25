@@ -9,24 +9,24 @@
     {
         private readonly Solution _solution;
         private readonly SolutionConfiguration _solutionConfiguration;
-        private readonly EnvDTE.SolutionContext _ctx;
+        private readonly EnvDTE.SolutionContext _context;
         private string _configurationName;
         private string _platformName;
 
-        public SolutionContext(Solution solution, SolutionConfiguration solutionConfiguration, EnvDTE.SolutionContext ctx)
+        public SolutionContext(Solution solution, SolutionConfiguration solutionConfiguration, EnvDTE.SolutionContext context)
         {
             Contract.Requires(solution != null);
             Contract.Requires(solutionConfiguration != null);
-            Contract.Requires(ctx != null);
+            Contract.Requires(context != null);
 
             _solution = solution;
             _solutionConfiguration = solutionConfiguration;
-            _ctx = ctx;
+            _context = context;
 
-            _configurationName = ctx.ConfigurationName;
-            _platformName = ctx.PlatformName;
+            _configurationName = context.ConfigurationName;
+            _platformName = context.PlatformName;
 
-            ProjectName = ctx.ProjectName;
+            ProjectName = context.ProjectName;
         }
 
         public string ConfigurationName
@@ -63,10 +63,10 @@
             if (!ContextIsValid())
                 return false;
 
-            _ctx.ConfigurationName = configuration.Configuration + "|" + configuration.Platform;
+            _context.ConfigurationName = configuration.Configuration + "|" + configuration.Platform;
 
-            ConfigurationName = _ctx.ConfigurationName;
-            PlatformName = _ctx.PlatformName;
+            ConfigurationName = _context.ConfigurationName;
+            PlatformName = _context.PlatformName;
 
             return true;
         }
@@ -80,14 +80,14 @@
         {
             get
             {
-                return ContextIsValid() && _ctx.ShouldBuild;
+                return ContextIsValid() && _context.ShouldBuild;
             }
             set
             {
                 if (!ContextIsValid())
                     return;
 
-                _ctx.ShouldBuild = value;
+                _context.ShouldBuild = value;
 
                 OnPropertyChanged();
             }
@@ -105,7 +105,7 @@
         private bool ContextIsValid()
         {
             // Check if the owning collection is valid - accessing other properites would throw an AccessViolationException!
-            if (_ctx.Collection?.Count != 0)
+            if (_context.Collection?.Count != 0)
                 return true;
 
             // This context is no longer valid, schedule a solution update and return false...
@@ -123,7 +123,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _ctx.GetHashCode();
+            return _context.GetHashCode();
         }
 
         /// <summary>
@@ -155,7 +155,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return left._ctx == right._ctx;
+            return left._context == right._context;
         }
 
         /// <summary>
@@ -181,7 +181,7 @@
         {
             Contract.Invariant(_solution != null);
             Contract.Invariant(_solutionConfiguration != null);
-            Contract.Invariant(_ctx != null);
+            Contract.Invariant(_context != null);
         }
     }
 }

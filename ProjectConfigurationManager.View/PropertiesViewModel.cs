@@ -41,7 +41,7 @@
             }
         }
 
-        public ICommand CopyCommand => new DelegateCommand<DataGrid>(CanCopy, Copy);
+        public static ICommand CopyCommand => new DelegateCommand<DataGrid>(CanCopy, Copy);
 
         private static void Copy(DataGrid dataGrid)
         {
@@ -55,7 +55,7 @@
             return dataGrid?.HasRectangularCellSelection() ?? false;
         }
 
-        public ICommand PasteCommand => new DelegateCommand<DataGrid>(CanPaste, Paste);
+        public static ICommand PasteCommand => new DelegateCommand<DataGrid>(CanPaste, Paste);
 
         private static void Paste(DataGrid dataGrid)
         {
@@ -74,7 +74,7 @@
             return Clipboard.ContainsText() && (dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false);
         }
 
-        public ICommand DeleteCommand => new DelegateCommand<DataGrid>(CanDelete, Delete);
+        public static ICommand DeleteCommand => new DelegateCommand<DataGrid>(CanDelete, Delete);
 
         private static void Delete(DataGrid dataGrid)
         {
@@ -84,7 +84,7 @@
             foreach (var cell in dataGrid.SelectedCells)
             {
                 var configuration = (ProjectConfiguration)cell.Item;
-                var propertyName = (string)cell.Column.GetValue(ProperitesColumnsMananger.PropertyNameProperty);
+                var propertyName = (string)cell.Column.GetValue(PropertiesColumnsManager.PropertyNameProperty);
                 if (propertyName != null)
                 {
                     configuration.DeleteProperty(propertyName);

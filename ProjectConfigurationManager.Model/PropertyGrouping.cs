@@ -103,7 +103,7 @@
             if (name.StartsWith("CodeContracts", StringComparison.OrdinalIgnoreCase))
                 return "CodeContracts";
 
-            if (name.StartsWith("Scc"))
+            if (name.StartsWith("Scc", StringComparison.OrdinalIgnoreCase))
                 return "Scc";
 
             if (name.Contains("CodeAnalysis"))

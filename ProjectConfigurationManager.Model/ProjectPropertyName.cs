@@ -28,7 +28,7 @@
 
             var length = groupName.Length;
 
-            return name.Length > length && name.StartsWith(groupName) && char.IsUpper(name[length]);
+            return name.Length > length && name.StartsWith(groupName, StringComparison.Ordinal) && char.IsUpper(name[length]);
         }
 
         public string Name
