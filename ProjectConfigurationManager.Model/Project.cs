@@ -237,7 +237,7 @@
                         .Take(1)
                         .SelectMany(references => references.Cast<VSLangProj.Reference>());
                 }
-                catch (ExternalException)
+                catch
                 {
                 }
 
@@ -254,7 +254,7 @@
                 {
                     return _vsProject?.References?.Cast<VSLangProj.Reference>();
                 }
-                catch (ExternalException)
+                catch
                 {
                     return null;
                 }
@@ -335,9 +335,9 @@
         internal void UpdateReferences()
         {
             var projectReferences = GetReferences()
-                .Where(reference => reference.GetSourceProject() != null)
-                .Where(reference => reference.CopyLocal)
-                .Select(reference => _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, reference.SourceProject.UniqueName, StringComparison.OrdinalIgnoreCase)))
+                .Select(GetSourceProjectUniqueName)
+                .Where(uniqueName => uniqueName != null)
+                .Select(uniqueName => _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, uniqueName, StringComparison.OrdinalIgnoreCase)))
                 .Where(project => project != null)
                 .ToArray();
 
@@ -377,6 +377,21 @@
                 .Select(item => item.Trim())
                 .Where(item => !string.IsNullOrEmpty(item))
                 .ToArray();
+        }
+
+        private static string GetSourceProjectUniqueName(VSLangProj.Reference reference)
+        {
+            Contract.Requires(reference != null);
+
+            try
+            {
+                return reference.SourceProject?.UniqueName;
+            }
+            catch
+            {
+            }
+
+            return null;
         }
 
         private class ProjectTypeGuidIndexer : IIndexer<bool>

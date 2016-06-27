@@ -29,19 +29,5 @@
                 element = parent;
             }
         }
-
-        public static EnvDTE.Project GetSourceProject(this VSLangProj.Reference reference)
-        {
-            Contract.Requires(reference != null);
-
-            try
-            {
-                return reference.SourceProject;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
     }
 }
