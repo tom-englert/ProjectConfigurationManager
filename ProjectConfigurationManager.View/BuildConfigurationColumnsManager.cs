@@ -103,6 +103,7 @@
             {
                 IsReadOnly = true,
                 SortMemberPath = path,
+                CanUserResize = false,
                 Header = new TextBlock
                 {
                     Text = solutionConfiguration.UniqueName,

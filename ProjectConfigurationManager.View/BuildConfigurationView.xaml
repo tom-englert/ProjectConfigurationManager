@@ -34,7 +34,7 @@
               ItemsSource="{Binding Solution.SpecificProjectConfigurations}"
               AutoGenerateColumns="False"
               VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
-              CanUserAddRows="False" CanUserResizeColumns="False" CanUserResizeRows="False"
+              CanUserAddRows="False" CanUserResizeRows="False"
               view:BuildConfigurationColumnsManager.Configurations="{Binding Solution.SolutionConfigurations}"
               toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedConfigurations}"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"

@@ -11,11 +11,11 @@
     <DataGrid ItemsSource="{Binding Solution.Projects}"
               AutoGenerateColumns="False"
               VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
-              CanUserAddRows="False" CanUserResizeColumns="False" CanUserResizeRows="False"
+              CanUserAddRows="False" CanUserResizeRows="False"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
               dgx:Tools.ApplyInitialSorting="True"
               local:ProjectTypesColumnManager.IsAttached="True"
-              FrozenColumnCount="3">
+              FrozenColumnCount="1">
       <DataGrid.ColumnHeaderStyle>
         <Style TargetType="DataGridColumnHeader">
           <Setter Property="VerticalContentAlignment" Value="Bottom"/>
@@ -23,7 +23,7 @@
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="SortKey" SortDirection="Ascending">
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="SortKey" SortDirection="Ascending" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate DataType="model:Project">
               <TextBlock Margin="2"><Run Text="{Binding Name, Mode=OneWay}" />

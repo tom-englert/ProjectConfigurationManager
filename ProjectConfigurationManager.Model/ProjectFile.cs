@@ -346,7 +346,8 @@
             {
                 get
                 {
-                    return _node.Value;
+                    var value = _node.Value;
+                    return string.IsNullOrWhiteSpace(value) ? string.Empty : value;
                 }
                 set
                 {
