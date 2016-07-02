@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-namespace tomenglertde.ProjectConfigurationManager.Model
+﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
     using System.Collections.Generic;
@@ -421,8 +420,9 @@ namespace tomenglertde.ProjectConfigurationManager.Model
                 .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties.Values))
                 .Select(prop => prop.Name)
                 .Distinct()
-                .Where(PropertyGrouping.IsNotProjectSpecific)
-                .Select(name => new ProjectPropertyName(name, PropertyGrouping.GetPropertyGroupName(name)));
+                .Where(PropertyGroupName.IsNotProjectSpecific)
+                .Select(name => new ProjectPropertyName(name, PropertyGroupName.GetGroupForProperty(name)))
+                .OrderBy(item => item.GroupName.Index);
         }
 
         // ReSharper disable once SuspiciousTypeConversion.Global

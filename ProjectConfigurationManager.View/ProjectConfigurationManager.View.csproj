@@ -204,7 +204,7 @@
       <DependentUpon>ProjectTypesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProjectTypesViewModel.cs" />
-    <Compile Include="PropertiesColumnsManager.cs" />
+    <Compile Include="PropertiesColumnsManagerBehavior.cs" />
     <Compile Include="PropertiesView.xaml.cs">
       <DependentUpon>PropertiesView.xaml</DependentUpon>
     </Compile>

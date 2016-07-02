@@ -84,7 +84,7 @@
             foreach (var cell in dataGrid.SelectedCells)
             {
                 var configuration = (ProjectConfiguration)cell.Item;
-                var propertyName = (string)cell.Column.GetValue(PropertiesColumnsManager.PropertyNameProperty);
+                var propertyName = (string)cell.Column.GetValue(PropertiesColumnsManagerBehavior.PropertyNameProperty);
                 if (propertyName != null)
                 {
                     configuration.DeleteProperty(propertyName);

@@ -91,7 +91,6 @@
     </StackPanel>
     <DataGrid x:Name="DataGrid"
               ItemsSource="{Binding Source={StaticResource ConfigurationsSource}}"
-              local:PropertiesColumnsManager.Properties="{Binding ElementName=PropertyGroups, Path=SelectedItems}"
               HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray" SelectionUnit="Cell"
               AutoGenerateColumns="False" FrozenColumnCount="4"
               dgx:Tools.ApplyInitialSorting="True"
@@ -125,7 +124,7 @@
         </DataGridTemplateColumn>
         <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" Width="110"/>
         <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" Width="85"/>
-        <DataGridTextColumn Header="Tags" Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}" DisplayIndex="3" local:PropertiesColumnsManager.PropertyName="Tags" />
+        <DataGridTextColumn Header="Tags" Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}" DisplayIndex="3" local:PropertiesColumnsManagerBehavior.PropertyName="Tags" />
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
@@ -168,6 +167,7 @@
         </Style>
       </DataGrid.CellStyle>
       <i:Interaction.Behaviors>
+        <local:PropertiesColumnsManagerBehavior Properties="{Binding ElementName=PropertyGroups, Path=SelectedItems}"/>
         <dgx:BeginEditOnCtrlEnterBehavior />
         <local:DataGridTryBeginEditBehavior />
         <toms:ZoomFontSizeOnMouseWheelBehavior />

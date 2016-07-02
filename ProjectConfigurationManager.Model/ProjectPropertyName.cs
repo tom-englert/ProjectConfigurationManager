@@ -7,17 +7,17 @@
     public class ProjectPropertyName : IEquatable<ProjectPropertyName>
     {
         private readonly string _name;
-        private readonly string _groupName;
+        private readonly PropertyGroupName _groupName;
         private readonly string _displayName;
 
-        internal ProjectPropertyName(string name, string groupName)
+        internal ProjectPropertyName(string name, PropertyGroupName groupName)
         {
             Contract.Requires(name != null);
             Contract.Requires(groupName != null);
 
             _name = name;
             _groupName = groupName;
-            _displayName = HasGroupNamePrefix(name, groupName) ? name.Substring(groupName.Length) : name;
+            _displayName = HasGroupNamePrefix(name, groupName.Name) ? name.Substring(groupName.Name.Length) : name;
         }
 
         private static bool HasGroupNamePrefix(string name, string groupName)
@@ -40,11 +40,11 @@
             }
         }
 
-        public string GroupName
+        public PropertyGroupName GroupName
         {
             get
             {
-                Contract.Ensures(Contract.Result<string>() != null);
+                Contract.Ensures(Contract.Result<PropertyGroupName>() != null);
                 return _groupName;
             }
         }

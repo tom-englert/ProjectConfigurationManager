@@ -1,3 +1,6 @@
+1.0.8.0
+* 
+
 1.0.7.0
 * Undo changes if project fails to load after saving.
 * Add project types view
