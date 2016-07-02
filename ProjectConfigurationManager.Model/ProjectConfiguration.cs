@@ -187,7 +187,7 @@
                     if (property == null)
                         throw new ArgumentException("Unable to create property: " + propertyName, nameof(propertyName));
 
-                    property.Value = value;
+                    property.Value = value ?? string.Empty;
                 }
             }
 
@@ -201,6 +201,8 @@
 
         private IProjectProperty CreateProperty(string propertyName)
         {
+            Contract.Requires(propertyName != null);
+
             var property = Project.CreateProperty(propertyName, _configuration, _platform);
 
             _properties.Add(propertyName, property);
@@ -210,6 +212,8 @@
 
         public void DeleteProperty(string propertyName)
         {
+            Contract.Requires(propertyName != null);
+
             Project.DeleteProperty(propertyName, _configuration, _platform);
         }
 

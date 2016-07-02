@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
@@ -101,9 +102,18 @@
         {
             throw new NotImplementedException();
         }
+
+        [ContractVerification(false)]
         private Brush GetNextBrush(string text)
         {
             return _brushes[_mappingCache.Count % _brushes.Length];
+        }
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_mappingCache != null);
         }
     }
 }

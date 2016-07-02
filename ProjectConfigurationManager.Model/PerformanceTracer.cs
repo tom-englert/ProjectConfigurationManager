@@ -39,6 +39,7 @@
 
             public Tracer(ITracer tracer, int index, string message)
             {
+                Contract.Requires(tracer != null);
                 Contract.Requires(message != null);
 
                 _tracer = tracer;
@@ -62,6 +63,7 @@
             {
                 Contract.Invariant(_tracer != null);
                 Contract.Invariant(_message != null);
+                Contract.Invariant(_stopwatch != null);
             }
         }
 

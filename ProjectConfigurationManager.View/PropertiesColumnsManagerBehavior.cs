@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows;
@@ -174,9 +175,7 @@
 
         private static int GetDisplayIndex(ProjectPropertyName projectPropertyName, Configuration configuration)
         {
-            Contract.Requires(projectPropertyName != null);
-
-            if (configuration == null)
+            if ((projectPropertyName == null) || (configuration == null))
                 return -1;
 
             string[] propertyColumnOrder;
@@ -215,6 +214,13 @@
             public ProjectPropertyName ProjectPropertyName { get; }
 
             public int DisplayIndex { get; }
+
+            [ContractInvariantMethod]
+            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+            private void ObjectInvariant()
+            {
+                Contract.Invariant(_column != null);
+            }
         }
 
         private void ColumnsCreated()
@@ -265,9 +271,10 @@
 
                 foreach (var group in columnsByGroup)
                 {
-                    Contract.Assume(group != null);
+                    var groupName = group?.Key?.Name;
+                    if (groupName == null)
+                        continue;
 
-                    var groupName = group.Key.Name;
                     var columnNames = group.Select(property => property.Name).ToArray();
 
                     string[] current;
@@ -287,6 +294,14 @@
             {
                 _tracer.TraceError(ex);
             }
+        }
+
+        [ContractInvariantMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_columnsCreatedThrottle != null);
+            Contract.Invariant(_displayIndexChangedThrottle != null);
         }
     }
 }

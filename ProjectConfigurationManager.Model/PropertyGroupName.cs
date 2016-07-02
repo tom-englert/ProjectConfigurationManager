@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
     public class PropertyGroupName : IEquatable<PropertyGroupName>
@@ -139,8 +140,6 @@
             return _name;
         }
 
-
-
         #region IEquatable implementation
 
         /// <summary>
@@ -203,6 +202,12 @@
 
         #endregion
 
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_name != null);
+        }
 
     }
 }

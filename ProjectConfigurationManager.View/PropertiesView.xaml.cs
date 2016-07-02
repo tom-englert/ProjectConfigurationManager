@@ -10,7 +10,6 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Threading;
 
     using DataGridExtensions;
 
@@ -69,7 +68,11 @@
 
         private void ConfirmedCommandConverter_Error(object sender, ErrorEventArgs e)
         {
-            _tracer.TraceError(e.GetException());
+            var exception = e.GetException();
+            if (exception == null)
+                return;
+
+            _tracer.TraceError(exception);
         }
 
         private void ConfirmedCommandConverter_OnExecuting(object sender, ConfirmedCommandEventArgs e)

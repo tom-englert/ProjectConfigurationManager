@@ -74,6 +74,7 @@
         private void ObjectInvariant()
         {
             Contract.Invariant(_solution != null);
+            Contract.Invariant(_selectedConfigurations != null);
         }
     }
 }

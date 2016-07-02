@@ -309,7 +309,7 @@
                 if (!conditionExpression.Contains("$(Platform)"))
                     return platform == "Any CPU";
 
-                return conditionExpression.Contains(platform.Replace(" ", ""));
+                return (platform != null) && conditionExpression.Contains(platform.Replace(" ", ""));
             }
 
             public void Delete()
@@ -321,6 +321,7 @@
             [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
             private void ObjectInvariant()
             {
+                Contract.Invariant(_projectFile != null);
                 Contract.Invariant(_propertyGroupNode != null);
                 Contract.Invariant(_properties != null);
             }
@@ -379,6 +380,9 @@
         private void ObjectInvariant()
         {
             Contract.Invariant(_project != null);
+            Contract.Invariant(_solution != null);
+            Contract.Invariant(_dispatcher != null);
+            Contract.Invariant(_deferredSaveThrottle != null);
         }
     }
 }

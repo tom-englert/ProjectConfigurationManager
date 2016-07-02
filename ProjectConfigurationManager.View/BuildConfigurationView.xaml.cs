@@ -1,6 +1,7 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
 
@@ -24,7 +25,18 @@
 
         private void ConfirmedCommandConverter_Error(object sender, ErrorEventArgs e)
         {
-            _tracer.TraceError(e.GetException());
+            var exception = e.GetException();
+            if (exception == null)
+                return;
+
+            _tracer.TraceError(exception);
+        }
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_tracer != null);
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using System.Diagnostics.Contracts;
-namespace tomenglertde.ProjectConfigurationManager.View
+﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
@@ -72,6 +70,7 @@ namespace tomenglertde.ProjectConfigurationManager.View
         private readonly ProjectDependenciesViewModel _model;
         private bool _isSelected;
         private bool _isProjectSelected;
+        private readonly Project _project;
 
         public ProjectDependency(ProjectDependenciesViewModel model, ProjectDependency parent, Project project, Func<Project, IList<Project>> getChildProjectsCallback)
         {
@@ -82,12 +81,19 @@ namespace tomenglertde.ProjectConfigurationManager.View
             _model = model;
 
             Level = (parent?.Level ?? -1) + 1;
-            Project = project;
+            _project = project;
 
             Children = GetChildren(project, getChildProjectsCallback);
         }
 
-        public Project Project { get; }
+        public Project Project
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Project>() != null);
+                return _project;
+            }
+        }
 
         public ICollection<ProjectDependency> Children { get; }
 
@@ -103,7 +109,7 @@ namespace tomenglertde.ProjectConfigurationManager.View
             {
                 if (SetProperty(ref _isSelected, value))
                 {
-                    _model.UpdateSelection(Project, value);
+                    _model.UpdateSelection(_project, value);
                 }
             }
         }
@@ -147,14 +153,15 @@ namespace tomenglertde.ProjectConfigurationManager.View
 
         public override string ToString()
         {
-            return Project.Name;
+            return _project.Name;
         }
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(Project != null);
+            Contract.Invariant(_project != null);
+            Contract.Invariant(_model != null);
         }
     }
 }

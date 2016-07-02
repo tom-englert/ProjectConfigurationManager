@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-namespace tomenglertde.ProjectConfigurationManager
+﻿namespace tomenglertde.ProjectConfigurationManager
 {
     using System;
     using System.ComponentModel;
@@ -7,6 +6,7 @@ namespace tomenglertde.ProjectConfigurationManager
     using System.ComponentModel.Composition.Hosting;
     using System.ComponentModel.Composition.Registration;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
@@ -171,6 +171,14 @@ namespace tomenglertde.ProjectConfigurationManager
 
             return constructors.SingleOrDefault(c => c.GetCustomAttributes<ImportingConstructorAttribute>().Any())
                    ?? constructors.OrderByDescending(c => c.GetParameters().Length).FirstOrDefault();
+        }
+
+        [ContractInvariantMethod]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_compositionHost != null);
+            Contract.Invariant(_tracer != null);
         }
     }
 }

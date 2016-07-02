@@ -43,6 +43,10 @@
             if (treeViewItem == null)
                 return;
 
+            var dispatcher = Dispatcher;
+            if (dispatcher == null)
+                return;
+
             // We get events from all ancestors, too! Must block them, else we would always expand/collapse the whole tree.
             if (_ancestors == null)
             {
@@ -57,9 +61,9 @@
 
             treeViewItem.VisualDescendants()
                 .OfType<TreeViewItem>()
-                .ForEach(i => Dispatcher.BeginInvoke(DispatcherPriority.Input, () => i.IsExpanded = isExpanded));
+                .ForEach(i => dispatcher.BeginInvoke(DispatcherPriority.Input, () => i.IsExpanded = isExpanded));
 
-            Dispatcher.BeginInvoke(DispatcherPriority.Background, () => _ancestors = null);
+            dispatcher.BeginInvoke(DispatcherPriority.Background, () => _ancestors = null);
         }
     }
 }

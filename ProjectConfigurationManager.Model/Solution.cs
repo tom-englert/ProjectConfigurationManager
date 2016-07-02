@@ -288,7 +288,7 @@
 
             foreach (var project in _projects)
             {
-                project.UpdateReferences();
+                project?.UpdateReferences();
             }
 
             foreach (var project in _projects)
@@ -374,6 +374,8 @@
 
         public IEnumerable<EnvDTE.Project> GetSubprojects(EnvDTE.Project project)
         {
+            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
+
             try
             {
                 var projectItems = project?.ProjectItems;
@@ -391,6 +393,8 @@
 
         public IEnumerable<EnvDTE.Project> GetDteProjects(EnvDTE.Projects projects)
         {
+            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
+
             if (projects == null)
                 yield break;
 
@@ -444,11 +448,17 @@
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         private void ObjectInvariant()
         {
+            Contract.Invariant(_deferredUpdateThrottle != null);
             Contract.Invariant(_tracer != null);
             Contract.Invariant(_serviceProvider != null);
             Contract.Invariant(_performanceTracer != null);
             Contract.Invariant(_projects != null);
             Contract.Invariant(_configurations != null);
+            Contract.Invariant(_specificProjectConfigurations != null);
+            Contract.Invariant(_projectConfigurations != null);
+            Contract.Invariant(_solutionContexts != null);
+            Contract.Invariant(_projectProperties != null);
+            Contract.Invariant(_projectTypeGuids != null);
         }
     }
 }

@@ -1,13 +1,11 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
-    using System.Windows;
 
     using Newtonsoft.Json;
 
@@ -17,7 +15,7 @@
     public class Configuration : ObservableObjectBase
     {
         private readonly ITracer _tracer;
-        private const string FileName = "Configuration.xml";
+        private const string FileName = "config.json";
         private static readonly string _directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tom-englert.de", "ProjectConfigurationManager");
 
         private readonly string _filePath;

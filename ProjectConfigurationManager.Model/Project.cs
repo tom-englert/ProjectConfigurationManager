@@ -8,7 +8,6 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -63,6 +62,8 @@
 
         internal static Project Create(Solution solution, EnvDTE.Project project, bool retryOnErrors, ITracer tracer)
         {
+            Contract.Requires(solution != null);
+
             if (project == null)
                 return null;
 
@@ -73,6 +74,9 @@
                 // Skip web pojects, we can't edit them.
                 if (Uri.TryCreate(project.FullName, UriKind.Absolute, out projectUri) && projectUri.IsFile)
                 {
+                    Contract.Assume(!string.IsNullOrEmpty(project.FullName));
+                    Contract.Assume(!string.IsNullOrEmpty(project.UniqueName));
+
                     return new Project(solution, project);
                 }
             }

@@ -47,6 +47,9 @@
         private static void Configurations_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var dataGrid = (DataGrid)d;
+            if (dataGrid == null)
+                return;
+
             Register(dataGrid, (ICollection)e.NewValue);
         }
 
