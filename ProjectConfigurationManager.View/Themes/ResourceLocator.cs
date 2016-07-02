@@ -1,7 +1,6 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View.Themes
 {
     using System.ComponentModel.Composition;
-    using System.Diagnostics.Contracts;
     using System.Windows;
 
     using DataGridExtensions;

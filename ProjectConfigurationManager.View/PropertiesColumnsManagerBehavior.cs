@@ -188,7 +188,7 @@
             return index;
         }
 
-        public class ColumInfo
+        private class ColumInfo
         {
             private readonly DataGridColumn _column;
 

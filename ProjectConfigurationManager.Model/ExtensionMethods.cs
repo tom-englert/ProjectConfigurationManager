@@ -1,6 +1,5 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
-    using System;
     using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
