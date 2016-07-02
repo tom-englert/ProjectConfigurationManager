@@ -1,5 +1,8 @@
 1.0.8.0
-* 
+* Preserve properties column order
+* Fix block copy issue when columns are reordered
+* Fix some UI issues
+* Properly load projects that do not implement "CopyLocal"
 
 1.0.7.0
 * Undo changes if project fails to load after saving.
