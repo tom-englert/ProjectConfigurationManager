@@ -1,0 +1,57 @@
+﻿<Control x:Class="tomenglertde.ProjectConfigurationManager.View.TagFilter"
+         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DesignHeight="30" d:DesignWidth="30"
+         xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
+         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+         xmlns:view="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
+         x:Name="Control">
+  <Control.Style>
+    <Style TargetType="Control">
+      <Setter Property="view:TagFilter.Filter" Value="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
+      <Setter Property="view:TagFilter.Values" Value="{Binding Path=SourceValues, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
+    </Style>
+  </Control.Style>
+  <Control.Template>
+    <ControlTemplate>
+      <StackPanel Orientation="Horizontal">
+        <Decorator Width="5"/>
+        <ToggleButton x:Name="ToggleButton">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="IsFilterActiveMarker" Text="." Margin="2,0,-4,0" Foreground="{Binding ElementName=FilterSymbol, Path=Foreground}" FontWeight="Bold" />
+            <Control x:Name="FilterSymbol" Style="{DynamicResource {x:Static dgx:DataGridFilter.IconStyleKey}}" />
+          </StackPanel>
+        </ToggleButton>
+        <Popup x:Name="Popup" DataContext="{Binding ElementName=Control}"
+               StaysOpen="False" IsOpen="{Binding Path=IsChecked, ElementName=ToggleButton, Mode=TwoWay}">
+          <FrameworkElement.Resources>
+            <CollectionViewSource x:Key="TagsSource" Source="{Binding Tags}">
+              <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription />
+              </CollectionViewSource.SortDescriptions>
+            </CollectionViewSource>
+          </FrameworkElement.Resources>
+          <ListBox x:Name="ListBox" ItemsSource="{Binding Source={StaticResource TagsSource}}" SelectionMode="Extended" SelectionChanged="ListBox_SelectionChanged">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <DockPanel>
+                  <CheckBox DockPanel.Dock="Left" Margin="3,2" IsChecked="{Binding IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                  <TextBlock Margin="3,2" Text="{Binding}" VerticalAlignment="Center" />
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Popup>
+      </StackPanel>
+      <ControlTemplate.Triggers>
+        <DataTrigger Binding="{Binding ElementName=Control, Path=Filter.Items}" Value="{x:Null}">
+          <Setter TargetName="IsFilterActiveMarker" Property="Visibility" Value="Hidden" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding ElementName=ListBox, Path=Items}" Value="0">
+          <Setter TargetName="ToggleButton" Property="IsEnabled" Value="False" />
+        </DataTrigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate>
+  </Control.Template>
+</Control>

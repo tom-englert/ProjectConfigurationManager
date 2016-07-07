@@ -139,8 +139,8 @@
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DataGridExtensions, Version=1.0.32.0, Culture=neutral, PublicKeyToken=43de855f87de903a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DataGridExtensions.1.0.32.0\lib\net40-Client\DataGridExtensions.dll</HintPath>
+    <Reference Include="DataGridExtensions, Version=1.0.33.0, Culture=neutral, PublicKeyToken=43de855f87de903a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DataGridExtensions.1.0.33.0\lib\net40-Client\DataGridExtensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=9.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -194,6 +194,9 @@
       <Link>Properties\Version.cs</Link>
     </Compile>
     <Compile Include="DataGridTryBeginEditBehavior.cs" />
+    <Compile Include="TagFilter.xaml.cs">
+      <DependentUpon>TagFilter.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProjectDependenciesView.xaml.cs">
       <DependentUpon>ProjectDependenciesView.xaml</DependentUpon>
     </Compile>
@@ -226,6 +229,10 @@
       <DependentUpon>BuildConfigurationView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="TagFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ProjectDependenciesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -59,6 +59,9 @@
     </Style>
     <dgx:RegexContentFilterFactory x:Key="RegexContentFilterFactory" />
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" Executing="ConfirmedCommandConverter_OnExecuting" />
+    <ControlTemplate x:Key="TagFilterTemplate">
+      <local:TagFilter />
+    </ControlTemplate>
   </UserControl.Resources>
 
   <DockPanel>
@@ -113,7 +116,7 @@
         </ItemsPanelTemplate>
       </DataGrid.ItemsPanel>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey" Width="150">
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey" Width="150" SortDirection="Ascending">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate DataType="model:ProjectConfiguration">
               <TextBlock Margin="2"><Run Text="{Binding Project.Name, Mode=OneWay}" />
@@ -122,9 +125,12 @@
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True" Width="110"/>
-        <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True" Width="85"/>
-        <DataGridTextColumn Header="Tags" Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}" DisplayIndex="3" local:PropertiesColumnsManagerBehavior.PropertyName="Tags" />
+        <DataGridTextColumn Header="Configuration" DisplayIndex="1" Binding="{Binding Configuration}" SortDirection="Ascending" IsReadOnly="True" Width="110" />
+        <DataGridTextColumn Header="Platform" DisplayIndex="2" Binding="{Binding Platform}" IsReadOnly="True" Width="85" />
+        <DataGridTextColumn Header="Tags" DisplayIndex="3"
+                            Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}"
+                            local:PropertiesColumnsManagerBehavior.PropertyName="Tags"
+                            dgx:DataGridFilterColumn.Template="{StaticResource TagFilterTemplate}" />
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
@@ -132,7 +138,7 @@
             <Setter.Value>
               <ToolTip>
                 <StackPanel d:DataContext="{d:DesignInstance model:ProjectConfiguration}">
-                  <Decorator Height="2"/>
+                  <Decorator Height="2" />
                   <TextBlock Text="{Binding Column.Header.Text}" DataContext="{Binding PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType=ToolTip}}" d:DataContext="{d:DesignInstance DataGridCell}" />
                   <Decorator Height="4" />
                   <TextBlock Foreground="Gray">
@@ -161,17 +167,17 @@
           <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
               <Setter Property="BorderBrush" Value="Gray" />
-              <Setter Property="Foreground" Value="{x:Static SystemColors.ControlTextBrush}"/>
+              <Setter Property="Foreground" Value="{x:Static SystemColors.ControlTextBrush}" />
             </Trigger>
           </Style.Triggers>
         </Style>
       </DataGrid.CellStyle>
       <i:Interaction.Behaviors>
-        <local:PropertiesColumnsManagerBehavior Properties="{Binding ElementName=PropertyGroups, Path=SelectedItems}"/>
+        <local:PropertiesColumnsManagerBehavior Properties="{Binding ElementName=PropertyGroups, Path=SelectedItems}" />
         <dgx:BeginEditOnCtrlEnterBehavior />
         <local:DataGridTryBeginEditBehavior />
         <toms:ZoomFontSizeOnMouseWheelBehavior />
-        <dgx:ExtendedStarSizeBehavior ResourceLocator="{toms:Import dgx:IResourceLocator}"/>
+        <dgx:ExtendedStarSizeBehavior ResourceLocator="{toms:Import dgx:IResourceLocator}" />
       </i:Interaction.Behaviors>
     </DataGrid>
   </DockPanel>
