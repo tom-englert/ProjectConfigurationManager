@@ -9,10 +9,12 @@
     using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Data;
 
     using DataGridExtensions;
 
     using TomsToolbox.Core;
+    using TomsToolbox.Wpf;
 
     /// <summary>
     /// Interaction logic for MultipleChoiceFilter.xaml
@@ -69,6 +71,11 @@
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            var filterColumnControl = this.TryFindAncestor<DataGridFilterColumnControl>();
+
+            BindingOperations.SetBinding(this, FilterProperty, new Binding { Source = filterColumnControl, Path = new PropertyPath(DataGridFilterColumnControl.FilterProperty) });
+            BindingOperations.SetBinding(this, ValuesProperty, new Binding { Source = filterColumnControl, Path = new PropertyPath(nameof(DataGridFilterColumnControl.SourceValues)) });
 
             _listBox = Template?.FindName("ListBox", this) as ListBox;
 
@@ -149,10 +156,10 @@
         public bool IsMatch(object value)
         {
             var input = value as string;
-            var tags = TagFilter.Regex.Split(input ?? string.Empty);
-
-            if ((tags.Length == 1) && (string.IsNullOrWhiteSpace(tags[0])))
+            if (string.IsNullOrWhiteSpace(input))
                 return Items?.Contains(string.Empty) ?? true;
+
+            var tags = TagFilter.Regex.Split(input);
 
             return Items?.ContainsAny(tags) ?? true;
         }

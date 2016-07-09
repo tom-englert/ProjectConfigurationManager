@@ -67,6 +67,9 @@
 
         private void Solution_Changed(string action)
         {
+            if (_projects.Any(p => p.IsSaving))
+                return;
+
             _tracer.WriteLine(action);
             _deferredUpdateThrottle.Tick();
         }

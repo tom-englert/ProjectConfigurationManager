@@ -1,12 +1,10 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View.Themes
 {
-    using System.ComponentModel.Composition;
     using System.Windows;
 
     using DataGridExtensions;
 
-    [Export(typeof(IResourceLocator))]
-    internal class ResourceLocator : IResourceLocator
+    public class ResourceLocator : IResourceLocator
     {
         public object FindResource(FrameworkElement target, object resourceKey)
         {

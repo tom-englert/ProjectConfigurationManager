@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                     xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
-                    xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
+                    xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
+                    xmlns:dgb="clr-namespace:DataGridExtensions.Behaviors;assembly=DataGridExtensions"
                     xmlns:wpf="urn:TomsToolbox">
 
   <Style TargetType="TextBlock" x:Key="{x:Static themes:ResourceKeys.AutoToolTipTextBoxStyle}">
@@ -64,7 +65,7 @@
             <DockPanel>
               <Button x:Name="clear" DockPanel.Dock="Right" Focusable="False" Style="{DynamicResource {x:Static themes:ResourceKeys.ColumnHeaderSearchTextBoxClearButtonStyleKey}}">
                 <i:Interaction.Behaviors>
-                  <dgx:ClearTextBoxOnButtonClickBehavior TextBox="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                  <dgb:ClearTextBoxOnButtonClickBehavior TextBox="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                 </i:Interaction.Behaviors>
               </Button>
               <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
