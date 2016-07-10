@@ -4,7 +4,9 @@
                     xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
                     xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
                     xmlns:dgb="clr-namespace:DataGridExtensions.Behaviors;assembly=DataGridExtensions"
-                    xmlns:wpf="urn:TomsToolbox">
+                    xmlns:wpf="urn:TomsToolbox"
+                    xmlns:view="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
+                    xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model">
 
   <Style TargetType="TextBlock" x:Key="{x:Static themes:ResourceKeys.AutoToolTipTextBoxStyle}">
     <Style.Triggers>
@@ -164,5 +166,16 @@
       </Setter.Value>
     </Setter>
   </Style>
+
+  <ControlTemplate x:Key="{x:Static themes:ResourceKeys.TagFilterTemplate}">
+    <view:TagFilter />
+  </ControlTemplate>
+
+  <DataTemplate x:Key="{x:Static themes:ResourceKeys.ProjectNameTemplate}" DataType="model:ProjectConfiguration">
+    <TextBlock Margin="2">
+      <Run Text="{Binding Project.Name, Mode=OneWay}" />
+      <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}" />)</Span>
+    </TextBlock>
+  </DataTemplate>
 
 </ResourceDictionary>

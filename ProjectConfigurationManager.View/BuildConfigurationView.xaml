@@ -7,26 +7,27 @@
              xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
              xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model"
              xmlns:toms="urn:TomsToolbox"
+             xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
              d:DataContext="{d:DesignInstance view:BuildConfigurationViewModel}">
   <UserControl.Resources>
-    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error"/>
+    <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" />
   </UserControl.Resources>
   <DockPanel Margin="10">
     <Border DockPanel.Dock="Right" Margin="5">
       <StackPanel IsHitTestVisible="False" MaxWidth="180" Margin="10">
         <CheckBox>
-          <TextBlock Text="Project does not build in this configuration." TextWrapping="Wrap"/>
+          <TextBlock Text="Project does not build in this configuration." TextWrapping="Wrap" />
         </CheckBox>
-        <Decorator Height="5"/>
-        <CheckBox IsThreeState="True" IsChecked="{x:Null}" >
-          <TextBlock Text="Project is the default for this configuration but does not build." TextWrapping="Wrap"/>
+        <Decorator Height="5" />
+        <CheckBox IsThreeState="True" IsChecked="{x:Null}">
+          <TextBlock Text="Project is the default for this configuration but does not build." TextWrapping="Wrap" />
         </CheckBox>
-        <Decorator Height="5"/>
+        <Decorator Height="5" />
         <CheckBox IsChecked="True">
-          <TextBlock Text="Project builds in this configuration." TextWrapping="Wrap"/>
+          <TextBlock Text="Project builds in this configuration." TextWrapping="Wrap" />
         </CheckBox>
-        <Decorator Height="25"/>
-        <TextBlock TextWrapping="Wrap">Use the context menu to delete unused project configurations from the project files.<LineBreak/><LineBreak/>You can only delete project configurations which are not selected in any solution configuration.</TextBlock>
+        <Decorator Height="25" />
+        <TextBlock TextWrapping="Wrap">Use the context menu to delete unused project configurations from the project files.<LineBreak /><LineBreak />You can only delete project configurations which are not selected in any solution configuration.</TextBlock>
 
       </StackPanel>
     </Border>
@@ -39,13 +40,13 @@
               toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedConfigurations}"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
               dgx:Tools.ApplyInitialSorting="True"
-              FrozenColumnCount="3">
+              FrozenColumnCount="4">
       <DataGrid.ItemsPanel>
         <ItemsPanelTemplate>
           <VirtualizingStackPanel>
             <VirtualizingStackPanel.ContextMenu>
               <ContextMenu>
-                <MenuItem Header="Delete" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}"/>
+                <MenuItem Header="Delete" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" />
               </ContextMenu>
             </VirtualizingStackPanel.ContextMenu>
           </VirtualizingStackPanel>
@@ -54,22 +55,27 @@
 
       <DataGrid.ColumnHeaderStyle>
         <Style TargetType="DataGridColumnHeader">
-          <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+          <Setter Property="VerticalContentAlignment" Value="Bottom" />
+          <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate DataType="model:ProjectConfiguration">
-              <TextBlock Margin="2"><Run Text="{Binding Project.Name, Mode=OneWay}"/>
-                <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}"/>)</Span>
-              </TextBlock>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Configuration" Binding="{Binding Configuration}" DisplayIndex="1" SortDirection="Ascending" IsReadOnly="True"/>
-        <DataGridTextColumn Header="Platform" Binding="{Binding Platform}" DisplayIndex="2" IsReadOnly="True"/>
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0"  CanUserReorder="False" 
+                                IsReadOnly="True" 
+                                SortMemberPath="Project.SortKey"
+                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}"/>
+        <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False" 
+                            IsReadOnly="True" 
+                            Binding="{Binding Configuration}" 
+                            SortDirection="Ascending" />
+        <DataGridTextColumn Header="Platform" DisplayIndex="2" CanUserReorder="False" 
+                            IsReadOnly="True" 
+                            Binding="{Binding Platform}"/>
+        <DataGridTextColumn Header="Tags" DisplayIndex="3" CanUserReorder="False"
+                            Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}"
+                            view:PropertiesColumnsManagerBehavior.PropertyName="Tags"
+                            dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.TagFilterTemplate}}" />
+
       </DataGrid.Columns>
     </DataGrid>
   </DockPanel>

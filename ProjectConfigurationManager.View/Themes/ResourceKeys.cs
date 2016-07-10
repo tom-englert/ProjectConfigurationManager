@@ -57,5 +57,11 @@
 
 
         public static readonly ResourceKey ColumnHeaderGripperToolTipStyleKey = new ComponentResourceKey(typeof(ResourceKeys), "ColumnHeaderGripperToolTipStyle");
+
+
+        public static readonly ResourceKey TagFilterTemplate = new ComponentResourceKey(typeof(ResourceKeys), "TagFilterTemplate");
+
+
+        public static readonly ResourceKey ProjectNameTemplate = new ComponentResourceKey(typeof(ResourceKeys), "ProjectNameTemplate");
     }
 }

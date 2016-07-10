@@ -60,9 +60,6 @@
     </Style>
     <dgx:RegexContentFilterFactory x:Key="RegexContentFilterFactory" />
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" Executing="ConfirmedCommandConverter_OnExecuting" />
-    <ControlTemplate x:Key="TagFilterTemplate">
-      <local:TagFilter />
-    </ControlTemplate>
     <themes:ResourceLocator x:Key="ResourceLocator"/>
   </UserControl.Resources>
 
@@ -118,21 +115,22 @@
         </ItemsPanelTemplate>
       </DataGrid.ItemsPanel>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0" IsReadOnly="True" SortMemberPath="Project.SortKey" Width="150" SortDirection="Ascending">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate DataType="model:ProjectConfiguration">
-              <TextBlock Margin="2"><Run Text="{Binding Project.Name, Mode=OneWay}" />
-                <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}" />)</Span>
-              </TextBlock>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Configuration" DisplayIndex="1" Binding="{Binding Configuration}" SortDirection="Ascending" IsReadOnly="True" Width="110" />
-        <DataGridTextColumn Header="Platform" DisplayIndex="2" Binding="{Binding Platform}" IsReadOnly="True" Width="85" />
-        <DataGridTextColumn Header="Tags" DisplayIndex="3"
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0" CanUserReorder="False" 
+                                IsReadOnly="True"  Width="150" 
+                                SortMemberPath="Project.SortKey"
+                                SortDirection="Ascending"
+                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}" />
+        <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False" 
+                            IsReadOnly="True" Width="110" 
+                            Binding="{Binding Configuration}" 
+                            SortDirection="Ascending" />
+        <DataGridTextColumn Header="Platform" DisplayIndex="2" CanUserReorder="False"
+                            IsReadOnly="True" Width="85" 
+                            Binding="{Binding Platform}"/>
+        <DataGridTextColumn Header="Tags" DisplayIndex="3" CanUserReorder="False"
                             Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}"
                             local:PropertiesColumnsManagerBehavior.PropertyName="Tags"
-                            dgx:DataGridFilterColumn.Template="{StaticResource TagFilterTemplate}" />
+                            dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.TagFilterTemplate}}" />
       </DataGrid.Columns>
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell">
