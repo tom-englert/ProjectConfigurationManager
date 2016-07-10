@@ -1,3 +1,6 @@
+1.0.9.0
+* Add an interactive filter for tags
+
 1.0.8.0
 * Preserve properties column order
 * Fix block copy issue when columns are reordered
