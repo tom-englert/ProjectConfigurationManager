@@ -215,6 +215,9 @@
             Contract.Requires(propertyName != null);
 
             Project.DeleteProperty(propertyName, _configuration, _platform);
+
+            if (_properties.Remove(propertyName))
+                OnPropertyChanged(nameof(PropertyValue));
         }
 
         #region IEquatable implementation

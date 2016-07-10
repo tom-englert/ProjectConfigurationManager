@@ -74,7 +74,7 @@
         <DataTrigger Binding="{Binding ElementName=Control, Path=Filter.Items}" Value="{x:Null}">
           <Setter TargetName="IsFilterActiveMarker" Property="Visibility" Value="Hidden" />
         </DataTrigger>
-        <DataTrigger Binding="{Binding ElementName=ListBox, Path=Items}" Value="0">
+        <DataTrigger Binding="{Binding ElementName=ListBox, Path=Items}" Value="1">
           <Setter TargetName="ToggleButton" Property="IsEnabled" Value="False" />
         </DataTrigger>
       </ControlTemplate.Triggers>

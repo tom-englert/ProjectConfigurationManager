@@ -73,23 +73,27 @@
             base.OnApplyTemplate();
 
             var filterColumnControl = this.TryFindAncestor<DataGridFilterColumnControl>();
+            Contract.Assume(filterColumnControl != null);
 
             BindingOperations.SetBinding(this, FilterProperty, new Binding { Source = filterColumnControl, Path = new PropertyPath(DataGridFilterColumnControl.FilterProperty) });
             BindingOperations.SetBinding(this, ValuesProperty, new Binding { Source = filterColumnControl, Path = new PropertyPath(nameof(DataGridFilterColumnControl.SourceValues)) });
 
+            var dataGrid = filterColumnControl.TryFindAncestor<DataGrid>();
+            Contract.Assume(dataGrid != null);
+            ((INotifyCollectionChanged)dataGrid.Items).CollectionChanged += (_, __) => BindingOperations.GetBindingExpression(this, ValuesProperty)?.UpdateTarget();
+
             _listBox = Template?.FindName("ListBox", this) as ListBox;
+            if (_listBox == null)
+                return;
 
             var filter = Filter;
 
             if (filter?.Items == null)
             {
-                _listBox?.SelectAll();
+                _listBox.SelectAll();
             }
 
-            var items = _listBox?.Items as INotifyCollectionChanged;
-            if (items == null)
-                return;
-
+            var items = _listBox.Items as INotifyCollectionChanged;
             items.CollectionChanged += ListBox_ItemsCollectionChanged;
         }
 

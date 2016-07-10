@@ -159,7 +159,7 @@
             <Setter.Value>
               <MultiBinding Converter="{StaticResource CellToBackgroundBrushConverter}">
                 <Binding RelativeSource="{RelativeSource Self}" />
-                <Binding />
+                <Binding Path="PropertyValue" />
               </MultiBinding>
             </Setter.Value>
           </Setter>
