@@ -84,11 +84,20 @@
             foreach (var cell in dataGrid.SelectedCells)
             {
                 var configuration = (ProjectConfiguration)cell.Item;
+                if (configuration == null)
+                    return;
+
                 var propertyName = (string)cell.Column?.GetValue(PropertiesColumnsManagerBehavior.PropertyNameProperty);
-                if (propertyName != null)
+                if (string.IsNullOrEmpty(propertyName))
+                    continue;
+
+                var projectPropertyName = cell.Column?.GetValue(PropertiesColumnsManagerBehavior.ProjectPropertyNameProperty) as ProjectPropertyName;
+                if (projectPropertyName == null)
                 {
-                    configuration?.DeleteProperty(propertyName);
+                    configuration = configuration.Project.DefaultProjectConfiguration;
                 }
+
+                configuration.DeleteProperty(propertyName);
             }
         }
 

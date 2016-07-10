@@ -63,6 +63,7 @@
         <DataGridTemplateColumn Header="Project" DisplayIndex="0"  CanUserReorder="False" 
                                 IsReadOnly="True" 
                                 SortMemberPath="Project.SortKey"
+                                SortDirection="Ascending" 
                                 CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}"/>
         <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False" 
                             IsReadOnly="True" 
