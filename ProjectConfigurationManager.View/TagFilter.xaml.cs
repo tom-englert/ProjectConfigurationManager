@@ -105,20 +105,23 @@
 
         private void Filter_Changed()
         {
-            var filter = Filter;
+            var listBox = _listBox;
+            if (listBox == null)
+                return;
 
+            var filter = Filter;
             if (filter?.Items == null)
             {
-                _listBox?.SelectAll();
+                listBox.SelectAll();
                 return;
             }
 
-            if (_listBox?.SelectedItems.Count != 0)
+            if (listBox.SelectedItems.Count != 0)
                 return;
 
             foreach (var item in filter.Items)
             {
-                _listBox.SelectedItems.Add(item);
+                listBox.SelectedItems.Add(item);
             }
         }
 
