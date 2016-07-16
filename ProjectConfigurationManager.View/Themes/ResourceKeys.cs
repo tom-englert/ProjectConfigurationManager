@@ -63,5 +63,8 @@
 
 
         public static readonly ResourceKey ProjectNameTemplate = new ComponentResourceKey(typeof(ResourceKeys), "ProjectNameTemplate");
+
+
+        public static readonly ResourceKey ProjectConfigurationNameTemplate = new ComponentResourceKey(typeof(ResourceKeys), "ProjectConfigurationNameTemplate");
     }
 }

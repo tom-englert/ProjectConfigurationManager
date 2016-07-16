@@ -64,7 +64,7 @@
                                 IsReadOnly="True" 
                                 SortMemberPath="Project.SortKey"
                                 SortDirection="Ascending" 
-                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}"/>
+                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}}"/>
         <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False" 
                             IsReadOnly="True" 
                             Binding="{Binding Configuration}" 

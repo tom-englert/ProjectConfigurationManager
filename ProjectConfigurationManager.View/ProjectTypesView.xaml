@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              xmlns:local="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
-             xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model"
              xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
              d:DataContext="{d:DesignInstance local:ProjectTypesViewModel}">
@@ -24,9 +23,9 @@
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0" CanUserReorder="False" 
-                                IsReadOnly="True" SortMemberPath="SortKey" SortDirection="Ascending" 
-                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}" />
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0" CanUserReorder="False"
+                                IsReadOnly="True" SortMemberPath="SortKey" SortDirection="Ascending"
+                                CellTemplate="{DynamicResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}" />
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

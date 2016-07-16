@@ -171,11 +171,15 @@
     <view:TagFilter />
   </ControlTemplate>
 
-  <DataTemplate x:Key="{x:Static themes:ResourceKeys.ProjectNameTemplate}" DataType="model:ProjectConfiguration">
+  <DataTemplate x:Key="{x:Static themes:ResourceKeys.ProjectNameTemplate}" DataType="model:Project">
     <TextBlock Margin="2">
-      <Run Text="{Binding Project.Name, Mode=OneWay}" />
-      <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}" />)</Span>
+      <Run Text="{Binding Name, Mode=OneWay}" />
+      <Span Foreground="Gray">(<Run Text="{Binding RelativePath, Mode=OneWay}" />)</Span>
     </TextBlock>
+  </DataTemplate>
+
+  <DataTemplate x:Key="{x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}" DataType="model:ProjectConfiguration">
+    <ContentControl Content="{Binding Project}" ContentTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}" Focusable="False" />
   </DataTemplate>
 
 </ResourceDictionary>
