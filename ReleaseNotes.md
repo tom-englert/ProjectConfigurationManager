@@ -1,3 +1,6 @@
+1.0.10.0
+* Fix: Project name missing in ProjectTypesView
+
 1.0.9.0
 * Add an interactive filter for tags
 

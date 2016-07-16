@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="e31595c9-3e0c-4f5c-b35c-dd8d61e364d1" Version="1.0.9.0" Language="en-US" Publisher="tom-englert.de" />
+    <Identity Id="e31595c9-3e0c-4f5c-b35c-dd8d61e364d1" Version="1.0.10.0" Language="en-US" Publisher="tom-englert.de" />
     <DisplayName>ProjectConfigurationManager</DisplayName>
     <Description xml:space="preserve">A Visual Studio extension to ease management of solution and project configurations.</Description>
     <MoreInfo>http://tom-englert.github.io/ProjectConfigurationManager</MoreInfo>
