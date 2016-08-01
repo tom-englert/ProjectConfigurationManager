@@ -99,11 +99,6 @@
             OnPropertyChanged(nameof(PropertyValue));
         }
 
-        private void InvalidateShouldBuild()
-        {
-            OnPropertyChanged(nameof(ShouldBuild));
-        }
-
         private class ShouldBuildIndexer : IIndexer<bool?>
         {
             private readonly ProjectConfiguration _projectConfiguration;
@@ -142,7 +137,7 @@
 
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        _projectConfiguration.Project.SpecificProjectConfigurations.ForEach(pc => pc.InvalidateShouldBuild());
+                        _projectConfiguration.Project.SpecificProjectConfigurations.ForEach(pc => pc.OnPropertyChanged(nameof(ShouldBuild)));
                     });
                 }
             }
@@ -188,6 +183,8 @@
                         throw new ArgumentException("Unable to create property: " + propertyName, nameof(propertyName));
 
                     property.Value = value ?? string.Empty;
+
+                    _projectConfiguration.OnPropertyChanged(nameof(PropertyValue));
                 }
             }
 
