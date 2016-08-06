@@ -1,3 +1,6 @@
+1.0.11.0
+* Fix: Cell color not updated in the PropertiesView
+
 1.0.10.0
 * Fix: Project name missing in ProjectTypesView
 
