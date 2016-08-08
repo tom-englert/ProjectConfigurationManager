@@ -180,11 +180,12 @@
                     }
 
                     if (property == null)
-                        throw new ArgumentException("Unable to create property: " + propertyName, nameof(propertyName));
+                        throw new ArgumentException(@"Unable to create property: " + propertyName, nameof(propertyName));
 
                     property.Value = value ?? string.Empty;
 
-                    _projectConfiguration.OnPropertyChanged(nameof(PropertyValue));
+                    // Defer property change notifications, else bulk operations on data grid will fail...
+                    Dispatcher.CurrentDispatcher.BeginInvoke(() => _projectConfiguration.OnPropertyChanged(nameof(PropertyValue)));
                 }
             }
 
