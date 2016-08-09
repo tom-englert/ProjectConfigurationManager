@@ -1,3 +1,6 @@
+1.0.12.0
+* Fix: Defer property change notifications, else bulk operations on data grid will only execute partially
+
 1.0.11.0
 * Fix: Cell color not updated in the PropertiesView
 
