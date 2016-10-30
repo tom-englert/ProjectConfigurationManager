@@ -1,4 +1,4 @@
-### Project Configuration Manager.
+### Project Configuration Manager. ![Badge](https://tom-englert.visualstudio.com/_apis/public/build/definitions/75bf84d2-d359-404a-a712-07c9f693f635/5/badge)
 This Visual Studio extension lets you manage your solution and project configurations in one place. 
 Forget about clicking through all the tabs in all the property pages - see all your projects and configurations on one grid. 
 Color highlighting let's you verify at a glance if the configurations of your projects are consistent. 
