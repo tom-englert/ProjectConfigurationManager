@@ -1,4 +1,6 @@
-﻿namespace tomenglertde.ProjectConfigurationManager.View
+﻿using JetBrains.Annotations;
+
+namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -16,56 +18,49 @@
     using TomsToolbox.Core;
     using TomsToolbox.Wpf;
 
-    /// <summary>
-    /// Interaction logic for MultipleChoiceFilter.xaml
-    /// </summary>
-    public partial class TagFilter
+    [TemplatePart(Name = "PART_ListBox", Type = typeof(ListBox))]
+    public abstract class MultipleChoiceFilterBase : Control
     {
-        internal static readonly Regex Regex = new Regex(@"\W+", RegexOptions.Compiled);
-        private readonly ObservableCollection<string> _tags = new ObservableCollection<string>();
-
         private ListBox _listBox;
 
-
-        public TagFilter()
+        static MultipleChoiceFilterBase()
         {
-            InitializeComponent();
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(typeof(MultipleChoiceFilterBase)));
         }
 
-        public TagsContentFilter Filter
+        protected MultipleChoiceFilterBase()
         {
-            get { return (TagsContentFilter)GetValue(FilterProperty); }
+            Values = new ObservableCollection<string>();
+        }
+
+        public MultipleChoiceContentFilterBase Filter
+        {
+            get { return (MultipleChoiceContentFilterBase)GetValue(FilterProperty); }
             set { SetValue(FilterProperty, value); }
         }
-        /// <summary>
-        /// Identifies the Filter dependency property
-        /// </summary>
         public static readonly DependencyProperty FilterProperty =
-            DependencyProperty.Register("Filter", typeof(TagsContentFilter), typeof(TagFilter), new FrameworkPropertyMetadata(new TagsContentFilter(null), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (sender, e) => ((TagFilter)sender).Filter_Changed()));
+            DependencyProperty.Register("Filter", typeof(MultipleChoiceContentFilterBase), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (sender, e) => ((MultipleChoiceFilterBase)sender).Filter_Changed()));
 
 
+        private static readonly DependencyProperty SourceValuesProperty =
+            DependencyProperty.Register("SourceValues", typeof(IList<string>), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(null, (sender, e) => ((MultipleChoiceFilterBase)sender).SourceValues_Changed((IList<string>)e.NewValue)));
+
+        private void SourceValues_Changed(IEnumerable<string> newValue)
+        {
+            OnSourceValuesChanged(newValue);
+        }
+
+        [NotNull]
         public IList<string> Values
         {
+            // ReSharper disable once AssignNullToNotNullAttribute
             get { return (IList<string>)GetValue(ValuesProperty); }
-            set { SetValue(ValuesProperty, value); }
+            private set { SetValue(ValuesPropertyKey, value); }
         }
-        /// <summary>
-        /// Identifies the <see cref="Values"/> dependency property
-        /// </summary>
-        public static readonly DependencyProperty ValuesProperty =
-            DependencyProperty.Register("Values", typeof(IList<string>), typeof(TagFilter), new FrameworkPropertyMetadata(null, (sender, e) => ((TagFilter)sender).Values_Changed((IList<string>)e.NewValue)));
+        private static readonly DependencyPropertyKey ValuesPropertyKey =
+            DependencyProperty.RegisterReadOnly("Values", typeof(IList<string>), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata());
+        public static readonly DependencyProperty ValuesProperty = ValuesPropertyKey.DependencyProperty;
 
-
-        public IList<string> Tags => _tags;
-
-
-        private void Values_Changed(IEnumerable<string> newValue)
-        {
-            if (newValue == null)
-                _tags.Clear();
-            else
-                _tags.SynchronizeWith(new[] { string.Empty }.Concat(newValue.SelectMany(x => Regex.Split(x))).Distinct().ToArray());
-        }
 
         /// <summary>When overridden in a derived class, is invoked whenever application code or internal processes call <see cref="M:System.Windows.FrameworkElement.ApplyTemplate" />.</summary>
         public override void OnApplyTemplate()
@@ -76,13 +71,16 @@
             Contract.Assume(filterColumnControl != null);
 
             BindingOperations.SetBinding(this, FilterProperty, new Binding { Source = filterColumnControl, Path = new PropertyPath(DataGridFilterColumnControl.FilterProperty) });
-            BindingOperations.SetBinding(this, ValuesProperty, new Binding { Source = filterColumnControl, Path = new PropertyPath(nameof(DataGridFilterColumnControl.SourceValues)) });
+            BindingOperations.SetBinding(this, SourceValuesProperty, new Binding { Source = filterColumnControl, Path = new PropertyPath(nameof(DataGridFilterColumnControl.SourceValues)) });
 
             var dataGrid = filterColumnControl.TryFindAncestor<DataGrid>();
-            Contract.Assume(dataGrid != null);
-            ((INotifyCollectionChanged)dataGrid.Items).CollectionChanged += (_, __) => BindingOperations.GetBindingExpression(this, ValuesProperty)?.UpdateTarget();
+            if (dataGrid == null)
+                return;
 
-            _listBox = Template?.FindName("ListBox", this) as ListBox;
+            var dataGridItems = (INotifyCollectionChanged)dataGrid.Items;
+            dataGridItems.CollectionChanged += (_, __) => BindingOperations.GetBindingExpression(this, SourceValuesProperty)?.UpdateTarget();
+
+            _listBox = Template?.FindName("PART_ListBox", this) as ListBox;
             if (_listBox == null)
                 return;
 
@@ -93,9 +91,16 @@
                 _listBox.SelectAll();
             }
 
-            var items = _listBox.Items as INotifyCollectionChanged;
+            _listBox.SelectionChanged += ListBox_SelectionChanged;
+            var items = (INotifyCollectionChanged)_listBox.Items;
+
             items.CollectionChanged += ListBox_ItemsCollectionChanged;
         }
+
+        [NotNull]
+        protected abstract MultipleChoiceContentFilterBase CreateFilter(IEnumerable<string> items);
+
+        protected abstract void OnSourceValuesChanged(IEnumerable<string> newValue);
 
         private void ListBox_ItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
@@ -138,19 +143,20 @@
 
             var areAllItemsSelected = listBox.Items.Count == selectedItems.Length;
 
-            Filter = new TagsContentFilter(areAllItemsSelected ? null : selectedItems);
+            Filter = CreateFilter(areAllItemsSelected ? null : selectedItems);
         }
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_tags != null);
+            Contract.Invariant(Values != null);
         }
     }
-    public class TagsContentFilter : IContentFilter
+
+    public abstract class MultipleChoiceContentFilterBase : IContentFilter
     {
-        public TagsContentFilter(IEnumerable<string> items)
+        protected MultipleChoiceContentFilterBase(IEnumerable<string> items)
         {
             Items = items?.ToArray();
         }
@@ -160,15 +166,6 @@
             get;
         }
 
-        public bool IsMatch(object value)
-        {
-            var input = value as string;
-            if (string.IsNullOrWhiteSpace(input))
-                return Items?.Contains(string.Empty) ?? true;
-
-            var tags = TagFilter.Regex.Split(input);
-
-            return Items?.ContainsAny(tags) ?? true;
-        }
+        public abstract bool IsMatch(object value);
     }
 }

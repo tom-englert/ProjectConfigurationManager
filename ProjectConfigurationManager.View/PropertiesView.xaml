@@ -119,14 +119,17 @@
                                 IsReadOnly="True" Width="150"
                                 SortMemberPath="Project.SortKey"
                                 SortDirection="Ascending"
-                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}}" />
+                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}}"
+                                dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.MultipleChoiceFilterTemplate}}" />
         <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False"
                             IsReadOnly="True" Width="110"
                             Binding="{Binding Configuration}"
-                            SortDirection="Ascending" />
+                            SortDirection="Ascending"
+                            dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.MultipleChoiceFilterTemplate}}" />
         <DataGridTextColumn Header="Platform" DisplayIndex="2" CanUserReorder="False"
                             IsReadOnly="True" Width="85"
-                            Binding="{Binding Platform}" />
+                            Binding="{Binding Platform}"
+                            dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.MultipleChoiceFilterTemplate}}" />
         <DataGridTextColumn Header="Tags" DisplayIndex="3" CanUserReorder="False"
                             Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}"
                             local:PropertiesColumnsManagerBehavior.PropertyName="Tags"

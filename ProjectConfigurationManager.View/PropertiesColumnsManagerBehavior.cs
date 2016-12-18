@@ -16,6 +16,7 @@
     using DataGridExtensions.Framework;
 
     using tomenglertde.ProjectConfigurationManager.Model;
+    using tomenglertde.ProjectConfigurationManager.View.Themes;
 
     using TomsToolbox.Core;
     using TomsToolbox.ObservableCollections;
@@ -157,14 +158,12 @@
             {
                 Header = new TextBlock { Text = projectPropertyName.DisplayName },
                 Width = new DataGridLength(1, DataGridLengthUnitType.Star),
-                Binding = new Binding(@"PropertyValue[" + projectPropertyName.Name + @"]")
-                {
-                    Mode = BindingMode.TwoWay
-                }
+                Binding = new Binding(@"PropertyValue[" + projectPropertyName.Name + @"]") { Mode = BindingMode.TwoWay },
             };
 
             column.EnableMultilineEditing();
 
+            column.SetValue(DataGridFilterColumn.TemplateProperty, AssociatedObject?.FindResource(ResourceKeys.MultipleChoiceFilterTemplate));
             column.SetValue(ProjectPropertyNameProperty, projectPropertyName);
             column.SetValue(PropertyNameProperty, projectPropertyName.Name);
 

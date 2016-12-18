@@ -5,12 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="800"
              xmlns:view="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
-             xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model"
              xmlns:toms="urn:TomsToolbox"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
              d:DataContext="{d:DesignInstance view:BuildConfigurationViewModel}">
   <UserControl.Resources>
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" />
+    <themes:ResourceLocator x:Key="ResourceLocator" />
   </UserControl.Resources>
   <DockPanel Margin="10">
     <Border DockPanel.Dock="Right" Margin="5">
@@ -38,6 +38,7 @@
               CanUserAddRows="False" CanUserResizeRows="False"
               view:BuildConfigurationColumnsManager.Configurations="{Binding Solution.SolutionConfigurations}"
               toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedConfigurations}"
+              dgx:DataGridFilter.ResourceLocator="{StaticResource ResourceLocator}"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
               dgx:Tools.ApplyInitialSorting="True"
               FrozenColumnCount="4">
@@ -60,18 +61,21 @@
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Header="Project" DisplayIndex="0"  CanUserReorder="False" 
-                                IsReadOnly="True" 
+        <DataGridTemplateColumn Header="Project" DisplayIndex="0" CanUserReorder="False"
+                                IsReadOnly="True"
                                 SortMemberPath="Project.SortKey"
-                                SortDirection="Ascending" 
-                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}}"/>
-        <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False" 
-                            IsReadOnly="True" 
-                            Binding="{Binding Configuration}" 
-                            SortDirection="Ascending" />
-        <DataGridTextColumn Header="Platform" DisplayIndex="2" CanUserReorder="False" 
-                            IsReadOnly="True" 
-                            Binding="{Binding Platform}"/>
+                                SortDirection="Ascending"
+                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}}"
+                                dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.MultipleChoiceFilterTemplate}}" />
+        <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False"
+                            IsReadOnly="True"
+                            Binding="{Binding Configuration}"
+                            SortDirection="Ascending"
+                            dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.MultipleChoiceFilterTemplate}}" />
+        <DataGridTextColumn Header="Platform" DisplayIndex="2" CanUserReorder="False"
+                            IsReadOnly="True"
+                            Binding="{Binding Platform}"
+                            dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.MultipleChoiceFilterTemplate}}" />
         <DataGridTextColumn Header="Tags" DisplayIndex="3" CanUserReorder="False"
                             Binding="{Binding Project.DefaultProjectConfiguration.PropertyValue[Tags]}"
                             view:PropertiesColumnsManagerBehavior.PropertyName="Tags"

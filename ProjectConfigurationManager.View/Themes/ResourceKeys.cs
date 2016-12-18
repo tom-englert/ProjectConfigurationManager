@@ -28,7 +28,7 @@
         /// <summary>
         /// Template for the whole column header.
         /// </summary>
-        public static readonly ResourceKey ColumnHeaderTemplateKey = new ComponentResourceKey(typeof(ResourceKeys), typeof(DataGridColumn));
+        public static readonly ResourceKey ColumnHeaderTemplateKey = new ComponentResourceKey(typeof(ResourceKeys), "ColumnHeaderTemplate");
 
         /// <summary>
         /// The filter icon template.
@@ -61,6 +61,9 @@
 
         public static readonly ResourceKey TagFilterTemplate = new ComponentResourceKey(typeof(ResourceKeys), "TagFilterTemplate");
 
+
+        public static readonly ResourceKey MultipleChoiceFilterTemplate = new ComponentResourceKey(typeof(ResourceKeys), "MultipleChoiceFilterTemplate");
+        
 
         public static readonly ResourceKey ProjectNameTemplate = new ComponentResourceKey(typeof(ResourceKeys), "ProjectNameTemplate");
 
