@@ -5,12 +5,15 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
+    using JetBrains.Annotations;
+
     public class PropertyGroupName : IEquatable<PropertyGroupName>
     {
+        [NotNull]
         private readonly string _name;
         private readonly int _index;
 
-        public PropertyGroupName(string name, int index)
+        public PropertyGroupName([NotNull] string name, int index)
         {
             Contract.Requires(name != null);
 
@@ -90,6 +93,7 @@
             "GenerateManifests",
         };
 
+        [NotNull]
         public string Name
         {
             get
@@ -106,7 +110,8 @@
             return !_projectSpecificProperties.Contains(propertyName);
         }
 
-        public static PropertyGroupName GetGroupForProperty(string propertyName)
+        [NotNull]
+        public static PropertyGroupName GetGroupForProperty([NotNull] string propertyName)
         {
             Contract.Requires(propertyName != null);
             Contract.Ensures(Contract.Result<PropertyGroupName>() != null);

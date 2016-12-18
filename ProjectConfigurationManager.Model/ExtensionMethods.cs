@@ -3,9 +3,11 @@
     using System.Diagnostics.Contracts;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     internal static class ExtensionMethods
     {
-        public static void RemoveSelfAndWhitespace(this XElement element)
+        public static void RemoveSelfAndWhitespace([NotNull] this XElement element)
         {
             Contract.Requires(element != null);
 

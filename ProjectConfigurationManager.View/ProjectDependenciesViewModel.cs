@@ -7,6 +7,8 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
@@ -18,10 +20,12 @@
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 4)]
     public class ProjectDependenciesViewModel : ObservableObject
     {
+        [NotNull]
         private readonly IObservableCollection<ProjectDependency> _references;
+        [NotNull]
         private readonly IObservableCollection<ProjectDependency> _referencedBy;
 
-        public ProjectDependenciesViewModel(Solution solution)
+        public ProjectDependenciesViewModel([NotNull] Solution solution)
         {
             Contract.Requires(solution != null);
 
@@ -67,12 +71,14 @@
 
     public class ProjectDependency : ObservableObject
     {
+        [NotNull]
         private readonly ProjectDependenciesViewModel _model;
         private bool _isSelected;
         private bool _isProjectSelected;
+        [NotNull]
         private readonly Project _project;
 
-        public ProjectDependency(ProjectDependenciesViewModel model, ProjectDependency parent, Project project, Func<Project, IList<Project>> getChildProjectsCallback)
+        public ProjectDependency([NotNull] ProjectDependenciesViewModel model, ProjectDependency parent, [NotNull] Project project, [NotNull] Func<Project, IList<Project>> getChildProjectsCallback)
         {
             Contract.Requires(model != null);
             Contract.Requires(project != null);
@@ -86,6 +92,7 @@
             Children = GetChildren(project, getChildProjectsCallback);
         }
 
+        [NotNull]
         public Project Project
         {
             get
@@ -126,6 +133,7 @@
             }
         }
 
+        [NotNull]
         public IEnumerable<ProjectDependency> DescendantsAndSelf
         {
             get
@@ -143,7 +151,7 @@
         }
 
         [ContractVerification(false)]
-        private IObservableCollection<ProjectDependency> GetChildren(Project project, Func<Project, IList<Project>> getChildProjectsCallback)
+        private IObservableCollection<ProjectDependency> GetChildren([NotNull] Project project, [NotNull] Func<Project, IList<Project>> getChildProjectsCallback)
         {
             Contract.Requires(project != null);
             Contract.Requires(getChildProjectsCallback != null);

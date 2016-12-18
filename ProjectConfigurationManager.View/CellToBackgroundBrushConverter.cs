@@ -12,11 +12,14 @@
     using System.Windows.Data;
     using System.Windows.Media;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Core;
 
     [Export]
     public class CellToBackgroundBrushConverter : IValueConverter, IMultiValueConverter
     {
+        [NotNull]
         private readonly Dictionary<string, Brush> _mappingCache = new Dictionary<string, Brush>(StringComparer.OrdinalIgnoreCase);
 
         private static readonly Brush[] _brushes =
@@ -56,7 +59,7 @@
             return _mappingCache.ForceValue(text, GetNextBrush);
         }
 
-        private static string GetColumnText(DataGridColumn column, object dataContext)
+        private static string GetColumnText([NotNull] DataGridColumn column, [NotNull] object dataContext)
         {
             Contract.Requires(column != null);
             Contract.Requires(dataContext != null);

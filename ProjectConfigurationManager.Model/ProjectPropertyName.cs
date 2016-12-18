@@ -4,13 +4,18 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
+    using JetBrains.Annotations;
+
     public class ProjectPropertyName : IEquatable<ProjectPropertyName>
     {
+        [NotNull]
         private readonly string _name;
+        [NotNull]
         private readonly PropertyGroupName _groupName;
+        [NotNull]
         private readonly string _displayName;
 
-        internal ProjectPropertyName(string name, PropertyGroupName groupName)
+        internal ProjectPropertyName([NotNull] string name, [NotNull] PropertyGroupName groupName)
         {
             Contract.Requires(name != null);
             Contract.Requires(groupName != null);
@@ -20,7 +25,7 @@
             _displayName = HasGroupNamePrefix(name, groupName.Name) ? name.Substring(groupName.Name.Length) : name;
         }
 
-        private static bool HasGroupNamePrefix(string name, string groupName)
+        private static bool HasGroupNamePrefix([NotNull] string name, [NotNull] string groupName)
         {
             Contract.Requires(name != null);
             Contract.Requires(groupName != null);
@@ -31,6 +36,7 @@
             return name.Length > length && name.StartsWith(groupName, StringComparison.Ordinal) && char.IsUpper(name[length]);
         }
 
+        [NotNull]
         public string Name
         {
             get
@@ -40,6 +46,7 @@
             }
         }
 
+        [NotNull]
         public PropertyGroupName GroupName
         {
             get
@@ -49,6 +56,7 @@
             }
         }
 
+        [NotNull]
         public string DisplayName
         {
             get

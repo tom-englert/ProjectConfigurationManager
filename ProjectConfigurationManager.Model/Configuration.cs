@@ -7,6 +7,8 @@
     using System.Diagnostics.Contracts;
     using System.IO;
 
+    using JetBrains.Annotations;
+
     using Newtonsoft.Json;
 
     using TomsToolbox.Desktop;
@@ -14,6 +16,7 @@
     [Export]
     public class Configuration : ObservableObjectBase
     {
+        [NotNull]
         private readonly ITracer _tracer;
         private const string FileName = "config.json";
         private static readonly string _directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tom-englert.de", "ProjectConfigurationManager");
@@ -22,7 +25,7 @@
         private IDictionary<string, string[]> _propertyColumnOrder;
 
         [ImportingConstructor]
-        public Configuration(ITracer tracer)
+        public Configuration([NotNull] ITracer tracer)
         {
             Contract.Requires(tracer != null);
             Contract.Assume(!string.IsNullOrEmpty(_directory));
@@ -54,6 +57,7 @@
         /// <value>
         /// The property column order, i.e. all column names by group in display order.
         /// </value>
+        [NotNull]
         public IDictionary<string, string[]> PropertyColumnOrder
         {
             get

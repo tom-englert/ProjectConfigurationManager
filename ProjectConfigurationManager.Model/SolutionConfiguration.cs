@@ -6,18 +6,25 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
     public class SolutionConfiguration : ObservableObject, IEquatable<SolutionConfiguration>
     {
+        [NotNull]
         private readonly Solution _solution;
+        [NotNull]
         private readonly EnvDTE80.SolutionConfiguration2 _solutionConfiguration;
+        [NotNull]
         private readonly ObservableCollection<SolutionContext> _contexts = new ObservableCollection<SolutionContext>();
+        [NotNull]
         private readonly string _name;
+        [NotNull]
         private readonly string _platformName;
 
-        internal SolutionConfiguration(Solution solution, EnvDTE80.SolutionConfiguration2 solutionConfiguration)
+        internal SolutionConfiguration([NotNull] Solution solution, [NotNull] EnvDTE80.SolutionConfiguration2 solutionConfiguration)
         {
             Contract.Requires(solution != null);
             Contract.Requires(solutionConfiguration != null);
@@ -31,6 +38,7 @@
             Update();
         }
 
+        [NotNull]
         public string Name
         {
             get
@@ -40,6 +48,7 @@
             }
         }
 
+        [NotNull]
         public string PlatformName
         {
             get
@@ -49,6 +58,7 @@
             }
         }
 
+        [NotNull]
         public string UniqueName
         {
             get
@@ -58,6 +68,7 @@
             }
         }
 
+        [NotNull]
         public ObservableCollection<SolutionContext> Contexts
         {
             get

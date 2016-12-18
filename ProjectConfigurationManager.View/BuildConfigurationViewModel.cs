@@ -9,6 +9,8 @@
     using System.Linq;
     using System.Windows.Input;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
@@ -20,17 +22,20 @@
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 1)]
     class BuildConfigurationViewModel : ObservableObject
     {
+        [NotNull]
         private readonly Solution _solution;
+        [NotNull]
         private readonly ICollection<ProjectConfiguration> _selectedConfigurations = new ObservableCollection<ProjectConfiguration>();
 
         [ImportingConstructor]
-        public BuildConfigurationViewModel(Solution solution)
+        public BuildConfigurationViewModel([NotNull] Solution solution)
         {
             Contract.Requires(solution != null);
 
             _solution = solution;
         }
 
+        [NotNull]
         public Solution Solution
         {
             get

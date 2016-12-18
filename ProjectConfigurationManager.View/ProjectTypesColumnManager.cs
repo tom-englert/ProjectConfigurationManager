@@ -11,6 +11,8 @@
 
     using DataGridExtensions;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
@@ -18,12 +20,12 @@
 
     public static class ProjectTypesColumnManager
     {
-        public static bool GetIsAttached(DependencyObject obj)
+        public static bool GetIsAttached([NotNull] DependencyObject obj)
         {
             Contract.Requires(obj != null);
             return obj.GetValue<bool>(IsAttachedProperty);
         }
-        public static void SetIsAttached(DependencyObject obj, bool value)
+        public static void SetIsAttached([NotNull] DependencyObject obj, bool value)
         {
             Contract.Requires(obj != null);
             obj.SetValue(IsAttachedProperty, value);
@@ -41,6 +43,7 @@
                 .ForEach(item => dataGrid.Columns.Add(CreateColumn(item)));
         }
 
+        [NotNull]
         private static DataGridColumn CreateColumn(KeyValuePair<string, string> item)
         {
             Contract.Ensures(Contract.Result<DataGridColumn>() != null);

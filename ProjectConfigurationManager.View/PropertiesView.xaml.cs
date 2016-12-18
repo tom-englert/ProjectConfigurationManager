@@ -13,6 +13,8 @@
 
     using DataGridExtensions;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Wpf;
@@ -25,10 +27,11 @@
     [DataTemplate(typeof(PropertiesViewModel))]
     public partial class PropertiesView
     {
+        [NotNull]
         private readonly ITracer _tracer;
 
         [ImportingConstructor]
-        public PropertiesView(ExportProvider exportProvider, ITracer tracer)
+        public PropertiesView([NotNull] ExportProvider exportProvider, [NotNull] ITracer tracer)
         {
             Contract.Requires(exportProvider != null);
             Contract.Requires(tracer != null);
@@ -39,14 +42,14 @@
             InitializeComponent();
         }
 
-        private static bool FilterPredicate(ProjectConfiguration item, IEnumerable<string> selectedGuids)
+        private static bool FilterPredicate(ProjectConfiguration item, [NotNull] IEnumerable<string> selectedGuids)
         {
             Contract.Requires(selectedGuids != null);
 
             return (item != null) && item.Project.ProjectTypeGuids.All(guid => selectedGuids.Contains(guid, StringComparer.OrdinalIgnoreCase));
         }
 
-        private void ProjectTypeGuids_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ProjectTypeGuids_SelectionChanged([NotNull] object sender, SelectionChangedEventArgs e)
         {
             Contract.Requires(sender != null);
 
@@ -57,7 +60,7 @@
             DataGridFilter.SetGlobalFilter(DataGrid, item => FilterPredicate(item as ProjectConfiguration, selectedGuids));
         }
 
-        private void ProjectTypeGuids_Loaded(object sender, RoutedEventArgs e)
+        private void ProjectTypeGuids_Loaded([NotNull] object sender, RoutedEventArgs e)
         {
             Contract.Requires(sender != null);
 

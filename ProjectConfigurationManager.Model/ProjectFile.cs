@@ -11,6 +11,8 @@
     using System.Xml;
     using System.Xml.Linq;
 
+    using JetBrains.Annotations;
+
     using Microsoft.VisualStudio.Shell.Interop;
 
     using TomsToolbox.Core;
@@ -23,16 +25,20 @@
         private static readonly XNamespace _xmlns = XNamespace.Get(@"http://schemas.microsoft.com/developer/msbuild/2003");
         private static readonly XName _propertyGroupNodeName = _xmlns.GetName("PropertyGroup");
 
+        [NotNull]
         private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
+        [NotNull]
         private readonly DispatcherThrottle _deferredSaveThrottle;
+        [NotNull]
         private readonly Solution _solution;
+        [NotNull]
         private readonly Project _project;
         private readonly Guid _projectGuid;
 
         private XDocument _document;
         private ProjectPropertyGroup[] _propertyGroups;
 
-        public ProjectFile(Solution solution, Project project)
+        public ProjectFile([NotNull] Solution solution, [NotNull] Project project)
         {
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
@@ -46,13 +52,14 @@
             _projectGuid = GetProjectGuid(solution, project.UniqueName);
         }
 
+        [NotNull]
         public IEnumerable<IProjectPropertyGroup> GetPropertyGroups(string configuration, string platform)
         {
             Contract.Ensures(Contract.Result<IEnumerable<IProjectPropertyGroup>>() != null);
             return PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
         }
 
-        public IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
+        public IProjectProperty CreateProperty([NotNull] string propertyName, string configuration, string platform)
         {
             Contract.Requires(propertyName != null);
 
@@ -61,7 +68,7 @@
             return group?.AddProperty(propertyName);
         }
 
-        public void DeleteProperty(string propertyName, string configuration, string platform)
+        public void DeleteProperty([NotNull] string propertyName, string configuration, string platform)
         {
             Contract.Requires(propertyName != null);
 
@@ -163,7 +170,7 @@
             ReloadProject(_dispatcher, solution, 0, projectGuid);
         }
 
-        private static void ReloadProject(Dispatcher dispatcher, IVsSolution4 solution, int retry, Guid projectGuid)
+        private static void ReloadProject([NotNull] Dispatcher dispatcher, [NotNull] IVsSolution4 solution, int retry, Guid projectGuid)
         {
             Contract.Requires(dispatcher != null);
             Contract.Requires(solution != null);
@@ -178,7 +185,7 @@
             }
         }
 
-        private static Guid GetProjectGuid(IServiceProvider serviceProvider, string uniqueName)
+        private static Guid GetProjectGuid([NotNull] IServiceProvider serviceProvider, [NotNull] string uniqueName)
         {
             Contract.Requires(serviceProvider != null);
             Contract.Requires(uniqueName != null);
@@ -216,6 +223,7 @@
             }
         }
 
+        [NotNull]
         private XDocument Document
         {
             get
@@ -225,6 +233,7 @@
             }
         }
 
+        [NotNull]
         private IEnumerable<ProjectPropertyGroup> PropertyGroups
         {
             get
@@ -244,11 +253,14 @@
 
         private class ProjectPropertyGroup : IProjectPropertyGroup
         {
+            [NotNull]
             private readonly ProjectFile _projectFile;
+            [NotNull]
             private readonly XElement _propertyGroupNode;
+            [NotNull]
             private readonly ObservableCollection<ProjectProperty> _properties;
 
-            public ProjectPropertyGroup(ProjectFile projectFile, XElement propertyGroupNode)
+            public ProjectPropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement propertyGroupNode)
             {
                 Contract.Requires(projectFile != null);
                 Contract.Requires(propertyGroupNode != null);
@@ -329,10 +341,12 @@
 
         private class ProjectProperty : IProjectProperty
         {
+            [NotNull]
             private readonly ProjectFile _projectFile;
+            [NotNull]
             private readonly XElement _node;
 
-            public ProjectProperty(ProjectFile projectFile, XElement node)
+            public ProjectProperty([NotNull] ProjectFile projectFile, [NotNull] XElement node)
             {
                 Contract.Requires(projectFile != null);
                 Contract.Requires(node != null);

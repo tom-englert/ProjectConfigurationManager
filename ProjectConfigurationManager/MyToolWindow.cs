@@ -16,6 +16,8 @@
     using System.Windows.Controls.Primitives;
     using System.Windows.Documents;
 
+    using JetBrains.Annotations;
+
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -44,7 +46,9 @@
             + "\nReport issues: https://github.com/tom-englert/ProjectConfigurationManager/issues"
             + "\nSupport the project by adding a short review: https://visualstudiogallery.msdn.microsoft.com/cf7efe17-ae87-40fe-a1e2-f2d61907f043/view/Reviews";
 
+        [NotNull]
         private readonly ICompositionHost _compositionHost = new CompositionHost();
+        [NotNull]
         private readonly ITracer _tracer;
 
         /// <summary>
@@ -133,7 +137,7 @@
         }
 
         [Localizable(false)]
-        private void CreateWebBrowser(string url)
+        private void CreateWebBrowser([NotNull] string url)
         {
             Contract.Requires(url != null);
 
@@ -154,6 +158,7 @@
         }
 
         [ContractVerification(false)]
+        [NotNull]
         private static RegistrationBuilder CreateRegistrationContext()
         {
             Contract.Ensures(Contract.Result<RegistrationBuilder>() != null);
@@ -165,7 +170,7 @@
             return context;
         }
 
-        private static ConstructorInfo SelectConstructor(ConstructorInfo[] constructors)
+        private static ConstructorInfo SelectConstructor([NotNull] ConstructorInfo[] constructors)
         {
             Contract.Requires(constructors != null);
 

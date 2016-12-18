@@ -11,6 +11,8 @@
 
     using DataGridExtensions;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Desktop;
@@ -21,16 +23,18 @@
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 2)]
     class PropertiesViewModel : ObservableObject
     {
+        [NotNull]
         private readonly Solution _solution;
 
         [ImportingConstructor]
-        public PropertiesViewModel(Solution solution)
+        public PropertiesViewModel([NotNull] Solution solution)
         {
             Contract.Requires(solution != null);
 
             _solution = solution;
         }
 
+        [NotNull]
         public Solution Solution
         {
             get
@@ -43,7 +47,7 @@
 
         public static ICommand CopyCommand => new DelegateCommand<DataGrid>(CanCopy, Copy);
 
-        private static void Copy(DataGrid dataGrid)
+        private static void Copy([NotNull] DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
 
@@ -57,7 +61,7 @@
 
         public static ICommand PasteCommand => new DelegateCommand<DataGrid>(CanPaste, Paste);
 
-        private static void Paste(DataGrid dataGrid)
+        private static void Paste([NotNull] DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
 
@@ -76,7 +80,7 @@
 
         public static ICommand DeleteCommand => new DelegateCommand<DataGrid>(CanDelete, Delete);
 
-        private static void Delete(DataGrid dataGrid)
+        private static void Delete([NotNull] DataGrid dataGrid)
         {
             Contract.Requires(dataGrid != null);
             Contract.Requires(dataGrid.SelectedCells != null);

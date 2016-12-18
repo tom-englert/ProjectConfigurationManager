@@ -5,6 +5,8 @@
     using System.Diagnostics.Contracts;
     using System.IO;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Wpf.Composition;
@@ -12,10 +14,11 @@
     [DataTemplate(typeof(BuildConfigurationViewModel))]
     public partial class BuildConfigurationView
     {
+        [NotNull]
         private readonly ITracer _tracer;
 
         [ImportingConstructor]
-        public BuildConfigurationView(ITracer tracer)
+        public BuildConfigurationView([NotNull] ITracer tracer)
         {
             Contract.Requires(tracer != null);
             _tracer = tracer;

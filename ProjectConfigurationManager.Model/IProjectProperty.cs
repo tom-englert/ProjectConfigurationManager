@@ -2,11 +2,15 @@
 {
     using System.Diagnostics.Contracts;
 
+    using JetBrains.Annotations;
+
     [ContractClass(typeof (ProjectPropertyContract))]
     interface IProjectProperty
     {
+        [NotNull]
         string Name { get; }
 
+        [NotNull]
         string Value
         {
             get;

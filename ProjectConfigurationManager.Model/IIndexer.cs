@@ -2,10 +2,12 @@ namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System.Diagnostics.Contracts;
 
+    using JetBrains.Annotations;
+
     [ContractClass(typeof(IndexerContract<>))]
     public interface IIndexer<T>
     {
-        T this[string key]
+        T this[[NotNull] string key]
         {
             get;
             set;

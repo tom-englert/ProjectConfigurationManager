@@ -8,6 +8,8 @@
     using System.Linq;
     using System.Windows.Threading;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
@@ -15,13 +17,17 @@
     {
         private readonly string _configuration;
         private readonly string _platform;
+        [NotNull]
         private readonly Project _project;
+        [NotNull]
         private readonly IIndexer<bool?> _shouldBuild;
+        [NotNull]
         private readonly IIndexer<string> _propertyValue;
 
+        [NotNull]
         private IDictionary<string, IProjectProperty> _properties = new Dictionary<string, IProjectProperty>();
 
-        internal ProjectConfiguration(Project project, string configuration, string platform)
+        internal ProjectConfiguration([NotNull] Project project, string configuration, string platform)
         {
             Contract.Requires(project != null);
 
@@ -33,6 +39,7 @@
             _propertyValue = new PropertyValueIndexer(this);
         }
 
+        [NotNull]
         public Project Project
         {
             get
@@ -46,6 +53,7 @@
 
         public string Platform => _platform;
 
+        [NotNull]
         public IIndexer<bool?> ShouldBuild
         {
             get
@@ -55,6 +63,7 @@
             }
         }
 
+        [NotNull]
         public IIndexer<string> PropertyValue
         {
             get
@@ -64,6 +73,7 @@
             }
         }
 
+        [NotNull]
         internal IDictionary<string, IProjectProperty> Properties
         {
             get
@@ -84,7 +94,7 @@
             return Project.SolutionContexts.Any(ctx => (ctx.ConfigurationName == Configuration) && (ctx.PlatformName == Platform));
         }
 
-        internal void SetProjectFile(ProjectFile projectFile)
+        internal void SetProjectFile([NotNull] ProjectFile projectFile)
         {
             Contract.Requires(projectFile != null);
 
@@ -101,9 +111,10 @@
 
         private class ShouldBuildIndexer : IIndexer<bool?>
         {
+            [NotNull]
             private readonly ProjectConfiguration _projectConfiguration;
 
-            public ShouldBuildIndexer(ProjectConfiguration projectConfiguration)
+            public ShouldBuildIndexer([NotNull] ProjectConfiguration projectConfiguration)
             {
                 Contract.Requires(projectConfiguration != null);
 
@@ -152,9 +163,10 @@
 
         private class PropertyValueIndexer : IIndexer<string>
         {
+            [NotNull]
             private readonly ProjectConfiguration _projectConfiguration;
 
-            public PropertyValueIndexer(ProjectConfiguration projectConfiguration)
+            public PropertyValueIndexer([NotNull] ProjectConfiguration projectConfiguration)
             {
                 Contract.Requires(projectConfiguration != null);
 
@@ -197,7 +209,7 @@
             }
         }
 
-        private IProjectProperty CreateProperty(string propertyName)
+        private IProjectProperty CreateProperty([NotNull] string propertyName)
         {
             Contract.Requires(propertyName != null);
 
@@ -208,7 +220,7 @@
             return property;
         }
 
-        public void DeleteProperty(string propertyName)
+        public void DeleteProperty([NotNull] string propertyName)
         {
             Contract.Requires(propertyName != null);
 

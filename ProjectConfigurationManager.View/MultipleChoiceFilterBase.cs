@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace tomenglertde.ProjectConfigurationManager.View
+﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -8,14 +6,14 @@ namespace tomenglertde.ProjectConfigurationManager.View
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
 
     using DataGridExtensions;
 
-    using TomsToolbox.Core;
+    using JetBrains.Annotations;
+
     using TomsToolbox.Wpf;
 
     [TemplatePart(Name = "PART_ListBox", Type = typeof(ListBox))]

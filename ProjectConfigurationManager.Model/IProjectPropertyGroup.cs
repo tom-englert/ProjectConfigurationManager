@@ -3,12 +3,15 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
+    using JetBrains.Annotations;
+
     [ContractClass(typeof (ProjectPropertyGroupContract))]
     interface IProjectPropertyGroup
     {
+        [NotNull]
         IEnumerable<IProjectProperty> Properties { get; }
 
-        IProjectProperty AddProperty(string propertyName);
+        IProjectProperty AddProperty([NotNull] string propertyName);
     }
 
     [ContractClassFor(typeof (IProjectPropertyGroup))]

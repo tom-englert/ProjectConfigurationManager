@@ -15,6 +15,8 @@
     using DataGridExtensions;
     using DataGridExtensions.Framework;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
     using tomenglertde.ProjectConfigurationManager.View.Themes;
 
@@ -25,19 +27,21 @@
 
     public class PropertiesColumnsManagerBehavior : FrameworkElementBehavior<DataGrid>
     {
+        [NotNull]
         private readonly DispatcherThrottle _displayIndexChangedThrottle;
+        [NotNull]
         private readonly DispatcherThrottle _columnsCreatedThrottle;
 
         private IObservableCollection<object> _projectPropertyNames;
         private Configuration _configuration;
         private ITracer _tracer;
 
-        internal static string GetProjectPropertyName(DependencyObject obj)
+        internal static string GetProjectPropertyName([NotNull] DependencyObject obj)
         {
             Contract.Requires(obj != null);
             return (string)obj.GetValue(ProjectPropertyNameProperty);
         }
-        internal static void SetProjectPropertyName(DependencyObject obj, string value)
+        internal static void SetProjectPropertyName([NotNull] DependencyObject obj, string value)
         {
             Contract.Requires(obj != null);
             obj.SetValue(ProjectPropertyNameProperty, value);
@@ -46,12 +50,12 @@
             DependencyProperty.RegisterAttached("ProjectPropertyName", typeof(ProjectPropertyName), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
 
 
-        public static string GetPropertyName(DependencyObject obj)
+        public static string GetPropertyName([NotNull] DependencyObject obj)
         {
             Contract.Requires(obj != null);
             return (string)obj.GetValue(PropertyNameProperty);
         }
-        public static void SetPropertyName(DependencyObject obj, string value)
+        public static void SetPropertyName([NotNull] DependencyObject obj, string value)
         {
             Contract.Requires(obj != null);
             obj.SetValue(PropertyNameProperty, value);
@@ -111,7 +115,7 @@
             dataGrid.ColumnDisplayIndexChanged += (_, __) => _displayIndexChangedThrottle.Tick();
         }
 
-        private void ProjectProperties_CollectionChanged(NotifyCollectionChangedEventArgs e)
+        private void ProjectProperties_CollectionChanged([NotNull] NotifyCollectionChangedEventArgs e)
         {
             Contract.Requires(e != null);
 
@@ -150,7 +154,7 @@
             }
         }
 
-        private DataGridColumn CreateColumn(ProjectPropertyName projectPropertyName)
+        private DataGridColumn CreateColumn([NotNull] ProjectPropertyName projectPropertyName)
         {
             Contract.Requires(projectPropertyName != null);
 
@@ -189,9 +193,10 @@
 
         private class ColumInfo
         {
+            [NotNull]
             private readonly DataGridColumn _column;
 
-            public ColumInfo(DataGridColumn column, Configuration configuration)
+            public ColumInfo([NotNull] DataGridColumn column, Configuration configuration)
             {
                 Contract.Requires(column != null);
 
@@ -201,6 +206,7 @@
                 DisplayIndex = GetDisplayIndex(ProjectPropertyName, configuration);
             }
 
+            [NotNull]
             public DataGridColumn Column
             {
                 get

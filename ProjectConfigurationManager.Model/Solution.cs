@@ -4,12 +4,15 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel.Composition;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Windows.Threading;
+
+    using JetBrains.Annotations;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -18,17 +21,28 @@
     [Export]
     public class Solution : ObservableObject, IServiceProvider
     {
+        [NotNull]
         private readonly DispatcherThrottle _deferredUpdateThrottle;
+        [NotNull]
         private readonly ITracer _tracer;
+        [NotNull]
         private readonly IVsServiceProvider _serviceProvider;
+        [NotNull]
         private readonly PerformanceTracer _performanceTracer;
 
+        [NotNull]
         private readonly ObservableCollection<Project> _projects = new ObservableCollection<Project>();
+        [NotNull]
         private readonly ObservableCollection<SolutionConfiguration> _configurations = new ObservableCollection<SolutionConfiguration>();
+        [NotNull]
         private readonly IObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
+        [NotNull]
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
+        [NotNull]
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
+        [NotNull]
         private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
+        [NotNull]
         private readonly ObservableCollection<string> _projectTypeGuids = new ObservableCollection<string>();
 
         private readonly EnvDTE.SolutionEvents _solutionEvents;
@@ -36,7 +50,7 @@
         private FileSystemWatcher _fileSystemWatcher;
 
         [ImportingConstructor]
-        public Solution(ITracer tracer, IVsServiceProvider serviceProvider, PerformanceTracer performanceTracer)
+        public Solution([NotNull] ITracer tracer, [NotNull] IVsServiceProvider serviceProvider, [NotNull] PerformanceTracer performanceTracer)
         {
             Contract.Requires(tracer != null);
             Contract.Requires(serviceProvider != null);
@@ -74,6 +88,7 @@
             _deferredUpdateThrottle.Tick();
         }
 
+        [NotNull]
         public ObservableCollection<Project> Projects
         {
             get
@@ -83,6 +98,7 @@
             }
         }
 
+        [NotNull]
         public ObservableCollection<SolutionConfiguration> SolutionConfigurations
         {
             get
@@ -92,6 +108,7 @@
             }
         }
 
+        [NotNull]
         public IObservableCollection<SolutionContext> SolutionContexts
         {
             get
@@ -101,6 +118,7 @@
             }
         }
 
+        [NotNull]
         public IObservableCollection<ProjectConfiguration> ProjectConfigurations
         {
             get
@@ -110,6 +128,7 @@
             }
         }
 
+        [NotNull]
         public ITracer Tracer
         {
             get
@@ -119,6 +138,7 @@
             }
         }
 
+        [NotNull]
         public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations
         {
             get
@@ -128,6 +148,7 @@
             }
         }
 
+        [NotNull]
         public ObservableCollection<ProjectPropertyName> ProjectProperties
         {
             get
@@ -137,6 +158,7 @@
             }
         }
 
+        [NotNull]
         public ObservableCollection<string> ProjectTypeGuids
         {
             get
@@ -313,6 +335,7 @@
             }
         }
 
+        [NotNull]
         private IEnumerable<SolutionConfiguration> GetConfigurations()
         {
             Contract.Ensures(Contract.Result<IEnumerable<SolutionConfiguration>>() != null);
@@ -321,6 +344,7 @@
                 .Select(item => new SolutionConfiguration(this, item)) ?? Enumerable.Empty<SolutionConfiguration>();
         }
 
+        [NotNull]
         private IEnumerable<Project> GetProjects(bool retryOnErrors)
         {
             Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
@@ -330,6 +354,7 @@
                 .Where(project => project != null);
         }
 
+        [NotNull]
         private IEnumerable<EnvDTE.Project> GetDteProjects(bool retryOnErrors)
         {
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
@@ -342,7 +367,7 @@
             return items;
         }
 
-        private void GetProjectOrSubProjects(ICollection<EnvDTE.Project> items, EnvDTE.Project project, bool retryOnErrors)
+        private void GetProjectOrSubProjects([NotNull] ICollection<EnvDTE.Project> items, EnvDTE.Project project, bool retryOnErrors)
         {
             Contract.Requires(items != null);
 
@@ -375,6 +400,7 @@
             }
         }
 
+        [NotNull]
         public IEnumerable<EnvDTE.Project> GetSubprojects(EnvDTE.Project project)
         {
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
@@ -394,6 +420,7 @@
             return Enumerable.Empty<EnvDTE.Project>();
         }
 
+        [NotNull]
         public IEnumerable<EnvDTE.Project> GetDteProjects(EnvDTE.Projects projects)
         {
             Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
@@ -419,6 +446,7 @@
             }
         }
 
+        [NotNull]
         private IEnumerable<ProjectPropertyName> GetProjectProperties()
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyName>>() != null);
@@ -449,6 +477,7 @@
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_deferredUpdateThrottle != null);

@@ -13,6 +13,8 @@
 
     using DataGridExtensions;
 
+    using JetBrains.Annotations;
+
     using tomenglertde.ProjectConfigurationManager.Model;
 
     using TomsToolbox.Core;
@@ -24,12 +26,12 @@
 
 
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
-        public static ICollection GetConfigurations(DependencyObject obj)
+        public static ICollection GetConfigurations([NotNull] DependencyObject obj)
         {
             Contract.Requires(obj != null);
             return (ICollection)obj.GetValue(ConfigurationsProperty);
         }
-        public static void SetConfigurations(DependencyObject obj, ICollection value)
+        public static void SetConfigurations([NotNull] DependencyObject obj, ICollection value)
         {
             Contract.Requires(obj != null);
             obj.SetValue(ConfigurationsProperty, value);
@@ -53,7 +55,7 @@
             Register(dataGrid, (ICollection)e.NewValue);
         }
 
-        private static void Register(DataGrid dataGrid, ICollection configurations)
+        private static void Register([NotNull] DataGrid dataGrid, ICollection configurations)
         {
             Contract.Requires(dataGrid != null);
 
@@ -66,7 +68,7 @@
         }
 
         [ContractVerification(false)]
-        private static void SolutionConfigurations_CollectionChanged(DataGrid dataGrid, NotifyCollectionChangedEventArgs e)
+        private static void SolutionConfigurations_CollectionChanged([NotNull] DataGrid dataGrid, [NotNull] NotifyCollectionChangedEventArgs e)
         {
             Contract.Requires(dataGrid != null);
             Contract.Requires(e != null);
@@ -84,7 +86,8 @@
             }
         }
 
-        private static DataGridColumn CreateColumn(SolutionConfiguration solutionConfiguration)
+        [NotNull]
+        private static DataGridColumn CreateColumn([NotNull] SolutionConfiguration solutionConfiguration)
         {
             Contract.Requires(solutionConfiguration != null);
             Contract.Ensures(Contract.Result<DataGridColumn>() != null);

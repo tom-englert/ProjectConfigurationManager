@@ -9,6 +9,8 @@
     using System.IO;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
     using TomsToolbox.ObservableCollections;
@@ -16,26 +18,39 @@
     public class Project : ObservableObject, IEquatable<Project>
     {
         private const string ProjectTypeGuidsPropertyKey = "ProjectTypeGuids";
+        [NotNull]
         private readonly EnvDTE.Project _project;
         private readonly VSLangProj.VSProject _vsProject;
 
+        [NotNull]
         private readonly Solution _solution;
+        [NotNull]
         private readonly string _uniqueName;
+        [NotNull]
         private readonly string _name;
+        [NotNull]
         private readonly string _fullName;
 
+        [NotNull]
         private readonly ObservableCollection<ProjectConfiguration> _internalSpecificProjectConfigurations = new ObservableCollection<ProjectConfiguration>();
+        [NotNull]
         private readonly ReadOnlyObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
+        [NotNull]
         private readonly IObservableCollection<SolutionContext> _solutionContexts;
+        [NotNull]
         private readonly ProjectConfiguration _defaultProjectConfiguration;
+        [NotNull]
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
         private readonly IIndexer<bool> _isProjectTypeGuidSelected;
+        [NotNull]
         private readonly ObservableCollection<Project> _referencedBy = new ObservableCollection<Project>();
+        [NotNull]
         private readonly ObservableCollection<Project> _references = new ObservableCollection<Project>();
 
+        [NotNull]
         private ProjectFile _projectFile;
 
-        private Project(Solution solution, EnvDTE.Project project)
+        private Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
         {
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
@@ -60,7 +75,7 @@
             Update();
         }
 
-        internal static Project Create(Solution solution, EnvDTE.Project project, bool retryOnErrors, ITracer tracer)
+        internal static Project Create([NotNull] Solution solution, EnvDTE.Project project, bool retryOnErrors, ITracer tracer)
         {
             Contract.Requires(solution != null);
 
@@ -91,6 +106,7 @@
             return null;
         }
 
+        [NotNull]
         public Solution Solution
         {
             get
@@ -100,6 +116,7 @@
             }
         }
 
+        [NotNull]
         public string Name
         {
             get
@@ -109,6 +126,7 @@
             }
         }
 
+        [NotNull]
         public string UniqueName
         {
             get
@@ -118,6 +136,7 @@
             }
         }
 
+        [NotNull]
         public string RelativePath
         {
             get
@@ -127,6 +146,7 @@
             }
         }
 
+        [NotNull]
         public string SortKey
         {
             get
@@ -136,6 +156,7 @@
             }
         }
 
+        [NotNull]
         public string FullName
         {
             get
@@ -145,6 +166,7 @@
             }
         }
 
+        [NotNull]
         public IList<string> ProjectTypeGuids
         {
             get
@@ -154,6 +176,7 @@
             }
         }
 
+        [NotNull]
         public IObservableCollection<SolutionContext> SolutionContexts
         {
             get
@@ -163,6 +186,7 @@
             }
         }
 
+        [NotNull]
         public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations
         {
             get
@@ -172,6 +196,7 @@
             }
         }
 
+        [NotNull]
         public ProjectConfiguration DefaultProjectConfiguration
         {
             get
@@ -181,6 +206,7 @@
             }
         }
 
+        [NotNull]
         public IObservableCollection<ProjectConfiguration> ProjectConfigurations
         {
             get
@@ -196,6 +222,7 @@
 
         public DateTime FileTime => _projectFile.FileTime;
 
+        [NotNull]
         public ObservableCollection<Project> References
         {
             get
@@ -206,6 +233,7 @@
             }
         }
 
+        [NotNull]
         public ObservableCollection<Project> ReferencedBy
         {
             get
@@ -216,6 +244,7 @@
             }
         }
 
+        [NotNull]
         private IEnumerable<VSLangProj.Reference> GetReferences()
         {
             Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
@@ -348,21 +377,21 @@
             _references.SynchronizeWith(projectReferences);
         }
 
-        internal IProjectProperty CreateProperty(string propertyName, string configuration, string platform)
+        internal IProjectProperty CreateProperty([NotNull] string propertyName, string configuration, string platform)
         {
             Contract.Requires(propertyName != null);
 
             return _projectFile.CreateProperty(propertyName, configuration, platform);
         }
 
-        internal void DeleteProperty(string propertyName, string configuration, string platform)
+        internal void DeleteProperty([NotNull] string propertyName, string configuration, string platform)
         {
             Contract.Requires(propertyName != null);
 
             _projectFile.DeleteProperty(propertyName, configuration, platform);
         }
 
-        internal void Delete(ProjectConfiguration configuration)
+        internal void Delete([NotNull] ProjectConfiguration configuration)
         {
             Contract.Requires(configuration != null);
 
@@ -372,6 +401,7 @@
             }
         }
 
+        [NotNull]
         private string[] RetrieveProjectTypeGuids()
         {
             Contract.Ensures(Contract.Result<string[]>() != null);
@@ -383,7 +413,7 @@
                 .ToArray();
         }
 
-        private static string GetSourceProjectUniqueName(VSLangProj.Reference reference)
+        private static string GetSourceProjectUniqueName([NotNull] VSLangProj.Reference reference)
         {
             Contract.Requires(reference != null);
 
@@ -400,9 +430,10 @@
 
         private class ProjectTypeGuidIndexer : IIndexer<bool>
         {
+            [NotNull]
             private readonly ProjectConfiguration _configuration;
 
-            public ProjectTypeGuidIndexer(ProjectConfiguration configuration)
+            public ProjectTypeGuidIndexer([NotNull] ProjectConfiguration configuration)
             {
                 Contract.Requires(configuration != null);
 
