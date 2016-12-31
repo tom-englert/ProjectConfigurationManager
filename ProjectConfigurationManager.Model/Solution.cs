@@ -386,7 +386,7 @@
         }
 
         [NotNull, ItemNotNull]
-        public static IEnumerable<IVsHierarchy> GetProjectsInSolution(IVsSolution solution, __VSENUMPROJFLAGS flags)
+        private static IEnumerable<IVsHierarchy> GetProjectsInSolution(IVsSolution solution, __VSENUMPROJFLAGS flags)
         {
             Contract.Ensures(Contract.Result<IEnumerable<IVsHierarchy>>() != null);
 
