@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.ProjectConfigurationManager.Model
+﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
+    using System.Diagnostics;
     using System.Diagnostics.Contracts;
 
     using JetBrains.Annotations;

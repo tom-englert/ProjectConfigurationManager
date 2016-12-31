@@ -1,11 +1,10 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.ProjectConfigurationManager.View
+﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;

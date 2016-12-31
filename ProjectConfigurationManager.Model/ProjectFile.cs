@@ -24,6 +24,7 @@
     {
         private const string ConditionAttributeName = "Condition";
 
+        [NotNull]
         private static readonly XNamespace _xmlns = XNamespace.Get(@"http://schemas.microsoft.com/developer/msbuild/2003");
         private static readonly XName _propertyGroupNodeName = _xmlns.GetName("PropertyGroup");
 
@@ -464,6 +465,7 @@
             Contract.Invariant(_solution != null);
             Contract.Invariant(_dispatcher != null);
             Contract.Invariant(_deferredSaveThrottle != null);
+            Contract.Invariant(_xmlns != null);
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.ProjectConfigurationManager.View
+﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
