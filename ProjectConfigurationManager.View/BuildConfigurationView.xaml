@@ -82,6 +82,16 @@
                             dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.TagFilterTemplate}}" />
 
       </DataGrid.Columns>
+      
+      <DataGrid.RowStyle>
+        <Style TargetType="DataGridRow">
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Project.IsLoaded}" Value="False">
+              <Setter Property="IsEnabled" Value="False"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </DataGrid.RowStyle>
     </DataGrid>
   </DockPanel>
 </UserControl>

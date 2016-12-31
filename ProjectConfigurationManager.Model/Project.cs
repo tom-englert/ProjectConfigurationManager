@@ -4,12 +4,16 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
 
     using JetBrains.Annotations;
+
+    using Microsoft.VisualStudio;
+    using Microsoft.VisualStudio.Shell.Interop;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -18,16 +22,9 @@
     public class Project : ObservableObject, IEquatable<Project>
     {
         private const string ProjectTypeGuidsPropertyKey = "ProjectTypeGuids";
-        [NotNull]
-        private readonly EnvDTE.Project _project;
-        private readonly VSLangProj.VSProject _vsProject;
 
         [NotNull]
         private readonly Solution _solution;
-        [NotNull]
-        private readonly string _uniqueName;
-        [NotNull]
-        private readonly string _name;
         [NotNull]
         private readonly string _fullName;
 
@@ -48,52 +45,41 @@
         private readonly ObservableCollection<Project> _references = new ObservableCollection<Project>();
 
         [NotNull]
+        private IVsHierarchy _projectHierarchy;
+        [NotNull]
         private ProjectFile _projectFile;
 
-        private Project([NotNull] Solution solution, [NotNull] EnvDTE.Project project)
+        private Project([NotNull] Solution solution, [NotNull] string fullName, [NotNull] IVsHierarchy projectHierarchy)
         {
             Contract.Requires(solution != null);
-            Contract.Requires(project != null);
-            Contract.Requires(!string.IsNullOrEmpty(project.FullName));
-            Contract.Requires(!string.IsNullOrEmpty(project.UniqueName));
+            Contract.Requires(projectHierarchy != null);
 
             _solution = solution;
-            _project = project;
-            _vsProject = project.Object as VSLangProj.VSProject;
-            _uniqueName = _project.UniqueName;
-            _name = _project.Name;
-            _fullName = _project.FullName;
+            _fullName = fullName;
+            _projectHierarchy = projectHierarchy;
 
             _projectFile = new ProjectFile(solution, this);
 
             _defaultProjectConfiguration = new ProjectConfiguration(this, null, null);
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
-            _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == _uniqueName);
+            _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == UniqueName);
+
             _projectConfigurations = ObservableCompositeCollection.FromSingleItemAndList(_defaultProjectConfiguration, _internalSpecificProjectConfigurations);
             _isProjectTypeGuidSelected = new ProjectTypeGuidIndexer(_defaultProjectConfiguration);
+
+            _solutionContexts.CollectionChanged += (_, __) => _projectConfigurations.ForEach(pc => pc.OnSolutionContextsChanged());
 
             Update();
         }
 
-        internal static Project Create([NotNull] Solution solution, EnvDTE.Project project, bool retryOnErrors, ITracer tracer)
+        internal static Project Create([NotNull] Solution solution, [NotNull] string fullName, [NotNull] IVsHierarchy projectHierarchy, bool retryOnErrors, ITracer tracer)
         {
             Contract.Requires(solution != null);
-
-            if (project == null)
-                return null;
+            Contract.Requires(projectHierarchy != null);
 
             try
             {
-                Uri projectUri;
-
-                // Skip web pojects, we can't edit them.
-                if (Uri.TryCreate(project.FullName, UriKind.Absolute, out projectUri) && projectUri.IsFile)
-                {
-                    Contract.Assume(!string.IsNullOrEmpty(project.FullName));
-                    Contract.Assume(!string.IsNullOrEmpty(project.UniqueName));
-
-                    return new Project(solution, project);
-                }
+                return new Project(solution, fullName, projectHierarchy);
             }
             catch (Exception ex)
             {
@@ -104,6 +90,16 @@
             }
 
             return null;
+        }
+
+        [NotNull]
+        public IVsHierarchy ProjectHierarchy
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IVsHierarchy>() != null);
+                return _projectHierarchy;
+            }
         }
 
         [NotNull]
@@ -122,7 +118,7 @@
             get
             {
                 Contract.Ensures(Contract.Result<string>() != null);
-                return _name;
+                return DteProject?.Name ?? Path.GetFileNameWithoutExtension(_fullName);
             }
         }
 
@@ -131,8 +127,23 @@
         {
             get
             {
-                Contract.Ensures(!string.IsNullOrEmpty(Contract.Result<string>()));
-                return _uniqueName;
+                Contract.Ensures(Contract.Result<string>() != null);
+
+                var solutionFolder = _solution.SolutionFolder;
+                if (string.IsNullOrEmpty(solutionFolder))
+                    return _fullName;
+
+                var solutionFolderUri = new Uri(solutionFolder + Path.DirectorySeparatorChar, UriKind.Absolute);
+                var projectUri = new Uri(_fullName, UriKind.Absolute);
+
+                var uniqueName = Uri.UnescapeDataString(solutionFolderUri
+                        .MakeRelativeUri(projectUri)
+                        .ToString())
+                    .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+                Debug.Assert(DteProject == null || DteProject.UniqueName == uniqueName);
+
+                return uniqueName;
             }
         }
 
@@ -142,6 +153,7 @@
             get
             {
                 Contract.Ensures(Contract.Result<string>() != null);
+
                 return Path.GetDirectoryName(UniqueName);
             }
         }
@@ -152,7 +164,7 @@
             get
             {
                 Contract.Ensures(Contract.Result<string>() != null);
-                return _name + " (" + RelativePath + ")";
+                return Name + " (" + RelativePath + ")";
             }
         }
 
@@ -252,7 +264,6 @@
             return VsProjectReferences ?? MpfProjectReferences ?? Enumerable.Empty<VSLangProj.Reference>();
         }
 
-
         [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> MpfProjectReferences
         {
@@ -260,10 +271,9 @@
             {
                 try
                 {
-                    var projectItems = _project.ProjectItems;
-                    Contract.Assume(projectItems != null);
+                    var projectItems = DteProject?.ProjectItems;
 
-                    return projectItems
+                    return projectItems?
                         .Cast<EnvDTE.ProjectItem>()
                         .Select(p => p.Object)
                         .OfType<VSLangProj.References>()
@@ -285,12 +295,25 @@
             {
                 try
                 {
-                    return _vsProject?.References?.Cast<VSLangProj.Reference>();
+                    var vsProject = DteProject?.Object as VSLangProj.VSProject;
+
+                    return vsProject?.References?.Cast<VSLangProj.Reference>();
                 }
                 catch
                 {
                     return null;
                 }
+            }
+        }
+
+        private EnvDTE.Project DteProject
+        {
+            get
+            {
+                object obj;
+                _projectHierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out obj);
+                return obj as EnvDTE.Project;
+
             }
         }
 
@@ -300,7 +323,7 @@
             {
                 try
                 {
-                    return _project.Saved;
+                    return DteProject?.Saved ?? true;
                 }
                 catch
                 {
@@ -310,13 +333,15 @@
             }
         }
 
-        internal bool IsLoaded
+        public bool IsLoaded
         {
             get
             {
                 try
                 {
-                    return _project.Saved || _project.IsDirty;
+                    var dteProject = DteProject;
+
+                    return dteProject != null && (dteProject.Saved || dteProject.IsDirty);
                 }
                 catch
                 {
@@ -331,21 +356,32 @@
             return IsSaved && _projectFile.CanEdit();
         }
 
+        public void Reload([NotNull] IVsHierarchy hierarchy)
+        {
+            Contract.Requires(hierarchy != null);
+
+            _projectHierarchy = hierarchy;
+
+            Reload();
+        }
+
         public void Reload()
         {
             _projectFile = new ProjectFile(_solution, this);
 
             Update();
+
+            OnPropertyChanged(nameof(IsLoaded));
         }
 
         internal void Update()
         {
-            var configurationManager = _project.ConfigurationManager;
-
-            var projectConfigurations = Enumerable.Empty<ProjectConfiguration>();
+            var configurationManager = DteProject?.ConfigurationManager;
 
             if (configurationManager != null)
             {
+                var projectConfigurations = Enumerable.Empty<ProjectConfiguration>();
+
                 var configurationNames = ((IEnumerable)configurationManager.ConfigurationRowNames)?.OfType<string>();
                 var platformNames = ((IEnumerable)configurationManager.PlatformNames)?.OfType<string>();
 
@@ -356,9 +392,9 @@
                             .Where(platform => _projectFile.HasConfiguration(configuration, platform))
                             .Select(platform => new ProjectConfiguration(this, configuration, platform)));
                 }
-            }
 
-            _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations.ToArray());
+                _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations.ToArray());
+            }
 
             _defaultProjectConfiguration.SetProjectFile(_projectFile);
 
@@ -368,9 +404,9 @@
         internal void UpdateReferences()
         {
             var projectReferences = GetReferences()
-                .Select(GetSourceProjectUniqueName)
-                .Where(uniqueName => uniqueName != null)
-                .Select(uniqueName => _solution.Projects.SingleOrDefault(p => string.Equals(p.UniqueName, uniqueName, StringComparison.OrdinalIgnoreCase)))
+                .Select(GetSourceProjectFullName)
+                .Where(fullName => fullName != null)
+                .Select(fullName => _solution.Projects.SingleOrDefault(p => string.Equals(p.FullName, fullName, StringComparison.OrdinalIgnoreCase)))
                 .Where(project => project != null)
                 .ToArray();
 
@@ -413,13 +449,13 @@
                 .ToArray();
         }
 
-        private static string GetSourceProjectUniqueName([NotNull] VSLangProj.Reference reference)
+        private static string GetSourceProjectFullName([NotNull] VSLangProj.Reference reference)
         {
             Contract.Requires(reference != null);
 
             try
             {
-                return reference.SourceProject?.UniqueName;
+                return reference.SourceProject?.FullName;
             }
             catch
             {
@@ -488,7 +524,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _project.GetHashCode();
+            return _projectHierarchy.GetHashCode();
         }
 
         /// <summary>
@@ -520,7 +556,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return left._project == right._project;
+            return left._projectHierarchy == right._projectHierarchy;
         }
 
         /// <summary>
@@ -542,18 +578,16 @@
 
         public override string ToString()
         {
-            return _name;
+            return Name;
         }
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_name != null);
             Contract.Invariant(!string.IsNullOrEmpty(_fullName));
-            Contract.Invariant(!string.IsNullOrEmpty(_uniqueName));
             Contract.Invariant(_solution != null);
-            Contract.Invariant(_project != null);
             Contract.Invariant(_projectFile != null);
             Contract.Invariant(_defaultProjectConfiguration != null);
             Contract.Invariant(_solutionContexts != null);
@@ -562,6 +596,7 @@
             Contract.Invariant(_projectConfigurations != null);
             Contract.Invariant(_referencedBy != null);
             Contract.Invariant(_references != null);
+            Contract.Invariant(_projectHierarchy != null);
         }
     }
 }

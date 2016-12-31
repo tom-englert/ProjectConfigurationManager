@@ -22,6 +22,15 @@
           <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
       </DataGrid.ColumnHeaderStyle>
+      <DataGrid.RowStyle>
+        <Style TargetType="DataGridRow">
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding IsLoaded}" Value="False">
+              <Setter Property="IsEnabled" Value="False"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </DataGrid.RowStyle>
       <DataGrid.Columns>
         <DataGridTemplateColumn Header="Project" DisplayIndex="0" CanUserReorder="False"
                                 IsReadOnly="True" SortMemberPath="SortKey" SortDirection="Ascending"

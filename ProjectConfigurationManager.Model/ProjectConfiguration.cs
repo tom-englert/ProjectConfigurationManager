@@ -109,6 +109,11 @@
             OnPropertyChanged(nameof(PropertyValue));
         }
 
+        internal void OnSolutionContextsChanged()
+        {
+            OnPropertyChanged(nameof(ShouldBuild));
+        }
+
         private class ShouldBuildIndexer : IIndexer<bool?>
         {
             [NotNull]

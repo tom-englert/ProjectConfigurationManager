@@ -14,6 +14,9 @@
 
     using JetBrains.Annotations;
 
+    using Microsoft.VisualStudio;
+    using Microsoft.VisualStudio.Shell.Interop;
+
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
     using TomsToolbox.ObservableCollections;
@@ -56,7 +59,7 @@
             Contract.Requires(serviceProvider != null);
             Contract.Requires(performanceTracer != null);
 
-            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ApplicationIdle, Update);
+            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ContextIdle, Update);
 
             _tracer = tracer;
             _serviceProvider = serviceProvider;
@@ -276,7 +279,7 @@
                             throw;
 
                         // could not access the project file, retry later...
-                        Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e, retry + 1));
+                        Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () => DeferredOnWatcherChanged(e, retry + 1));
                         return;
                     }
 
@@ -349,100 +352,59 @@
         {
             Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
 
-            return GetDteProjects(retryOnErrors)
-                .Select(project => Project.Create(this, project, retryOnErrors, _tracer))
-                .Where(project => project != null);
-        }
+            var solution = (IVsSolution)GetService(typeof(IVsSolution));
 
-        [NotNull]
-        private IEnumerable<EnvDTE.Project> GetDteProjects(bool retryOnErrors)
-        {
-            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
-
-            var items = new List<EnvDTE.Project>();
-
-            GetDteProjects(DteSolution?.Projects)
-                .ForEach(project => GetProjectOrSubProjects(items, project, retryOnErrors));
-
-            return items;
-        }
-
-        private void GetProjectOrSubProjects([NotNull] ICollection<EnvDTE.Project> items, EnvDTE.Project project, bool retryOnErrors)
-        {
-            Contract.Requires(items != null);
-
-            if (project == null)
-                return;
-
-            if (string.Equals(project.Kind, ItemKind.SolutionFolder, StringComparison.OrdinalIgnoreCase))
+            foreach (var projectHierarchy in GetProjectsInSolution(solution, __VSENUMPROJFLAGS.EPF_ALLINSOLUTION))
             {
-                GetSubprojects(project).ForEach(p => GetProjectOrSubProjects(items, p, retryOnErrors));
-                return;
-            }
+                Uri projectUri;
 
-            if (string.IsNullOrEmpty(project.UniqueName))
-                return;
+                string fullName = null;
+                var vsProject = projectHierarchy as IVsProject;
+                vsProject?.GetMkDocument(VSConstants.VSITEMID_ROOT, out fullName);
 
-            try
-            {
-                if (!string.IsNullOrEmpty(project.FullName))
+                if (string.IsNullOrEmpty(fullName))
                 {
-                    items.Add(project);
+                    // unloaded project?
+                    projectHierarchy.GetCanonicalName(VSConstants.VSITEMID_ROOT, out fullName);
                 }
-            }
-            catch (Exception ex)
-            {
-                if (ex is NotImplementedException)
-                    if (retryOnErrors)
-                        throw new RetryException(ex);
 
-                _tracer.TraceError("Error loading a project: " + ex.Message);
+                // Skip web pojects, we can't edit them.
+                if (!Uri.TryCreate(fullName, UriKind.Absolute, out projectUri) || !projectUri.IsFile || !File.Exists(fullName))
+                    continue;
+
+                var existing = _projects.FirstOrDefault(p => string.Equals(p.FullName, fullName, StringComparison.OrdinalIgnoreCase));
+                if (existing != null)
+                {
+                    existing.Reload(projectHierarchy);
+                    yield return existing;
+                }
+
+                var project = Project.Create(this, fullName, projectHierarchy, retryOnErrors, _tracer);
+                if (project != null)
+                    yield return project;
             }
         }
 
-        [NotNull]
-        public IEnumerable<EnvDTE.Project> GetSubprojects(EnvDTE.Project project)
+        [NotNull, ItemNotNull]
+        public static IEnumerable<IVsHierarchy> GetProjectsInSolution(IVsSolution solution, __VSENUMPROJFLAGS flags)
         {
-            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
+            Contract.Ensures(Contract.Result<IEnumerable<IVsHierarchy>>() != null);
 
-            try
-            {
-                var projectItems = project?.ProjectItems;
-
-                if (projectItems != null)
-                    return projectItems.OfType<EnvDTE.ProjectItem>().Select(item => item.SubProject);
-            }
-            catch (Exception ex)
-            {
-                _tracer.TraceError("Error loading sub projects: " + ex.Message);
-            }
-
-            return Enumerable.Empty<EnvDTE.Project>();
-        }
-
-        [NotNull]
-        public IEnumerable<EnvDTE.Project> GetDteProjects(EnvDTE.Projects projects)
-        {
-            Contract.Ensures(Contract.Result<IEnumerable<EnvDTE.Project>>() != null);
-
-            if (projects == null)
+            if (solution == null)
                 yield break;
 
-            for (var i = 1; i <= projects.Count; i++)
+            IEnumHierarchies enumHierarchies;
+            var guid = Guid.Empty;
+            solution.GetProjectEnum((uint)flags, ref guid, out enumHierarchies);
+            if (enumHierarchies == null)
+                yield break;
+
+            var hierarchy = new IVsHierarchy[1];
+            uint fetched;
+            while (enumHierarchies.Next(1, hierarchy, out fetched) == VSConstants.S_OK && fetched == 1)
             {
-                EnvDTE.Project item;
-
-                try
-                {
-                    item = projects.Item(i);
-                }
-                catch (Exception ex)
-                {
-                    _tracer.TraceError("Error loading a project: " + ex.Message);
-                    continue;
-                }
-
-                yield return item;
+                if (hierarchy.Length > 0 && hierarchy[0] != null)
+                    yield return hierarchy[0];
             }
         }
 

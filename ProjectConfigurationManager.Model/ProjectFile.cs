@@ -49,7 +49,7 @@
 
             FileTime = File.GetLastWriteTime(project.FullName);
 
-            _projectGuid = GetProjectGuid(solution, project.UniqueName);
+            _projectGuid = GetProjectGuid(solution, project.ProjectHierarchy);
         }
 
         [NotNull]
@@ -128,9 +128,8 @@
             IsSaving = true;
 
             var outputFileName = _project.FullName;
-            var projectName = _project.Name;
 
-            _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () =>
+            _dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
             {
                 IsSaving = false;
                 FileTime = File.GetLastWriteTime(outputFileName);
@@ -144,7 +143,13 @@
             if (!_project.IsSaved)
                 return;
 
-            solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+            var reloadProject = false;
+
+            if (_project.IsLoaded)
+            {
+                reloadProject = true;
+                solution.UnloadProject(ref projectGuid, (int) _VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+            }
 
             var settings = new XmlWriterSettings
             {
@@ -159,12 +164,15 @@
                 Document.WriteTo(writer);
             }
 
+            if (!reloadProject)
+                return;
+
             var result = solution.ReloadProject(ref projectGuid);
 
             if (result == 0)
                 return;
 
-            _solution.Tracer.TraceError("Loading project {0} failed after saving - reverting changes.", projectName);
+            _solution.Tracer.TraceError("Loading project {0} failed after saving - reverting changes.", outputFileName);
             File.WriteAllBytes(outputFileName, backup);
 
             ReloadProject(_dispatcher, solution, 0, projectGuid);
@@ -185,17 +193,13 @@
             }
         }
 
-        private static Guid GetProjectGuid([NotNull] IServiceProvider serviceProvider, [NotNull] string uniqueName)
+        private static Guid GetProjectGuid([NotNull] IServiceProvider serviceProvider, [NotNull] IVsHierarchy projectHierarchy)
         {
             Contract.Requires(serviceProvider != null);
-            Contract.Requires(uniqueName != null);
+            Contract.Requires(projectHierarchy != null);
 
             var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
             Contract.Assume(solution != null);
-
-            IVsHierarchy projectHierarchy;
-            solution.GetProjectOfUniqueName(uniqueName, out projectHierarchy);
-            Contract.Assume(projectHierarchy != null);
 
             Guid projectGuid;
             solution.GetGuidOfProject(projectHierarchy, out projectGuid);
