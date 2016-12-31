@@ -1,14 +1,14 @@
-﻿using System.Diagnostics;
-
-namespace tomenglertde.ProjectConfigurationManager.Model
+﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Windows.Threading;
     using System.Xml;
     using System.Xml.Linq;
@@ -20,7 +20,7 @@ namespace tomenglertde.ProjectConfigurationManager.Model
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
-    class ProjectFile
+    internal class ProjectFile
     {
         private const string ConditionAttributeName = "Condition";
 
@@ -120,6 +120,25 @@ namespace tomenglertde.ProjectConfigurationManager.Model
             SaveChanges();
         }
 
+        internal void ParseConfigurations([NotNull] IList<string> configurationNames, [NotNull] IList<string> platformNames)
+        {
+            Contract.Requires(configurationNames != null);
+            Contract.Requires(platformNames != null);
+
+            foreach (var propertyGroup in PropertyGroups)
+            {
+                Contract.Assume(propertyGroup != null);
+
+                string configuration, plattform;
+
+                if (!propertyGroup.ParseConfiguration(out configuration, out plattform))
+                    continue;
+
+                configurationNames.Add(configuration);
+                platformNames.Add(plattform);
+            }
+        }
+
         private void SaveChanges()
         {
             _deferredSaveThrottle.Tick();
@@ -150,7 +169,7 @@ namespace tomenglertde.ProjectConfigurationManager.Model
             if (_project.IsLoaded)
             {
                 reloadProject = true;
-                solution.UnloadProject(ref projectGuid, (int) _VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+                solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
             }
 
             var settings = new XmlWriterSettings
@@ -239,7 +258,7 @@ namespace tomenglertde.ProjectConfigurationManager.Model
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private IEnumerable<ProjectPropertyGroup> PropertyGroups
         {
             get
@@ -249,8 +268,11 @@ namespace tomenglertde.ProjectConfigurationManager.Model
             }
         }
 
+        [NotNull, ItemNotNull]
         private ProjectPropertyGroup[] GeneratePropertyGroups()
         {
+            Contract.Ensures(Contract.Result<ProjectPropertyGroup[]>() != null);
+
             return Document.Descendants(_propertyGroupNodeName)
                 .Where(node => node.Parent?.Name.LocalName == "Project")
                 .Select(node => new ProjectPropertyGroup(this, node))
@@ -328,6 +350,42 @@ namespace tomenglertde.ProjectConfigurationManager.Model
                     return platform == "Any CPU";
 
                 return (platform != null) && conditionExpression.Contains(platform.Replace(" ", ""));
+            }
+
+            public bool ParseConfiguration(out string configuration, out string platform)
+            {
+                configuration = platform = string.Empty;
+
+                try
+                {
+                    var conditionExpression = _propertyGroupNode.GetAttribute(ConditionAttributeName);
+
+                    if (string.IsNullOrEmpty(conditionExpression))
+                        return false;
+
+                    var parts = conditionExpression.Split(new[] {"=="}, StringSplitOptions.None);
+                    if (parts.Length != 2)
+                        return false;
+
+                    var expression = parts[0].Trim().Replace("$(", "(?<").Replace(")", ">\\w+)").Replace("|", "\\|");
+                    // Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'"
+                    // Regex: '(^<Configuration>\w+)\|(^Platform>\w+)'
+
+
+                    var regex = new Regex(expression);
+
+                    var match = regex.Match(parts[1].Trim());
+
+                    configuration = match.Groups["Configuration"]?.Value;
+                    platform = match.Groups["Platform"]?.Value;
+
+                    return !string.IsNullOrEmpty(configuration) && !string.IsNullOrEmpty(platform);
+                }
+                catch
+                {
+                    // some unknown expression..
+                    return false;
+                }
             }
 
             public void Delete()

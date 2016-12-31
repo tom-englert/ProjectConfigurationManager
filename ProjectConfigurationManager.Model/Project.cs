@@ -141,7 +141,7 @@
                         .ToString())
                     .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
-                Debug.Assert(DteProject == null || DteProject.UniqueName == uniqueName);
+                Contract.Assume(DteProject == null || DteProject.UniqueName == uniqueName);
 
                 return uniqueName;
             }
@@ -376,28 +376,27 @@
 
         internal void Update()
         {
-            var configurationManager = DteProject?.ConfigurationManager;
+            var configurationNames = new List<string>();
+            var platformNames = new List<string>();
 
+            var configurationManager = DteProject?.ConfigurationManager;
             if (configurationManager != null)
             {
-                var projectConfigurations = Enumerable.Empty<ProjectConfiguration>();
-
-                var configurationNames = ((IEnumerable)configurationManager.ConfigurationRowNames)?.OfType<string>();
-                var platformNames = ((IEnumerable)configurationManager.PlatformNames)?.OfType<string>();
-
-                if ((configurationNames != null) && (platformNames != null))
-                {
-                    projectConfigurations = configurationNames
-                        .SelectMany(configuration => platformNames
-                            .Where(platform => _projectFile.HasConfiguration(configuration, platform))
-                            .Select(platform => new ProjectConfiguration(this, configuration, platform)));
-                }
-
-                _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations.ToArray());
+                configurationNames = ((IEnumerable)configurationManager.ConfigurationRowNames)?.OfType<string>().ToList() ?? new List<string>();
+                platformNames = ((IEnumerable)configurationManager.PlatformNames)?.OfType<string>().ToList() ?? new List<string>();
+            }
+            else
+            {
+                _projectFile.ParseConfigurations(configurationNames, platformNames);
             }
 
-            _defaultProjectConfiguration.SetProjectFile(_projectFile);
+            var projectConfigurations = configurationNames
+                .SelectMany(configuration => platformNames
+                    .Where(platform => _projectFile.HasConfiguration(configuration, platform))
+                    .Select(platform => new ProjectConfiguration(this, configuration, platform)));
 
+            _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations.ToArray());
+            _defaultProjectConfiguration.SetProjectFile(_projectFile);
             _internalSpecificProjectConfigurations.ForEach(config => config.SetProjectFile(_projectFile));
         }
 

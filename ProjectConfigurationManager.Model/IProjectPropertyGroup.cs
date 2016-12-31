@@ -11,6 +11,7 @@
         [NotNull]
         IEnumerable<IProjectProperty> Properties { get; }
 
+        [NotNull]
         IProjectProperty AddProperty([NotNull] string propertyName);
     }
 
@@ -29,6 +30,7 @@
         public IProjectProperty AddProperty(string propertyName)
         {
             Contract.Requires(propertyName != null);
+            Contract.Ensures(Contract.Result<IProjectProperty>() != null);
             throw new System.NotImplementedException();
         }
     }
