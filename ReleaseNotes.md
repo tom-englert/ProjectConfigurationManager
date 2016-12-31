@@ -1,5 +1,9 @@
+1.0.14.0
+* Fix #12: Also show unloaded projects and enable editing of properties.
+* Use multiple choice filters instead of simple text filters where appropriate.
+
 1.0.13.0
-* Support VS15 RC
+* Support VS2017 RC
 
 1.0.12.0
 * Fix: Defer property change notifications, else bulk operations on data grid will only execute partially
