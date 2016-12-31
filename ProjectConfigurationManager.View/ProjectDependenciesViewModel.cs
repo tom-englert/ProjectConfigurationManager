@@ -1,4 +1,6 @@
-﻿namespace tomenglertde.ProjectConfigurationManager.View
+﻿using System.Diagnostics;
+
+namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System;
     using System.Collections.Generic;
@@ -50,6 +52,7 @@
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_references != null);
@@ -166,6 +169,7 @@
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_project != null);

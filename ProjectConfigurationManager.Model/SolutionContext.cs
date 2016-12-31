@@ -1,4 +1,6 @@
-﻿namespace tomenglertde.ProjectConfigurationManager.Model
+﻿using System.Diagnostics;
+
+namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
     using System.Diagnostics.Contracts;
@@ -183,6 +185,7 @@
 
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
             Contract.Invariant(_solution != null);
