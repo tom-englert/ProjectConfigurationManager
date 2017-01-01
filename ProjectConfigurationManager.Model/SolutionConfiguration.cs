@@ -97,7 +97,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _solutionConfiguration.GetHashCode();
+            return _solutionConfiguration.GetHashCode() + _contexts.Sum(ctx => ctx.GetHashCode());
 
         }
 
@@ -121,6 +121,7 @@
             return InternalEquals(this, other);
         }
 
+        [ContractVerification(false)]
         private static bool InternalEquals(SolutionConfiguration left, SolutionConfiguration right)
         {
             if (ReferenceEquals(left, right))
@@ -130,7 +131,8 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return left._solutionConfiguration == right._solutionConfiguration;
+            return left._solutionConfiguration == right._solutionConfiguration
+                && left._contexts.SequenceEqual(right.Contexts);
         }
 
         /// <summary>

@@ -42,8 +42,6 @@
         [NotNull]
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
         [NotNull]
-        private readonly IObservableCollection<SolutionContext> _solutionContexts;
-        [NotNull]
         private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
         [NotNull]
         private readonly ObservableCollection<string> _projectTypeGuids = new ObservableCollection<string>();
@@ -66,7 +64,6 @@
             _performanceTracer = performanceTracer;
 
             _specificProjectConfigurations = _projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
-            _solutionContexts = SolutionConfigurations.ObservableSelectMany(cfg => cfg.Contexts);
             _projectConfigurations = _projects.ObservableSelectMany(prj => prj.ProjectConfigurations);
 
             _solutionEvents = Dte?.Events?.SolutionEvents;
@@ -108,16 +105,6 @@
             {
                 Contract.Ensures(Contract.Result<ObservableCollection<SolutionConfiguration>>() != null);
                 return _configurations;
-            }
-        }
-
-        [NotNull]
-        public IObservableCollection<SolutionContext> SolutionContexts
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IObservableCollection<SolutionContext>>() != null);
-                return _solutionContexts;
             }
         }
 
@@ -305,7 +292,7 @@
 
             _projectProperties.SynchronizeWith(GetProjectProperties().ToArray());
 
-            _projectTypeGuids.SynchronizeWith(_projects.SelectMany(p => p.ProjectTypeGuids ?? Enumerable.Empty<string>()).ToArray());
+            _projectTypeGuids.SynchronizeWith(_projects.SelectMany(p => p.ProjectTypeGuids).ToArray());
 
             UpdateReferences();
         }
@@ -450,7 +437,6 @@
             Contract.Invariant(_configurations != null);
             Contract.Invariant(_specificProjectConfigurations != null);
             Contract.Invariant(_projectConfigurations != null);
-            Contract.Invariant(_solutionContexts != null);
             Contract.Invariant(_projectProperties != null);
             Contract.Invariant(_projectTypeGuids != null);
         }

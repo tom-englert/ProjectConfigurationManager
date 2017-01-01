@@ -49,7 +49,7 @@
 
             return conditionExpression.ParseCondition(out groupConfiguration, out groupPlatform)
                    && configuration == groupConfiguration
-                   && platform?.Replace(" ", string.Empty) == groupPlatform;
+                   && platform == groupPlatform;
         }
 
         [NotNull, ItemNotNull]
@@ -115,13 +115,11 @@
 
                 // Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'"
                 // Regex: '(^<Configuration>\w+)\|(^Platform>\w+)'
-
-
                 var regex = new Regex(expression);
                 var match = regex.Match(parts[1].Trim());
 
                 configuration = match.Groups["Configuration"]?.Value;
-                platform = match.Groups["Platform"]?.Value ?? "AnyCPU";
+                platform = (match.Groups["Platform"]?.Value ?? "AnyCPU").Replace("AnyCPU", "Any CPU");
 
                 return !string.IsNullOrEmpty(configuration) && !string.IsNullOrEmpty(platform);
             }

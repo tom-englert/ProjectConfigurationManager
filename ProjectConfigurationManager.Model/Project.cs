@@ -32,8 +32,6 @@
         [NotNull]
         private readonly ReadOnlyObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
         [NotNull]
-        private readonly IObservableCollection<SolutionContext> _solutionContexts;
-        [NotNull]
         private readonly ProjectConfiguration _defaultProjectConfiguration;
         [NotNull]
         private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
@@ -61,12 +59,9 @@
 
             _defaultProjectConfiguration = new ProjectConfiguration(this, null, null);
             _specificProjectConfigurations = new ReadOnlyObservableCollection<ProjectConfiguration>(_internalSpecificProjectConfigurations);
-            _solutionContexts = _solution.SolutionContexts.ObservableWhere(context => context.ProjectName == UniqueName);
 
             _projectConfigurations = ObservableCompositeCollection.FromSingleItemAndList(_defaultProjectConfiguration, _internalSpecificProjectConfigurations);
             _isProjectTypeGuidSelected = new ProjectTypeGuidIndexer(_defaultProjectConfiguration);
-
-            _solutionContexts.CollectionChanged += (_, __) => _projectConfigurations.ForEach(pc => pc.OnSolutionContextsChanged());
 
             Update();
         }
@@ -188,12 +183,12 @@
         }
 
         [NotNull]
-        public IObservableCollection<SolutionContext> SolutionContexts
+        public IEnumerable<SolutionContext> SolutionContexts
         {
             get
             {
-                Contract.Ensures(Contract.Result<IObservableCollection<SolutionContext>>() != null);
-                return _solutionContexts;
+                Contract.Ensures(Contract.Result<IEnumerable<SolutionContext>>() != null);
+                return _solution.SolutionConfigurations.SelectMany(cfg => cfg.Contexts).Where(context => context.ProjectName == UniqueName);
             }
         }
 
@@ -582,7 +577,6 @@
             Contract.Invariant(_solution != null);
             Contract.Invariant(_projectFile != null);
             Contract.Invariant(_defaultProjectConfiguration != null);
-            Contract.Invariant(_solutionContexts != null);
             Contract.Invariant(_internalSpecificProjectConfigurations != null);
             Contract.Invariant(_specificProjectConfigurations != null);
             Contract.Invariant(_projectConfigurations != null);

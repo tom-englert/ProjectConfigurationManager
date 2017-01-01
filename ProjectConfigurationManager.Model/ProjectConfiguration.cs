@@ -16,8 +16,6 @@
 
     public class ProjectConfiguration : ObservableObject, IEquatable<ProjectConfiguration>
     {
-        private readonly string _configuration;
-        private readonly string _platform;
         [NotNull]
         private readonly Project _project;
         [NotNull]
@@ -33,8 +31,8 @@
             Contract.Requires(project != null);
 
             _project = project;
-            _configuration = configuration;
-            _platform = platform;
+            Configuration = configuration;
+            Platform = platform;
 
             _shouldBuild = new ShouldBuildIndexer(this);
             _propertyValue = new PropertyValueIndexer(this);
@@ -50,9 +48,9 @@
             }
         }
 
-        public string Configuration => _configuration;
+        public string Configuration { get; }
 
-        public string Platform => _platform;
+        public string Platform { get; }
 
         [NotNull]
         public IIndexer<bool?> ShouldBuild
@@ -100,7 +98,7 @@
             Contract.Requires(projectFile != null);
 
             var properties = projectFile
-                .GetPropertyGroups(_configuration, _platform)
+                .GetPropertyGroups(Configuration, Platform)
                 .SelectMany(group => group.Properties)
                 .Distinct(new DelegateEqualityComparer<IProjectProperty>(property => property.Name))
                 .ToDictionary(property => property.Name);
@@ -108,11 +106,6 @@
             _properties = new Dictionary<string, IProjectProperty>(properties);
 
             OnPropertyChanged(nameof(PropertyValue));
-        }
-
-        internal void OnSolutionContextsChanged()
-        {
-            OnPropertyChanged(nameof(ShouldBuild));
         }
 
         private class ShouldBuildIndexer : IIndexer<bool?>
@@ -131,7 +124,9 @@
             {
                 get
                 {
-                    var context = _projectConfiguration.Project.SolutionContexts
+                    var projectSolutionContexts = _projectConfiguration.Project.SolutionContexts;
+
+                    var context = projectSolutionContexts
                         .SingleOrDefault(ctx => (ctx.SolutionConfiguration.UniqueName == solutionConfiguration)
                                                 && (ctx.ConfigurationName == _projectConfiguration.Configuration)
                                                 && (ctx.PlatformName == _projectConfiguration.Platform));
@@ -140,7 +135,9 @@
                 }
                 set
                 {
-                    var context = _projectConfiguration.Project.SolutionContexts
+                    var projectSolutionContexts = _projectConfiguration.Project.SolutionContexts;
+
+                    var context = projectSolutionContexts
                         .FirstOrDefault(ctx => ctx.SolutionConfiguration.UniqueName == solutionConfiguration);
 
                     Contract.Assume(context != null);
@@ -221,7 +218,7 @@
         {
             Contract.Requires(propertyName != null);
 
-            var property = Project.CreateProperty(propertyName, _configuration, _platform);
+            var property = Project.CreateProperty(propertyName, Configuration, Platform);
 
             _properties.Add(propertyName, property);
 
@@ -232,7 +229,7 @@
         {
             Contract.Requires(propertyName != null);
 
-            Project.DeleteProperty(propertyName, _configuration, _platform);
+            Project.DeleteProperty(propertyName, Configuration, Platform);
 
             if (_properties.Remove(propertyName))
                 OnPropertyChanged(nameof(PropertyValue));
@@ -248,7 +245,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return Project.GetHashCode() + (_configuration?.GetHashCode()).GetValueOrDefault() + (_platform?.GetHashCode()).GetValueOrDefault();
+            return Project.GetHashCode() + (Configuration?.GetHashCode()).GetValueOrDefault() + (Platform?.GetHashCode()).GetValueOrDefault();
         }
 
         /// <summary>
@@ -282,8 +279,8 @@
                 return false;
 
             return (left.Project == right.Project)
-                   && (left._configuration == right._configuration)
-                   && (left._platform == right._platform);
+                   && (left.Configuration == right.Configuration)
+                   && (left.Platform == right.Platform);
         }
 
         /// <summary>
