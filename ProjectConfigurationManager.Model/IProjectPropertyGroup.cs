@@ -11,12 +11,16 @@
         [NotNull]
         IEnumerable<IProjectProperty> Properties { get; }
 
+        string ConditionExpression { get; }
+
         [NotNull]
         IProjectProperty AddProperty([NotNull] string propertyName);
+
+        void Delete();
     }
 
     [ContractClassFor(typeof (IProjectPropertyGroup))]
-    abstract class ProjectPropertyGroupContract : IProjectPropertyGroup
+    internal abstract class ProjectPropertyGroupContract : IProjectPropertyGroup
     {
         public IEnumerable<IProjectProperty> Properties
         {
@@ -27,11 +31,14 @@
             }
         }
 
+        public abstract string ConditionExpression { get; }
+
         public IProjectProperty AddProperty(string propertyName)
         {
             Contract.Requires(propertyName != null);
             Contract.Ensures(Contract.Result<IProjectProperty>() != null);
             throw new System.NotImplementedException();
         }
+        public abstract void Delete();
     }
 }

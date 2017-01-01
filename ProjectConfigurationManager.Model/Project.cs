@@ -1,7 +1,6 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -306,7 +305,7 @@
             }
         }
 
-        private EnvDTE.Project DteProject
+        internal EnvDTE.Project DteProject
         {
             get
             {
@@ -351,6 +350,16 @@
             }
         }
 
+        [NotNull]
+        internal ProjectFile ProjectFile
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<ProjectFile>() != null);
+                return _projectFile;
+            }
+        }
+
         public bool CanEdit()
         {
             return IsSaved && _projectFile.CanEdit();
@@ -376,26 +385,9 @@
 
         internal void Update()
         {
-            var configurationNames = new List<string>();
-            var platformNames = new List<string>();
+            var projectConfigurations = this.GetProjectConfigurations().ToArray();
 
-            var configurationManager = DteProject?.ConfigurationManager;
-            if (configurationManager != null)
-            {
-                configurationNames = ((IEnumerable)configurationManager.ConfigurationRowNames)?.OfType<string>().ToList() ?? new List<string>();
-                platformNames = ((IEnumerable)configurationManager.PlatformNames)?.OfType<string>().ToList() ?? new List<string>();
-            }
-            else
-            {
-                _projectFile.ParseConfigurations(configurationNames, platformNames);
-            }
-
-            var projectConfigurations = configurationNames
-                .SelectMany(configuration => platformNames
-                    .Where(platform => _projectFile.HasConfiguration(configuration, platform))
-                    .Select(platform => new ProjectConfiguration(this, configuration, platform)));
-
-            _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations.ToArray());
+            _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations);
             _defaultProjectConfiguration.SetProjectFile(_projectFile);
             _internalSpecificProjectConfigurations.ForEach(config => config.SetProjectFile(_projectFile));
         }

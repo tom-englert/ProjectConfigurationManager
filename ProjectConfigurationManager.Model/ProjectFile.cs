@@ -8,7 +8,6 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Windows.Threading;
     using System.Xml;
     using System.Xml.Linq;
@@ -39,7 +38,7 @@
         private readonly Guid _projectGuid;
 
         private XDocument _document;
-        private ProjectPropertyGroup[] _propertyGroups;
+        private IProjectPropertyGroup[] _propertyGroups;
 
         public ProjectFile([NotNull] Solution solution, [NotNull] Project project)
         {
@@ -105,11 +104,6 @@
                 && (editVerdict == (uint)tagVSQueryEditResult.QER_EditOK);
         }
 
-        internal bool HasConfiguration(string configuration, string platform)
-        {
-            return PropertyGroups.Any(group => group.MatchesConfiguration(configuration, platform));
-        }
-
         internal void DeleteConfiguration(string configuration, string platform)
         {
             var groupsToDelete = PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform)).ToArray();
@@ -119,25 +113,6 @@
             groupsToDelete.ForEach(group => group.Delete());
 
             SaveChanges();
-        }
-
-        internal void ParseConfigurations([NotNull] IList<string> configurationNames, [NotNull] IList<string> platformNames)
-        {
-            Contract.Requires(configurationNames != null);
-            Contract.Requires(platformNames != null);
-
-            foreach (var propertyGroup in PropertyGroups)
-            {
-                Contract.Assume(propertyGroup != null);
-
-                string configuration, plattform;
-
-                if (!propertyGroup.ParseConfiguration(out configuration, out plattform))
-                    continue;
-
-                configurationNames.Add(configuration);
-                platformNames.Add(plattform);
-            }
         }
 
         private void SaveChanges()
@@ -260,19 +235,19 @@
         }
 
         [NotNull, ItemNotNull]
-        private IEnumerable<ProjectPropertyGroup> PropertyGroups
+        internal IEnumerable<IProjectPropertyGroup> PropertyGroups
         {
             get
             {
-                Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyGroup>>() != null);
+                Contract.Ensures(Contract.Result<IEnumerable<IProjectPropertyGroup>>() != null);
                 return _propertyGroups ?? (_propertyGroups = GeneratePropertyGroups());
             }
         }
 
         [NotNull, ItemNotNull]
-        private ProjectPropertyGroup[] GeneratePropertyGroups()
+        private IProjectPropertyGroup[] GeneratePropertyGroups()
         {
-            Contract.Ensures(Contract.Result<ProjectPropertyGroup[]>() != null);
+            Contract.Ensures(Contract.Result<IProjectPropertyGroup[]>() != null);
 
             return Document.Descendants(_propertyGroupNodeName)
                 .Where(node => node.Parent?.Name.LocalName == "Project")
@@ -329,65 +304,7 @@
                 return property;
             }
 
-            public bool MatchesConfiguration(string configuration, string platform)
-            {
-                var conditionExpression = _propertyGroupNode.GetAttribute(ConditionAttributeName);
-
-                if (string.IsNullOrEmpty(conditionExpression))
-                    return string.IsNullOrEmpty(configuration) && string.IsNullOrEmpty(platform);
-
-                if (string.IsNullOrEmpty(configuration))
-                    return false;
-
-                conditionExpression = conditionExpression.Replace(" ", "");
-
-                if (!conditionExpression.Contains("$(Configuration)") || !conditionExpression.Contains("=="))
-                    return false;
-
-                if (!conditionExpression.Contains(configuration))
-                    return false;
-
-                if (!conditionExpression.Contains("$(Platform)"))
-                    return platform == "Any CPU";
-
-                return (platform != null) && conditionExpression.Contains(platform.Replace(" ", ""));
-            }
-
-            public bool ParseConfiguration(out string configuration, out string platform)
-            {
-                configuration = platform = string.Empty;
-
-                try
-                {
-                    var conditionExpression = _propertyGroupNode.GetAttribute(ConditionAttributeName);
-
-                    if (string.IsNullOrEmpty(conditionExpression))
-                        return false;
-
-                    var parts = conditionExpression.Split(new[] {"=="}, StringSplitOptions.None);
-                    if (parts.Length != 2)
-                        return false;
-
-                    var expression = parts[0].Trim().Replace("$(", "(?<").Replace(")", ">\\w+)").Replace("|", "\\|");
-                    // Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'"
-                    // Regex: '(^<Configuration>\w+)\|(^Platform>\w+)'
-
-
-                    var regex = new Regex(expression);
-
-                    var match = regex.Match(parts[1].Trim());
-
-                    configuration = match.Groups["Configuration"]?.Value;
-                    platform = match.Groups["Platform"]?.Value;
-
-                    return !string.IsNullOrEmpty(configuration) && !string.IsNullOrEmpty(platform);
-                }
-                catch
-                {
-                    // some unknown expression..
-                    return false;
-                }
-            }
+            public string ConditionExpression => _propertyGroupNode.GetAttribute(ConditionAttributeName);
 
             public void Delete()
             {
