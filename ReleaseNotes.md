@@ -1,3 +1,6 @@
+1.0.15.0
+* Fix issues with build configuration editing after unloading/reloading projects
+ 
 1.0.14.0
 * Fix #12: Also show unloaded projects and enable editing of properties.
 * Use multiple choice filters instead of simple text filters where appropriate.
