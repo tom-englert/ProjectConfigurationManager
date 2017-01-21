@@ -57,7 +57,7 @@
             Contract.Requires(serviceProvider != null);
             Contract.Requires(performanceTracer != null);
 
-            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ContextIdle, Update);
+            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ApplicationIdle, Update);
 
             _tracer = tracer;
             _serviceProvider = serviceProvider;
@@ -81,9 +81,6 @@
 
         private void Solution_Changed(string action)
         {
-            if (_projects.Any(p => p.IsSaving))
-                return;
-
             _tracer.WriteLine(action);
             _deferredUpdateThrottle.Tick();
         }

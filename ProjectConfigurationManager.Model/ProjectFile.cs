@@ -126,7 +126,7 @@
 
             var outputFileName = _project.FullName;
 
-            _dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+            _dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () =>
             {
                 IsSaving = false;
                 FileTime = File.GetLastWriteTime(outputFileName);
