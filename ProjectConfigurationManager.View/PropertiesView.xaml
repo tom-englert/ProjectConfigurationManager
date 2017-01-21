@@ -176,6 +176,15 @@
           </Style.Triggers>
         </Style>
       </DataGrid.CellStyle>
+      <DataGrid.RowStyle>
+        <Style TargetType="DataGridRow">
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Project.IsSaved}" Value="False">
+              <Setter Property="IsEnabled" Value="False"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </DataGrid.RowStyle>
       <i:Interaction.Behaviors>
         <local:PropertiesColumnsManagerBehavior Properties="{Binding ElementName=PropertyGroups, Path=SelectedItems}" />
         <dgb:BeginEditOnCtrlEnterBehavior />

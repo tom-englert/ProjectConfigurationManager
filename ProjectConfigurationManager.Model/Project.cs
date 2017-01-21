@@ -8,6 +8,7 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Windows.Input;
 
     using JetBrains.Annotations;
 
@@ -62,6 +63,8 @@
 
             _projectConfigurations = ObservableCompositeCollection.FromSingleItemAndList(_defaultProjectConfiguration, _internalSpecificProjectConfigurations);
             _isProjectTypeGuidSelected = new ProjectTypeGuidIndexer(_defaultProjectConfiguration);
+
+            CommandManager.RequerySuggested += (_, __) => OnPropertyChanged(nameof(IsSaved));
 
             Update();
         }
@@ -311,7 +314,7 @@
             }
         }
 
-        internal bool IsSaved
+        public bool IsSaved
         {
             get
             {
