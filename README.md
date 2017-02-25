@@ -4,7 +4,7 @@ Forget about clicking through all the tabs in all the property pages - see all y
 Color highlighting let's you verify at a glance if the configurations of your projects are consistent. 
 Initialize new projects by simply copy/paste defaults from other projects.
 
-Install the extension from the [Visual Studio Gallery](https://visualstudiogallery.msdn.microsoft.com/cf7efe17-ae87-40fe-a1e2-f2d61907f043).
+Install the extension from the [Visual Studio Gallery](https://marketplace.visualstudio.com/vsgallery/cf7efe17-ae87-40fe-a1e2-f2d61907f043).
 
 ![Project Properties](http://tom-englert.github.io/ProjectConfigurationManager/images/ProjectProperties.png)
 

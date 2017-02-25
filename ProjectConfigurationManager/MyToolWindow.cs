@@ -44,7 +44,7 @@
         private const string _introMessage = "Project Configuration Manager loaded."
             + "\nHome: https://github.com/tom-englert/ProjectConfigurationManager"
             + "\nReport issues: https://github.com/tom-englert/ProjectConfigurationManager/issues"
-            + "\nSupport the project by adding a short review: https://visualstudiogallery.msdn.microsoft.com/cf7efe17-ae87-40fe-a1e2-f2d61907f043/view/Reviews";
+            + "\nSupport the project by adding a short review: https://marketplace.visualstudio.com/vsgallery/cf7efe17-ae87-40fe-a1e2-f2d61907f043#review-details";
 
         [NotNull]
         private readonly ICompositionHost _compositionHost = new CompositionHost();
