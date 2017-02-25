@@ -1,3 +1,8 @@
+1.0.16.0
+* Update packages to align with other extensions (to avoid https://connect.microsoft.com/VisualStudio/feedback/details/2993889/)
+* Visualize that projects with pending changes can't be edited.
+* Project hierarchy is not properly refreshed after reload
+
 1.0.15.0
 * Fix issues with build configuration editing after unloading/reloading projects
  
