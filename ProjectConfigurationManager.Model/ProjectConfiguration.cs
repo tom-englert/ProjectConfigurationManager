@@ -245,7 +245,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return Project.GetHashCode() + (Configuration?.GetHashCode()).GetValueOrDefault() + (Platform?.GetHashCode()).GetValueOrDefault();
+            return HashCode.Aggregate(Project.GetHashCode(), HashCode.Aggregate((Configuration?.GetHashCode()).GetValueOrDefault(), (Platform?.GetHashCode()).GetValueOrDefault()));
         }
 
         /// <summary>

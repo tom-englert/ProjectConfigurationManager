@@ -97,8 +97,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _solutionConfiguration.GetHashCode() + _contexts.Sum(ctx => ctx.GetHashCode());
-
+            return _contexts.Select(ctx => ctx.GetHashCode()).Aggregate(_solutionConfiguration.GetHashCode(), HashCode.Aggregate);
         }
 
         /// <summary>
