@@ -1,3 +1,6 @@
+1.0.17.0
+* Fix hash code overflow
+
 1.0.16.0
 * Update packages to align with other extensions (to avoid https://connect.microsoft.com/VisualStudio/feedback/details/2993889/)
 * Visualize that projects with pending changes can't be edited.
