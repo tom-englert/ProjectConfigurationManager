@@ -101,14 +101,19 @@
               dgx:DataGridFilter.ContentFilterFactory="{StaticResource RegexContentFilterFactory}">
       <DataGrid.Resources>
         <ContextMenu x:Key="ContextMenu">
-          <MenuItem Header="Copy" Command="{Binding CopyCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
-          <MenuItem Header="Paste" Command="{Binding PasteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
-          <MenuItem Header="Delete" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+          <MenuItem Header="Copy" InputGestureText="Ctrl+C" Command="{Binding CopyCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+          <MenuItem Header="Paste" InputGestureText="Ctrl+V" Command="{Binding PasteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+          <MenuItem Header="Delete" InputGestureText="Del" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
         </ContextMenu>
         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Static themes:ResourceKeys.AutoToolTipTextBoxStyle}}">
           <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         </Style>
       </DataGrid.Resources>
+      <DataGrid.InputBindings>
+        <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid} }" />
+        <KeyBinding Key="V" Modifiers="Control" Command="{Binding PasteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid} }" />
+        <KeyBinding Key="Delete" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid} }" />
+      </DataGrid.InputBindings>
       <DataGrid.ItemsPanel>
         <ItemsPanelTemplate>
           <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}" ContextMenu="{StaticResource ContextMenu}" />
