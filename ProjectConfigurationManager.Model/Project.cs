@@ -30,6 +30,7 @@
 
         [NotNull]
         private readonly ObservableCollection<ProjectConfiguration> _internalSpecificProjectConfigurations = new ObservableCollection<ProjectConfiguration>();
+
         [NotNull]
         private readonly ReadOnlyObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
         [NotNull]
@@ -379,6 +380,15 @@
             Update();
 
             OnPropertyChanged(nameof(IsLoaded));
+        }
+
+        public void UnloadProject()
+        {
+            var solution = _solution.GetService(typeof(SVsSolution)) as IVsSolution4;
+
+            var projectGuid = _solution.GetProjectGuid(_projectHierarchy);
+
+            solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
         }
 
         internal void Update()

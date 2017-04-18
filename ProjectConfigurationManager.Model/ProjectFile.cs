@@ -51,7 +51,7 @@
 
             FileTime = File.GetLastWriteTime(project.FullName);
 
-            _projectGuid = GetProjectGuid(solution, project.ProjectHierarchy);
+            _projectGuid = solution.GetProjectGuid(project.ProjectHierarchy);
         }
 
         [NotNull]
@@ -188,19 +188,6 @@
             {
                 dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () => ReloadProject(dispatcher, solution, retry + 1, projectGuid));
             }
-        }
-
-        private static Guid GetProjectGuid([NotNull] IServiceProvider serviceProvider, [NotNull] IVsHierarchy projectHierarchy)
-        {
-            Contract.Requires(serviceProvider != null);
-            Contract.Requires(projectHierarchy != null);
-
-            var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
-            Contract.Assume(solution != null);
-
-            Guid projectGuid;
-            solution.GetGuidOfProject(projectHierarchy, out projectGuid);
-            return projectGuid;
         }
 
         private bool IsWritable

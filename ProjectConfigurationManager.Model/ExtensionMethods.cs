@@ -9,6 +9,8 @@
 
     using JetBrains.Annotations;
 
+    using Microsoft.VisualStudio.Shell.Interop;
+
     internal static class ExtensionMethods
     {
         public static void RemoveSelfAndWhitespace([NotNull] this XElement element)
@@ -128,6 +130,19 @@
                 // some unknown expression..
                 return false;
             }
+        }
+
+        internal static Guid GetProjectGuid([NotNull] this IServiceProvider serviceProvider, [NotNull] IVsHierarchy projectHierarchy)
+        {
+            Contract.Requires(serviceProvider != null);
+            Contract.Requires(projectHierarchy != null);
+
+            var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
+            Contract.Assume(solution != null);
+
+            Guid projectGuid;
+            solution.GetGuidOfProject(projectHierarchy, out projectGuid);
+            return projectGuid;
         }
     }
 }

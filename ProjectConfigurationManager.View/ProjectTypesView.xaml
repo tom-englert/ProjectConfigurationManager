@@ -8,7 +8,8 @@
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
              d:DataContext="{d:DesignInstance local:ProjectTypesViewModel}">
   <Grid Margin="10">
-    <DataGrid ItemsSource="{Binding Solution.Projects}"
+    <DataGrid x:Name="DataGrid"
+              ItemsSource="{Binding Solution.Projects}"
               AutoGenerateColumns="False"
               VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
               CanUserAddRows="False" CanUserResizeRows="False"
@@ -35,7 +36,21 @@
         <DataGridTemplateColumn Header="Project" DisplayIndex="0" CanUserReorder="False"
                                 IsReadOnly="True" SortMemberPath="SortKey" SortDirection="Ascending"
                                 CellTemplate="{DynamicResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}" />
+        <DataGridTextColumn Header="Tags" DisplayIndex="1" CanUserReorder="False" IsReadOnly="True"
+                            Binding="{Binding DefaultProjectConfiguration.PropertyValue[Tags]}"
+                            dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.TagFilterTemplate}}" />
       </DataGrid.Columns>
+      <DataGrid.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}">
+            <VirtualizingStackPanel.ContextMenu>
+              <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="Unload selected project(s)" Command="{Binding DataContext.UnloadProjectsCommand}" CommandParameter="{Binding SelectedItems}"/>
+              </ContextMenu>
+            </VirtualizingStackPanel.ContextMenu>
+          </VirtualizingStackPanel>
+        </ItemsPanelTemplate>
+      </DataGrid.ItemsPanel>
     </DataGrid>
   </Grid>
 </UserControl>
