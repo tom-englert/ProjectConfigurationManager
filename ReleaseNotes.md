@@ -1,5 +1,7 @@
 1.1
 * Latest build available at http://vsixgallery.com/extension/e31595c9-3e0c-4f5c-b35c-dd8d61e364d1/
+* Add "Unload project" in context menu of the project types view.
+* Add keyboard bindings to copy, paste and delete
 
 1.0.17.0
 * Fix hash code overflow
