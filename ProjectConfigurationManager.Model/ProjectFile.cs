@@ -24,10 +24,6 @@
         private const string ConditionAttributeName = "Condition";
 
         [NotNull]
-        private static readonly XNamespace _xmlns = XNamespace.Get(@"http://schemas.microsoft.com/developer/msbuild/2003");
-        private static readonly XName _propertyGroupNodeName = _xmlns.GetName("PropertyGroup");
-
-        [NotNull]
         private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
         [NotNull]
         private readonly DispatcherThrottle _deferredSaveThrottle;
@@ -39,6 +35,9 @@
 
         private XDocument _document;
         private IProjectPropertyGroup[] _propertyGroups;
+
+        [NotNull]
+        private XName _propertyGroupNodeName => DefaultNamespace.GetName("PropertyGroup");
 
         public ProjectFile([NotNull] Solution solution, [NotNull] Project project)
         {
@@ -221,6 +220,16 @@
             }
         }
 
+        [NotNull]
+        private XNamespace DefaultNamespace
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<XNamespace>() != null);
+                return Document.Root?.GetDefaultNamespace() ?? XNamespace.None;
+            }
+        }
+
         [NotNull, ItemNotNull]
         internal IEnumerable<IProjectPropertyGroup> PropertyGroups
         {
@@ -250,6 +259,8 @@
             private readonly XElement _propertyGroupNode;
             [NotNull]
             private readonly ObservableCollection<ProjectProperty> _properties;
+            [NotNull]
+            private XNamespace _xmlns => _propertyGroupNode.Document?.Root?.GetDefaultNamespace() ?? XNamespace.None;
 
             public ProjectPropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement propertyGroupNode)
             {
@@ -369,7 +380,6 @@
             Contract.Invariant(_solution != null);
             Contract.Invariant(_dispatcher != null);
             Contract.Invariant(_deferredSaveThrottle != null);
-            Contract.Invariant(_xmlns != null);
         }
     }
 }
