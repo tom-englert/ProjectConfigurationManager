@@ -113,10 +113,10 @@
                 if (parts.Length != 2)
                     return false;
 
-                var expression = parts[0].Trim().Replace("$(", "(?<").Replace(")", ">\\w+)").Replace("|", "\\|");
+                var expression = parts[0].Trim().Replace("$(", "(?<").Replace(")", ">.+?)").Replace("|", "\\|");
 
                 // Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'"
-                // Regex: '(^<Configuration>\w+)\|(^Platform>\w+)'
+                // Regex: '(^<Configuration>.+?)\|(^Platform>.+?)'
                 var regex = new Regex(expression);
                 var match = regex.Match(parts[1].Trim());
 
