@@ -60,12 +60,15 @@
             Contract.Requires(project != null);
             Contract.Ensures(Contract.Result<IEnumerable<ProjectConfiguration>>() != null);
 
-            var configurationNames = new HashSet<string>();
+            var configurationNames = new HashSet<string> { "Debug", "Release" };
             var platformNames = new HashSet<string>();
 
             var projectFile = project.ProjectFile;
 
             ParseConfigurations(projectFile, configurationNames, platformNames);
+
+            if (!platformNames.Any())
+                platformNames.Add("Any CPU");
 
             var projectConfigurations = configurationNames
                 .SelectMany(configuration => platformNames.Select(platform => new ProjectConfiguration(project, configuration, platform)));

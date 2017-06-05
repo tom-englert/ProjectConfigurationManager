@@ -6,6 +6,7 @@
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Windows.Threading;
@@ -34,7 +35,7 @@
         private readonly Guid _projectGuid;
 
         private XDocument _document;
-        private IProjectPropertyGroup[] _propertyGroups;
+        private IList<IProjectPropertyGroup> _propertyGroups;
 
         [NotNull]
         private XName _propertyGroupNodeName => DefaultNamespace.GetName("PropertyGroup");
@@ -64,9 +65,36 @@
         {
             Contract.Requires(propertyName != null);
 
-            var group = GetPropertyGroups(configuration, platform).FirstOrDefault();
+            var group = GetPropertyGroups(configuration, platform).FirstOrDefault() ?? CreateNewSpecificPropertyGroup(configuration, platform);
 
             return group?.AddProperty(propertyName);
+        }
+
+        private IProjectPropertyGroup CreateNewSpecificPropertyGroup(string configuration, string platform)
+        {
+            if (string.IsNullOrEmpty(configuration) || string.IsNullOrEmpty(platform))
+                return null;
+
+            if (_propertyGroups == null)
+                return null;
+
+            var lastGroupNode = Document.Descendants(_propertyGroupNodeName)
+                .LastOrDefault(node => node.Parent?.Name.LocalName == "Project");
+
+            if (lastGroupNode == null)
+                return null;
+
+            var conditionExpression = string.Format(CultureInfo.InvariantCulture, "'$(Configuration)|$(Platform)'=='{0}|{1}'", configuration, platform.Replace(" ", ""));
+            var newGroupNode = new XElement(_propertyGroupNodeName, new XAttribute(ConditionAttributeName, conditionExpression), new XText("\n  "));
+
+            lastGroupNode.AddAfterSelf(newGroupNode);
+            newGroupNode.AddBeforeSelf(new XText("\n  "));
+
+            var group = new ProjectPropertyGroup(this, newGroupNode);
+
+            _propertyGroups.Add(group);
+
+            return group;
         }
 
         public void DeleteProperty([NotNull] string propertyName, string configuration, string platform)
@@ -105,9 +133,11 @@
 
         internal void DeleteConfiguration(string configuration, string platform)
         {
-            var groupsToDelete = PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform)).ToArray();
+            var groupsToDelete = PropertyGroups
+                .Where(group => group.MatchesConfiguration(configuration, platform))
+                .ToArray();
 
-            _propertyGroups = PropertyGroups.Except(groupsToDelete).ToArray();
+            _propertyGroups.RemoveRange(groupsToDelete);
 
             groupsToDelete.ForEach(group => group.Delete());
 
@@ -241,14 +271,15 @@
         }
 
         [NotNull, ItemNotNull]
-        private IProjectPropertyGroup[] GeneratePropertyGroups()
+        private IList<IProjectPropertyGroup> GeneratePropertyGroups()
         {
-            Contract.Ensures(Contract.Result<IProjectPropertyGroup[]>() != null);
+            Contract.Ensures(Contract.Result<IList<IProjectPropertyGroup>>() != null);
 
             return Document.Descendants(_propertyGroupNodeName)
                 .Where(node => node.Parent?.Name.LocalName == "Project")
                 .Select(node => new ProjectPropertyGroup(this, node))
-                .ToArray();
+                .Cast<IProjectPropertyGroup>()
+                .ToList();
         }
 
         private class ProjectPropertyGroup : IProjectPropertyGroup
