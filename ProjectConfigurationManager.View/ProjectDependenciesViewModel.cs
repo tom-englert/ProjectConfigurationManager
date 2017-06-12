@@ -7,6 +7,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using System.Windows.Data;
 
     using JetBrains.Annotations;
 
@@ -21,9 +22,9 @@
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 4)]
     public class ProjectDependenciesViewModel : ObservableObject
     {
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly IObservableCollection<ProjectDependency> _references;
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly IObservableCollection<ProjectDependency> _referencedBy;
 
         public ProjectDependenciesViewModel([NotNull] Solution solution)
@@ -45,7 +46,9 @@
         public void UpdateSelection(Project project, bool value)
         {
             _references.Concat(_referencedBy)
+                // ReSharper disable once PossibleNullReferenceException
                 .SelectMany(p => p.DescendantsAndSelf)
+                // ReSharper disable once PossibleNullReferenceException
                 .ForEach(p => p.IsProjectSelected = value && (p.Project == project));
         }
 
@@ -61,24 +64,30 @@
 
     public class ProjectDependencyGroup : ObservableObject
     {
-        public ProjectDependencyGroup(string name, IObservableCollection<ProjectDependency> items)
+        public ProjectDependencyGroup(string name, [NotNull] IList<ProjectDependency> items)
         {
-            Items = items;
+            Contract.Requires(items != null);
+
+            Items = items.ToCollectionView();
             Name = name;
         }
 
         public string Name { get; }
-        public IObservableCollection<ProjectDependency> Items { get; }
+
+        public ICollectionView Items { get; }
     }
 
     public class ProjectDependency : ObservableObject
     {
         [NotNull]
         private readonly ProjectDependenciesViewModel _model;
-        private bool _isSelected;
-        private bool _isProjectSelected;
         [NotNull]
         private readonly Project _project;
+        [NotNull, ItemNotNull]
+        private readonly IList<ProjectDependency> _children;
+
+        private bool _isSelected;
+        private bool _isProjectSelected;
 
         public ProjectDependency([NotNull] ProjectDependenciesViewModel model, ProjectDependency parent, [NotNull] Project project, [NotNull] Func<Project, IList<Project>> getChildProjectsCallback)
         {
@@ -91,7 +100,9 @@
             Level = (parent?.Level ?? -1) + 1;
             _project = project;
 
-            Children = GetChildren(project, getChildProjectsCallback);
+            _children = GetChildren(project, getChildProjectsCallback);
+
+            Children = _children.ToCollectionView();
         }
 
         [NotNull]
@@ -104,7 +115,7 @@
             }
         }
 
-        public ICollection<ProjectDependency> Children { get; }
+        public ICollectionView Children { get; }
 
         public int Level { get; }
 
@@ -144,7 +155,7 @@
 
                 yield return this;
 
-                foreach (var item in Children.SelectMany(p => p.DescendantsAndSelf))
+                foreach (var item in _children.SelectMany(p => p.DescendantsAndSelf))
                 {
                     yield return item;
                 }
@@ -153,11 +164,14 @@
         }
 
         [ContractVerification(false)]
+        [NotNull, ItemNotNull]
         private IObservableCollection<ProjectDependency> GetChildren([NotNull] Project project, [NotNull] Func<Project, IList<Project>> getChildProjectsCallback)
         {
             Contract.Requires(project != null);
             Contract.Requires(getChildProjectsCallback != null);
+            Contract.Ensures(Contract.Result<IObservableCollection<ProjectDependency>>() != null);
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             return getChildProjectsCallback(project)?.ObservableSelect(p => new ProjectDependency(_model, this, p, getChildProjectsCallback));
         }
 
@@ -173,6 +187,25 @@
         {
             Contract.Invariant(_project != null);
             Contract.Invariant(_model != null);
+            Contract.Invariant(_children != null);
+        }
+    }
+
+    internal static class ExtensionMethods
+    {
+        [NotNull]
+        public static ICollectionView ToCollectionView([NotNull] this IList<ProjectDependency> items)
+        {
+            Contract.Requires(items != null);
+            Contract.Ensures(Contract.Result<ICollectionView>() != null);
+
+            var source = new CollectionViewSource() { Source = items };
+
+            // ReSharper disable once PossibleNullReferenceException
+            source.SortDescriptions.Add(new SortDescription("Project.Name", ListSortDirection.Ascending));
+
+            // ReSharper disable once AssignNullToNotNullAttribute
+            return source.View;
         }
     }
 }

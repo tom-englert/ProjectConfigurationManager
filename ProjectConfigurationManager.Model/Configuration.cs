@@ -22,6 +22,7 @@
         private const string FileName = "config.json";
         private static readonly string _directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tom-englert.de", "ProjectConfigurationManager");
 
+        [NotNull]
         private readonly string _filePath;
         private IDictionary<string, string[]> _propertyColumnOrder;
 
@@ -90,6 +91,7 @@
         private void ObjectInvariant()
         {
             Contract.Invariant(_tracer != null);
+            Contract.Invariant(_filePath != null);
         }
     }
 }
