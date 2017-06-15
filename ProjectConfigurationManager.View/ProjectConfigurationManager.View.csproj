@@ -219,6 +219,7 @@
     <Compile Include="CellToBackgroundBrushConverter.cs" />
     <Compile Include="MultipleChoiceFilter.cs" />
     <Compile Include="MultipleChoiceTagFilter.cs" />
+    <Compile Include="ThemeResourceProvider.cs" />
     <Compile Include="Themes\ResourceKeys.cs" />
     <Compile Include="Themes\ResourceLocator.cs" />
     <Page Include="BuildConfigurationView.xaml">
@@ -282,6 +283,10 @@
     <ProjectReference Include="..\ProjectConfigurationManager.Model\ProjectConfigurationManager.Model.csproj">
       <Project>{821890ac-a0be-41e6-b1ca-ff0e1075265f}</Project>
       <Name>ProjectConfigurationManager.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TomsToolbox.Wpf.Styles\TomsToolbox.WpfStyles.csproj">
+      <Project>{e5d732d2-0294-48fd-8314-63dc1a9155fe}</Project>
+      <Name>TomsToolbox.WpfStyles</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

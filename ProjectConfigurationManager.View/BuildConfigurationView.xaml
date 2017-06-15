@@ -7,10 +7,13 @@
              xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
              xmlns:toms="urn:TomsToolbox"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
+             xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles;assembly=TomsToolbox.WpfStyles"
              d:DataContext="{d:DesignInstance view:BuildConfigurationViewModel}">
   <UserControl.Resources>
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" />
     <themes:ResourceLocator x:Key="ResourceLocator" />
+    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Static styles:ResourceKeys.CheckBoxStyle}}"/>
+    <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridStyle}}"/>
   </UserControl.Resources>
   <DockPanel Margin="10">
     <Border DockPanel.Dock="Right" Margin="5">
@@ -27,14 +30,15 @@
           <TextBlock Text="Project builds in this configuration." TextWrapping="Wrap" />
         </CheckBox>
         <Decorator Height="25" />
-        <TextBlock TextWrapping="Wrap">Use the context menu to delete unused project configurations from the project files.<LineBreak /><LineBreak />You can only delete project configurations which are not selected in any solution configuration.</TextBlock>
-
+        <TextBlock TextWrapping="Wrap">
+          Use the context menu to delete unused project configurations from the project files.
+          <LineBreak /><LineBreak />
+          You can only delete project configurations which are not selected in any solution configuration.
+        </TextBlock>
       </StackPanel>
     </Border>
-    <DataGrid x:Name="DataGrid"
-              ItemsSource="{Binding Solution.SpecificProjectConfigurations}"
+    <DataGrid ItemsSource="{Binding Solution.SpecificProjectConfigurations}"
               AutoGenerateColumns="False"
-              VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
               CanUserAddRows="False" CanUserResizeRows="False"
               view:BuildConfigurationColumnsManager.Configurations="{Binding Solution.SolutionConfigurations}"
               toms:MultiSelectorExtensions.SelectionBinding="{Binding SelectedConfigurations}"
@@ -53,9 +57,8 @@
           </VirtualizingStackPanel>
         </ItemsPanelTemplate>
       </DataGrid.ItemsPanel>
-
       <DataGrid.ColumnHeaderStyle>
-        <Style TargetType="DataGridColumnHeader">
+        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridColumnHeaderStyle}}">
           <Setter Property="VerticalContentAlignment" Value="Bottom" />
           <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
@@ -82,9 +85,8 @@
                             dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.TagFilterTemplate}}" />
 
       </DataGrid.Columns>
-      
       <DataGrid.RowStyle>
-        <Style TargetType="DataGridRow">
+        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridRowStyle}}">
           <Style.Triggers>
             <DataTrigger Binding="{Binding Project.IsLoaded}" Value="False">
               <Setter Property="IsEnabled" Value="False"/>

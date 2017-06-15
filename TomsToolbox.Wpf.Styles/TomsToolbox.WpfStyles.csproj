@@ -143,8 +143,8 @@
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DataGridExtensions, Version=1.0.34.0, Culture=neutral, PublicKeyToken=43de855f87de903a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DataGridExtensions.1.0.34.0\lib\net40-Client\DataGridExtensions.dll</HintPath>
+    <Reference Include="DataGridExtensions, Version=1.0.35.0, Culture=neutral, PublicKeyToken=43de855f87de903a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DataGridExtensions.1.0.35.0\lib\net40-Client\DataGridExtensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
