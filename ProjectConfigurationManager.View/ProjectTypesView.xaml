@@ -6,25 +6,26 @@
              xmlns:local="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
+             xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles;assembly=TomsToolbox.WpfStyles"
              d:DataContext="{d:DesignInstance local:ProjectTypesViewModel}">
   <Grid Margin="10">
     <DataGrid x:Name="DataGrid"
               ItemsSource="{Binding Solution.Projects}"
               AutoGenerateColumns="False"
-              VerticalGridLinesBrush="LightGray" HorizontalGridLinesBrush="LightGray"
+              Style="{StaticResource {x:Static styles:ResourceKeys.DataGridStyle}}"
               CanUserAddRows="False" CanUserResizeRows="False"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
               dgx:Tools.ApplyInitialSorting="True"
               local:ProjectTypesColumnManager.IsAttached="True"
               FrozenColumnCount="1">
       <DataGrid.ColumnHeaderStyle>
-        <Style TargetType="DataGridColumnHeader">
+        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridColumnHeaderStyle}}">
           <Setter Property="VerticalContentAlignment" Value="Bottom"/>
           <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.RowStyle>
-        <Style TargetType="DataGridRow">
+        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridRowStyle}}">
           <Style.Triggers>
             <DataTrigger Binding="{Binding IsLoaded}" Value="False">
               <Setter Property="IsEnabled" Value="False"/>
@@ -44,7 +45,8 @@
         <ItemsPanelTemplate>
           <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}">
             <VirtualizingStackPanel.ContextMenu>
-              <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+              <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
+                           Style="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
                 <MenuItem Header="Unload selected project(s)" Command="{Binding DataContext.UnloadProjectsCommand}" CommandParameter="{Binding SelectedItems}"/>
               </ContextMenu>
             </VirtualizingStackPanel.ContextMenu>

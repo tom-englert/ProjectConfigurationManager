@@ -10,11 +10,11 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:model="clr-namespace:tomenglertde.ProjectConfigurationManager.Model;assembly=ProjectConfigurationManager.Model"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
+             xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles;assembly=TomsToolbox.WpfStyles"
              d:DataContext="{d:DesignInstance local:PropertiesViewModel}"
              Padding="10">
 
   <UserControl.Resources>
-    <local:CellToBackgroundBrushConverter x:Key="CellToBackgroundBrushConverter" />
     <local:ProjectTypeGuidToDisplayNameConverter x:Key="ProjectTypeGuidToDisplayNameConverter" />
     <CollectionViewSource x:Key="PropertiesSource" Source="{Binding Solution.ProjectProperties}">
       <CollectionViewSource.GroupDescriptions>
@@ -24,7 +24,7 @@
     <CollectionViewSource x:Key="ConfigurationsSource" Source="{Binding Solution.ProjectConfigurations}" />
     <Style TargetType="ListBoxItem" x:Key="FilterItemContainerStyle">
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Gray" />
+      <Setter Property="BorderBrush" Value="{StaticResource {x:Static styles:ResourceKeys.BorderBrush}}" />
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="ListBoxItem">
@@ -40,7 +40,7 @@
                 <Setter Property="BorderBrush" Value="Black" />
               </Trigger>
               <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="Aquamarine" />
+                <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.HighlightBrushKey}}" />
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -50,7 +50,7 @@
     <ItemsPanelTemplate x:Key="FilterItemsPanelTemplate">
       <WrapPanel />
     </ItemsPanelTemplate>
-    <Style TargetType="ListBox" x:Key="FilterListBoxStyle">
+    <Style TargetType="ListBox" x:Key="FilterListBoxStyle" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ListBoxStyle}}">
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="SelectionMode" Value="Extended" />
@@ -65,7 +65,7 @@
 
   <DockPanel>
     <StackPanel DockPanel.Dock="Top">
-      <GroupBox Header="Show properties:">
+      <GroupBox Header="Show properties:" Style="{StaticResource {x:Static styles:ResourceKeys.GroupBoxStyle}}">
         <ListBox x:Name="PropertyGroups"
                  ItemsSource="{Binding Groups, Source={StaticResource PropertiesSource}}"
                  Style="{StaticResource FilterListBoxStyle}">
@@ -77,7 +77,7 @@
         </ListBox>
       </GroupBox>
       <Decorator Height="8" />
-      <GroupBox Header="Show projects:">
+      <GroupBox Header="Show projects:" Style="{StaticResource {x:Static styles:ResourceKeys.GroupBoxStyle}}">
         <ListBox ItemsSource="{Binding Solution.ProjectTypeGuids}"
                  Style="{StaticResource FilterListBoxStyle}"
                  SelectionChanged="ProjectTypeGuids_SelectionChanged"
@@ -93,14 +93,15 @@
     </StackPanel>
     <DataGrid x:Name="DataGrid"
               ItemsSource="{Binding Source={StaticResource ConfigurationsSource}}"
-              HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray" SelectionUnit="Cell"
+              Style="{StaticResource {x:Static styles:ResourceKeys.DataGridStyle}}"
+              SelectionUnit="Cell"
               AutoGenerateColumns="False" FrozenColumnCount="4"
               dgx:Tools.ApplyInitialSorting="True"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
               dgx:DataGridFilter.ResourceLocator="{StaticResource ResourceLocator}"
               dgx:DataGridFilter.ContentFilterFactory="{StaticResource RegexContentFilterFactory}">
       <DataGrid.Resources>
-        <ContextMenu x:Key="ContextMenu">
+        <ContextMenu x:Key="ContextMenu" Style="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
           <MenuItem Header="Copy" InputGestureText="Ctrl+C" Command="{Binding CopyCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
           <MenuItem Header="Paste" InputGestureText="Ctrl+V" Command="{Binding PasteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
           <MenuItem Header="Delete" InputGestureText="Del" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
@@ -141,7 +142,7 @@
                             dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.TagFilterTemplate}}" />
       </DataGrid.Columns>
       <DataGrid.CellStyle>
-        <Style TargetType="DataGridCell">
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridCellStyle}}">
           <Setter Property="ToolTip">
             <Setter.Value>
               <ToolTip>
@@ -149,7 +150,7 @@
                   <Decorator Height="2" />
                   <TextBlock Text="{Binding Column.Header.Text}" DataContext="{Binding PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType=ToolTip}}" d:DataContext="{d:DesignInstance DataGridCell}" />
                   <Decorator Height="4" />
-                  <TextBlock Foreground="Gray">
+                  <TextBlock Foreground="{StaticResource {x:Static SystemColors.MenuTextBrushKey}}">
                     <TextBlock.Text>
                       <MultiBinding StringFormat="{}{0} | {1} | {2}">
                         <Binding Path="Project.Name" />
@@ -165,7 +166,7 @@
           <Setter Property="BorderThickness" Value="2" />
           <Setter Property="Background">
             <Setter.Value>
-              <MultiBinding Converter="{StaticResource CellToBackgroundBrushConverter}">
+              <MultiBinding Converter="{toms:Import local:CellToBackgroundBrushConverter}">
                 <Binding RelativeSource="{RelativeSource Self}" />
                 <Binding Path="PropertyValue" />
                 <Binding Path="Project.DefaultProjectConfiguration.PropertyValue" />
@@ -182,7 +183,7 @@
         </Style>
       </DataGrid.CellStyle>
       <DataGrid.RowStyle>
-        <Style TargetType="DataGridRow">
+        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridRowStyle}}">
           <Style.Triggers>
             <DataTrigger Binding="{Binding Project.IsSaved}" Value="False">
               <Setter Property="IsEnabled" Value="False"/>

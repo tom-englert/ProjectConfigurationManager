@@ -5,9 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              xmlns:toms="urn:TomsToolbox"
              xmlns:view="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
+             xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles;assembly=TomsToolbox.WpfStyles"
              UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+  <UserControl.Resources>
+    <ResourceDictionary Source="/ProjectConfigurationManager.View;component/VSColorScheme.xaml" />
+  </UserControl.Resources>
+
   <Grid>
-    <TabControl toms:VisualComposition.RegionId="{x:Static view:GlobalId.ShellRegion}">
+    <TabControl toms:VisualComposition.RegionId="{x:Static view:GlobalId.ShellRegion}" Style="{StaticResource {x:Static styles:ResourceKeys.TabControlStyle}}">
       <TabControl.ItemTemplate>
         <DataTemplate>
           <TextBlock Text="{Binding Converter={x:Static toms:ObjectToDisplayNameConverter.Default}}"/>

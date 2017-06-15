@@ -50,7 +50,7 @@
         <ItemsPanelTemplate>
           <VirtualizingStackPanel>
             <VirtualizingStackPanel.ContextMenu>
-              <ContextMenu>
+              <ContextMenu Style="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
                 <MenuItem Header="Delete" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" />
               </ContextMenu>
             </VirtualizingStackPanel.ContextMenu>

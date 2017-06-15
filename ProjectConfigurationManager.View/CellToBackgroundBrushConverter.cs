@@ -21,22 +21,29 @@
     public class CellToBackgroundBrushConverter : IValueConverter, IMultiValueConverter
     {
         [NotNull]
+        private readonly ThemeManager _themeManager;
+        [NotNull]
         private readonly Dictionary<string, Brush> _mappingCache = new Dictionary<string, Brush>(StringComparer.OrdinalIgnoreCase);
-
-        private static readonly Brush[] _brushes =
+        [NotNull]
+        private static readonly Color[] _colors =
         {
-            Brushes.Aquamarine,
-            Brushes.Aqua,
-            Brushes.BlanchedAlmond,
-            Brushes.Gold,
-            Brushes.LightBlue,
-            Brushes.LightGreen,
-            Brushes.LightPink,
-            Brushes.LightSalmon,
-            Brushes.LightSeaGreen,
-            Brushes.Thistle,
-            Brushes.Turquoise
+            Colors.Aquamarine,
+            Colors.Aqua,
+            Colors.BlanchedAlmond,
+            Colors.Gold,
+            Colors.LightBlue,
+            Colors.LightGreen,
+            Colors.LightPink,
+            Colors.LightSalmon,
+            Colors.LightSeaGreen,
+            Colors.Thistle,
+            Colors.Turquoise
         };
+
+        public CellToBackgroundBrushConverter([NotNull] ThemeManager themeManager)
+        {
+            _themeManager = themeManager;
+        }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -52,7 +59,7 @@
 
             var text = GetColumnText(column, dataContext);
             if (text == null)
-                return Brushes.LightGray;
+                return _themeManager.IsDarkTheme ? Brushes.DimGray : Brushes.LightGray;
 
             if (string.IsNullOrEmpty(text))
                 return Brushes.Transparent;
@@ -107,10 +114,20 @@
             throw new NotImplementedException();
         }
 
+        [NotNull]
         [ContractVerification(false)]
-        private Brush GetNextBrush(string text)
+        private Brush GetNextBrush([CanBeNull] string text)
         {
-            return _brushes[_mappingCache.Count % _brushes.Length];
+            var color = _colors[_mappingCache.Count % _colors.Length];
+
+            if (_themeManager.IsDarkTheme)
+            {
+                color.ScR = 1 - color.ScR;
+                color.ScG = 1 - color.ScG;
+                color.ScB = 1 - color.ScB;
+            }
+
+            return new SolidColorBrush(color);
         }
 
         [ContractInvariantMethod]
