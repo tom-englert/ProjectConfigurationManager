@@ -98,7 +98,7 @@
     </Setter>
   </Style>
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=TabControlStyle}" TargetType="{x:Type TabControl}">
+  <Style x:Key="{x:Static styles:ResourceKeys.TabControlStyle}" TargetType="{x:Type TabControl}">
     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
     <Setter Property="Padding" Value="4" />
     <Setter Property="BorderThickness" Value="1" />

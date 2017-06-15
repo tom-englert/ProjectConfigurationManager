@@ -211,7 +211,7 @@
     </ControlTemplate.Triggers>
   </ControlTemplate>
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=ComboBoxStyle}" TargetType="{x:Type ComboBox}">
+  <Style x:Key="{x:Static styles:ResourceKeys.ComboBoxStyle}" TargetType="{x:Type ComboBox}">
     <Setter Property="SnapsToDevicePixels" Value="True" />
     <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     <Setter Property="Padding" Value="6,3,0,3" />
@@ -246,13 +246,13 @@
     </Style.Triggers>
   </Style>
 
-  <Style TargetType="ComboBox" x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=DataGridComboBoxEditingElementStyle}" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ComboBoxStyle}}">
+  <Style TargetType="ComboBox" x:Key="{x:Static styles:ResourceKeys.DataGridComboBoxEditingElementStyle}" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ComboBoxStyle}}">
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="1" />
     <Setter Property="IsSynchronizedWithCurrentItem" Value="False" />
   </Style>
 
-  <Style TargetType="ComboBox" x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=DataGridComboBoxElementStyle}">
+  <Style TargetType="ComboBox" x:Key="{x:Static styles:ResourceKeys.DataGridComboBoxElementStyle}">
     <Setter Property="IsSynchronizedWithCurrentItem" Value="False" />
   </Style>
 

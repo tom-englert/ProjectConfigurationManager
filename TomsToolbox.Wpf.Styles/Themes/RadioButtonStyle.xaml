@@ -3,7 +3,7 @@
                     xmlns:toms="urn:TomsToolbox"
                     xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles">
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=RadioButtonStyle}" TargetType="{x:Type RadioButton}">
+  <Style x:Key="{x:Static styles:ResourceKeys.RadioButtonStyle}" TargetType="{x:Type RadioButton}">
     <Setter Property="UseLayoutRounding" Value="False" />
     <Setter Property="SnapsToDevicePixels" Value="True" />
     <Setter Property="FocusVisualStyle" Value="{x:Null}" />

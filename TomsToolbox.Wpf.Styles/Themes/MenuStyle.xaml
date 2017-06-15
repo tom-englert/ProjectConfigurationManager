@@ -83,7 +83,7 @@
     </Setter>
   </Style>
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=MenuItemSeparatorStyle}" TargetType="{x:Type Separator}">
+  <Style x:Key="{x:Static styles:ResourceKeys.MenuItemSeparatorStyle}" TargetType="{x:Type Separator}">
     <Setter Property="Height" Value="1" />
     <Setter Property="Margin" Value="25,2,0,2" />
     <Setter Property="Template">
@@ -230,7 +230,7 @@
     </ControlTemplate.Triggers>
   </ControlTemplate>
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=MenuItemStyle}" TargetType="{x:Type MenuItem}">
+  <Style x:Key="{x:Static styles:ResourceKeys.MenuItemStyle}" TargetType="{x:Type MenuItem}">
     <Setter Property="OverridesDefaultStyle" Value="True" />
     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
     <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" />
@@ -254,7 +254,7 @@
     </Style.Triggers>
   </Style>
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=ContextMenuStyle}" TargetType="{x:Type ContextMenu}">
+  <Style x:Key="{x:Static styles:ResourceKeys.ContextMenuStyle}" TargetType="{x:Type ContextMenu}">
     <Setter Property="SnapsToDevicePixels" Value="True" />
     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" />
     <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" />
@@ -279,7 +279,7 @@
     </Setter>
   </Style>
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=MenuStyle}" TargetType="{x:Type Menu}">
+  <Style x:Key="{x:Static styles:ResourceKeys.MenuStyle}" TargetType="{x:Type Menu}">
     <Setter Property="SnapsToDevicePixels" Value="True" />
     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
     <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" />
@@ -345,7 +345,7 @@
     </Style.Triggers>
   </Style>
 
-  <Style x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=CompositeContextMenuStyle}" TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
+  <Style x:Key="{x:Static styles:ResourceKeys.CompositeContextMenuStyle}" TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
     <Setter Property="toms:StyleBindings.GroupStyle" Value="{StaticResource MenuGroupStyle}"/>
     <Setter Property="toms:StyleBindings.GroupDescriptions">
       <Setter.Value>

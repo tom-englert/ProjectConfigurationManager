@@ -20,10 +20,10 @@
 
   <!--  Brushes -->
 
-  <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=DisabledBrush}" Color="#F3F3F3" />
+  <SolidColorBrush x:Key="{x:Static styles:ResourceKeys.DisabledBrush}" Color="#F3F3F3" />
 
-  <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=BorderBrush}" Color="#CCCEDB" />
+  <SolidColorBrush x:Key="{x:Static styles:ResourceKeys.BorderBrush}" Color="#CCCEDB" />
 
-  <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly=styles:ResourceKeys, ResourceId=AccentDarkBrush}" Color="#CCCEDB" />
+  <SolidColorBrush x:Key="{x:Static styles:ResourceKeys.AccentDarkBrush}" Color="#CCCEDB" />
   
 </ResourceDictionary>
