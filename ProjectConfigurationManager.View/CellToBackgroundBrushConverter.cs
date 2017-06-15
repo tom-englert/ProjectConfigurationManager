@@ -23,7 +23,7 @@
         [NotNull]
         private readonly ThemeManager _themeManager;
         [NotNull]
-        private readonly Dictionary<string, Brush> _mappingCache = new Dictionary<string, Brush>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Color> _mappingCache = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
         [NotNull]
         private static readonly Color[] _colors =
         {
@@ -64,7 +64,16 @@
             if (string.IsNullOrEmpty(text))
                 return Brushes.Transparent;
 
-            return _mappingCache.ForceValue(text, GetNextBrush);
+            var color = _mappingCache.ForceValue(text, GetNextColor);
+
+            if (_themeManager.IsDarkTheme)
+            {
+                color.ScR = 1 - color.ScR;
+                color.ScG = 1 - color.ScG;
+                color.ScB = 1 - color.ScB;
+            }
+
+            return new SolidColorBrush(color);
         }
 
         private static string GetColumnText([NotNull] DataGridColumn column, [NotNull] object dataContext)
@@ -116,18 +125,9 @@
 
         [NotNull]
         [ContractVerification(false)]
-        private Brush GetNextBrush([CanBeNull] string text)
+        private Color GetNextColor([CanBeNull] string text)
         {
-            var color = _colors[_mappingCache.Count % _colors.Length];
-
-            if (_themeManager.IsDarkTheme)
-            {
-                color.ScR = 1 - color.ScR;
-                color.ScG = 1 - color.ScG;
-                color.ScB = 1 - color.ScB;
-            }
-
-            return new SolidColorBrush(color);
+            return _colors[_mappingCache.Count % _colors.Length];
         }
 
         [ContractInvariantMethod]

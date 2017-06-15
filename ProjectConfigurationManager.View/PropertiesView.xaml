@@ -170,6 +170,7 @@
                 <Binding RelativeSource="{RelativeSource Self}" />
                 <Binding Path="PropertyValue" />
                 <Binding Path="Project.DefaultProjectConfiguration.PropertyValue" />
+                <Binding Path="IsDarkTheme" Source="{toms:Import local:ThemeManager}"/>
               </MultiBinding>
             </Setter.Value>
           </Setter>

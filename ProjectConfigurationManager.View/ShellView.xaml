@@ -6,7 +6,10 @@
              xmlns:toms="urn:TomsToolbox"
              xmlns:view="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles;assembly=TomsToolbox.WpfStyles"
-             UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+             xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.11.0"
+             UseLayoutRounding="True" TextOptions.TextFormattingMode="Display"
+             Foreground="{DynamicResource {x:Static vsfx:VsBrushes.WindowTextKey}}"
+             Background="{DynamicResource {x:Static vsfx:VsBrushes.WindowKey}}">
   <UserControl.Resources>
     <ResourceDictionary Source="/ProjectConfigurationManager.View;component/VSColorScheme.xaml" />
   </UserControl.Resources>
