@@ -3,19 +3,19 @@
                     xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/ButtonStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/CheckBoxStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/ComboBoxStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/MenuStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/GridSplitterStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/GroupBoxStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/ListBoxStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/RadioButtonStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/TabControlStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/TextBoxStyles.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/ToggleButtonStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/ToolTipStyle.xaml"/>
-    <ResourceDictionary Source="/TomsToolbox.Wpf.Styles;component/Themes/DataGridStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/ButtonStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/CheckBoxStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/ComboBoxStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/MenuStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/GridSplitterStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/GroupBoxStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/ListBoxStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/RadioButtonStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/TabControlStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/TextBoxStyles.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/ToggleButtonStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/ToolTipStyle.xaml"/>
+    <ResourceDictionary Source="/TomsToolbox.WpfStyles;component/Themes/DataGridStyle.xaml"/>
   </ResourceDictionary.MergedDictionaries>
 
   <!--  Brushes -->

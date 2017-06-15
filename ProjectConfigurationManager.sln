@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectConfigurationManager
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectConfigurationManager.Model", "ProjectConfigurationManager.Model\ProjectConfigurationManager.Model.csproj", "{821890AC-A0BE-41E6-B1CA-FF0E1075265F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TomsToolbox.Wpf.Styles", "TomsToolbox.Wpf.Styles\TomsToolbox.Wpf.Styles.csproj", "{E5D732D2-0294-48FD-8314-63DC1A9155FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TomsToolbox.WpfStyles", "TomsToolbox.Wpf.Styles\TomsToolbox.WpfStyles.csproj", "{E5D732D2-0294-48FD-8314-63DC1A9155FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
