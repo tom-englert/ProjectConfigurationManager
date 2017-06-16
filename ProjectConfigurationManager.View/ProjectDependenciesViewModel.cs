@@ -1,6 +1,7 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
@@ -199,13 +200,12 @@
             Contract.Requires(items != null);
             Contract.Ensures(Contract.Result<ICollectionView>() != null);
 
-            var source = new CollectionViewSource() { Source = items };
+            var view = new ListCollectionView((IList)items);
 
             // ReSharper disable once PossibleNullReferenceException
-            source.SortDescriptions.Add(new SortDescription("Project.Name", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new SortDescription("Project.Name", ListSortDirection.Ascending));
 
-            // ReSharper disable once AssignNullToNotNullAttribute
-            return source.View;
+            return view;
         }
     }
 }
