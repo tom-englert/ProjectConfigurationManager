@@ -24,7 +24,7 @@
       <Style.Triggers>
         <DataTrigger Binding="{Binding Path=(local:ProjectDependency.Level), FallbackValue=0}" Value="0">
           <Setter Property="IsExpanded" Value="True"/>
-          <Setter Property="Background" Value="#F0F0F0"/>
+          <Setter Property="Background" Value="#40808080"/>
         </DataTrigger>
         <DataTrigger Binding="{Binding Path=(local:ProjectDependency.Level)}" Value="{x:Null}">
           <Setter Property="Background" Value="Transparent"/>
