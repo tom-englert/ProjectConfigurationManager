@@ -12,6 +12,7 @@
     using System.Windows.Data;
 
     using DataGridExtensions;
+    using DataGridExtensions.Framework;
 
     using JetBrains.Annotations;
 
@@ -20,6 +21,8 @@
     [TemplatePart(Name = "PART_ListBox", Type = typeof(ListBox))]
     public abstract class MultipleChoiceFilterBase : Control
     {
+        [NotNull]
+        private readonly DispatcherThrottle _updateSourceValuesTargetThrottle;
         private ListBox _listBox;
 
         static MultipleChoiceFilterBase()
@@ -29,7 +32,10 @@
 
         protected MultipleChoiceFilterBase()
         {
+            _updateSourceValuesTargetThrottle = new DispatcherThrottle(() => BindingOperations.GetBindingExpression(this, SourceValuesProperty)?.UpdateTarget());
+
             Values = new ObservableCollection<string>();
+
         }
 
         public MultipleChoiceContentFilterBase Filter
@@ -77,7 +83,7 @@
                 return;
 
             var dataGridItems = (INotifyCollectionChanged)dataGrid.Items;
-            dataGridItems.CollectionChanged += (_, __) => BindingOperations.GetBindingExpression(this, SourceValuesProperty)?.UpdateTarget();
+            dataGridItems.CollectionChanged += (_, __) => _updateSourceValuesTargetThrottle.Tick();
 
             _listBox = Template?.FindName("PART_ListBox", this) as ListBox;
             if (_listBox == null)
