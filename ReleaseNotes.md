@@ -1,3 +1,6 @@
+1.3
+* Fix load performance issue with larger solutions
+
 1.2
 * #15: Support for dark theme.
 * Sort dependencies by name in the project dependencies view.
