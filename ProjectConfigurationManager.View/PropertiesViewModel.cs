@@ -24,28 +24,18 @@
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 2)]
     class PropertiesViewModel : ObservableObject
     {
-        [NotNull]
-        private readonly Solution _solution;
-
         [ImportingConstructor]
         public PropertiesViewModel([NotNull] Solution solution)
         {
             Contract.Requires(solution != null);
 
-            _solution = solution;
+            Solution = solution;
         }
 
         [NotNull]
-        public Solution Solution
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Solution>() != null);
+        public Solution Solution { get; }
 
-                return _solution;
-            }
-        }
-
+        [NotNull]
         public static ICommand CopyCommand => new DelegateCommand<DataGrid>(CanCopy, Copy);
 
         private static void Copy([NotNull] DataGrid dataGrid)
@@ -55,11 +45,12 @@
             dataGrid.GetCellSelection().SetClipboardData();
         }
 
-        private static bool CanCopy(DataGrid dataGrid)
+        private static bool CanCopy([CanBeNull] DataGrid dataGrid)
         {
             return dataGrid?.HasRectangularCellSelection() ?? false;
         }
 
+        [NotNull]
         public static ICommand PasteCommand => new DelegateCommand<DataGrid>(CanPaste, Paste);
 
         private static void Paste([NotNull] DataGrid dataGrid)
@@ -74,11 +65,12 @@
             dataGrid.CommitEdit();
         }
 
-        private static bool CanPaste(DataGrid dataGrid)
+        private static bool CanPaste([CanBeNull] DataGrid dataGrid)
         {
             return Clipboard.ContainsText() && (dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false);
         }
 
+        [NotNull]
         public static ICommand DeleteCommand => new DelegateCommand<DataGrid>(CanDelete, Delete);
 
         private static void Delete([NotNull] DataGrid dataGrid)
@@ -116,7 +108,7 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_solution != null);
+            Contract.Invariant(Solution != null);
         }
     }
 }

@@ -9,21 +9,14 @@
 
     public class ProjectPropertyName : IEquatable<ProjectPropertyName>
     {
-        [NotNull]
-        private readonly string _name;
-        [NotNull]
-        private readonly PropertyGroupName _groupName;
-        [NotNull]
-        private readonly string _displayName;
-
         internal ProjectPropertyName([NotNull] string name, [NotNull] PropertyGroupName groupName)
         {
             Contract.Requires(name != null);
             Contract.Requires(groupName != null);
 
-            _name = name;
-            _groupName = groupName;
-            _displayName = HasGroupNamePrefix(name, groupName.Name) ? name.Substring(groupName.Name.Length) : name;
+            Name = name;
+            GroupName = groupName;
+            DisplayName = HasGroupNamePrefix(name, groupName.Name) ? name.Substring(groupName.Name.Length) : name;
         }
 
         private static bool HasGroupNamePrefix([NotNull] string name, [NotNull] string groupName)
@@ -38,34 +31,13 @@
         }
 
         [NotNull]
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _name;
-            }
-        }
+        public string Name { get; }
 
         [NotNull]
-        public PropertyGroupName GroupName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<PropertyGroupName>() != null);
-                return _groupName;
-            }
-        }
+        public PropertyGroupName GroupName { get; }
 
         [NotNull]
-        public string DisplayName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _displayName;
-            }
-        }
+        public string DisplayName { get; }
 
         #region IEquatable implementation
 
@@ -77,7 +49,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _name.ToUpperInvariant().GetHashCode();
+            return Name.ToUpperInvariant().GetHashCode();
         }
 
         /// <summary>
@@ -109,7 +81,7 @@
             if (ReferenceEquals(right, null))
                 return false;
 
-            return string.Equals(left._name, right._name, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(left.Name, right.Name, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -134,9 +106,9 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_name != null);
-            Contract.Invariant(_groupName != null);
-            Contract.Invariant(_displayName != null);
+            Contract.Invariant(Name != null);
+            Contract.Invariant(GroupName != null);
+            Contract.Invariant(DisplayName != null);
         }
     }
 }

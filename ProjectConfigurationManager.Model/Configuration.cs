@@ -2,11 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
+    using System.ComponentModel;
     using System.ComponentModel.Composition;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
+    using System.Runtime.CompilerServices;
 
     using JetBrains.Annotations;
 
@@ -15,7 +18,7 @@
     using TomsToolbox.Desktop;
 
     [Export]
-    public class Configuration : ObservableObjectBase
+    public sealed class Configuration : INotifyPropertyChanged
     {
         [NotNull]
         private readonly ITracer _tracer;
@@ -24,7 +27,6 @@
 
         [NotNull]
         private readonly string _filePath;
-        private IDictionary<string, string[]> _propertyColumnOrder;
 
         [ImportingConstructor]
         public Configuration([NotNull] ITracer tracer)
@@ -59,21 +61,10 @@
         /// <value>
         /// The property column order, i.e. all column names by group in display order.
         /// </value>
-        [NotNull]
-        public IDictionary<string, string[]> PropertyColumnOrder
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IDictionary<string, string[]>>() != null);
-                return _propertyColumnOrder ?? (_propertyColumnOrder = new Dictionary<string, string[]>());
-            }
-            set
-            {
-                SetProperty(ref _propertyColumnOrder, value);
-            }
-        }
+        [CanBeNull]
+        public ImmutableDictionary<string, string[]> PropertyColumnOrder { get; set; }
 
-        public void Save()
+        private void Save()
         {
             try
             {
@@ -92,6 +83,15 @@
         {
             Contract.Invariant(_tracer != null);
             Contract.Invariant(_filePath != null);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Save();
         }
     }
 }

@@ -19,14 +19,9 @@
         [NotNull]
         private readonly Project _project;
         [NotNull]
-        private readonly IIndexer<bool?> _shouldBuild;
-        [NotNull]
-        private readonly IIndexer<string> _propertyValue;
-
-        [NotNull]
         private IDictionary<string, IProjectProperty> _properties = new Dictionary<string, IProjectProperty>();
 
-        internal ProjectConfiguration([NotNull] Project project, string configuration, string platform)
+        internal ProjectConfiguration([NotNull] Project project, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(project != null);
 
@@ -34,8 +29,8 @@
             Configuration = configuration;
             Platform = platform;
 
-            _shouldBuild = new ShouldBuildIndexer(this);
-            _propertyValue = new PropertyValueIndexer(this);
+            ShouldBuild = new ShouldBuildIndexer(this);
+            PropertyValue = new PropertyValueIndexer(this);
         }
 
         [NotNull]
@@ -52,36 +47,14 @@
 
         public string Platform { get; }
 
-        [NotNull]
-        public IIndexer<bool?> ShouldBuild
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IIndexer<bool?>>() != null);
-                return _shouldBuild;
-            }
-        }
+        [NotNull] // ReSharper disable once MemberCanBePrivate.Global - used in column binding
+        public IIndexer<bool?> ShouldBuild { get; }
 
         [NotNull]
-        public IIndexer<string> PropertyValue
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IIndexer<string>>() != null);
-                return _propertyValue;
-            }
-        }
+        public IIndexer<string> PropertyValue { get; }
 
         [NotNull]
-        internal IDictionary<string, IProjectProperty> Properties
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IDictionary<string, IProjectProperty>>() != null);
-
-                return new ReadOnlyDictionary<string, IProjectProperty>(_properties);
-            }
-        }
+        internal IDictionary<string, IProjectProperty> Properties => new ReadOnlyDictionary<string, IProjectProperty>(_properties);
 
         public void Delete()
         {
@@ -185,9 +158,7 @@
                 }
                 set
                 {
-                    IProjectProperty property;
-
-                    if (!_projectConfiguration.Properties.TryGetValue(propertyName, out property) || (property == null))
+                    if (!_projectConfiguration.Properties.TryGetValue(propertyName, out IProjectProperty property) || (property == null))
                     {
                         if (string.IsNullOrEmpty(value)) // do not create empty entries.
                             return;
@@ -214,6 +185,7 @@
             }
         }
 
+        [CanBeNull]
         private IProjectProperty CreateProperty([NotNull] string propertyName)
         {
             Contract.Requires(propertyName != null);
@@ -307,8 +279,8 @@
         private void ObjectInvariant()
         {
             Contract.Invariant(_project != null);
-            Contract.Invariant(_shouldBuild != null);
-            Contract.Invariant(_propertyValue != null);
+            Contract.Invariant(ShouldBuild != null);
+            Contract.Invariant(PropertyValue != null);
             Contract.Invariant(_properties != null);
         }
     }

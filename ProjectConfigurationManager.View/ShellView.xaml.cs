@@ -27,7 +27,6 @@
             Contract.Requires(exportProvider != null);
             this.SetExportProvider(exportProvider);
 
-            // ReSharper disable once AssignNullToNotNullAttribute
             _themeManager = exportProvider.GetExportedValue<ThemeManager>();
 
             InitializeComponent();

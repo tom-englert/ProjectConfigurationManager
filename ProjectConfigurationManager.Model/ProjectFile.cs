@@ -61,6 +61,7 @@
             return PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
         }
 
+        [CanBeNull]
         public IProjectProperty CreateProperty([NotNull] string propertyName, string configuration, string platform)
         {
             Contract.Requires(propertyName != null);
@@ -70,6 +71,7 @@
             return group?.AddProperty(propertyName);
         }
 
+        [CanBeNull]
         private IProjectPropertyGroup CreateNewSpecificPropertyGroup(string configuration, string platform)
         {
             if (string.IsNullOrEmpty(configuration) || string.IsNullOrEmpty(platform))
@@ -124,10 +126,8 @@
                 return true;
 
             var files = new[] { _project.FullName };
-            uint editVerdict;
-            uint moreInfo;
 
-            return (0 == service.QueryEditFiles(0, files.Length, files, null, null, out editVerdict, out moreInfo))
+            return (0 == service.QueryEditFiles(0, files.Length, files, null, null, out var editVerdict, out var moreInfo))
                 && (editVerdict == (uint)tagVSQueryEditResult.QER_EditOK);
         }
 

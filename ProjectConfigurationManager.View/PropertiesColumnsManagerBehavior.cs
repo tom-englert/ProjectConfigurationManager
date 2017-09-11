@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Collections.Specialized;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -37,47 +38,53 @@
         private Configuration _configuration;
         private ITracer _tracer;
 
-        internal static string GetProjectPropertyName([NotNull] DependencyObject obj)
-        {
-            Contract.Requires(obj != null);
-            return (string)obj.GetValue(ProjectPropertyNameProperty);
-        }
-        internal static void SetProjectPropertyName([NotNull] DependencyObject obj, string value)
-        {
-            Contract.Requires(obj != null);
-            obj.SetValue(ProjectPropertyNameProperty, value);
-        }
-        internal static readonly DependencyProperty ProjectPropertyNameProperty =
-            DependencyProperty.RegisterAttached("ProjectPropertyName", typeof(ProjectPropertyName), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
-
-
-        public static string GetPropertyName([NotNull] DependencyObject obj)
-        {
-            Contract.Requires(obj != null);
-            return (string)obj.GetValue(PropertyNameProperty);
-        }
-        public static void SetPropertyName([NotNull] DependencyObject obj, string value)
-        {
-            Contract.Requires(obj != null);
-            obj.SetValue(PropertyNameProperty, value);
-        }
-        public static readonly DependencyProperty PropertyNameProperty =
-            DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
-
-
-        public ICollection Properties
-        {
-            get { return (ICollection)GetValue(PropertiesProperty); }
-            set { SetValue(PropertiesProperty, value); }
-        }
-        public static readonly DependencyProperty PropertiesProperty =
-            DependencyProperty.Register("Properties", typeof(ICollection), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null, (sender, e) => ((PropertiesColumnsManagerBehavior)sender).Properties_Changed(e.NewValue as IList<object>)));
-
         public PropertiesColumnsManagerBehavior()
         {
             _columnsCreatedThrottle = new DispatcherThrottle(DispatcherPriority.Background, ColumnsCreated);
             _displayIndexChangedThrottle = new DispatcherThrottle(DispatcherPriority.Background, ColumnsDisplayIndexChanged);
         }
+
+        [CanBeNull]
+        internal static string GetProjectPropertyName([NotNull] DependencyObject obj)
+        {
+            Contract.Requires(obj != null);
+            return (string)obj.GetValue(ProjectPropertyNameProperty);
+        }
+        internal static void SetProjectPropertyName([NotNull] DependencyObject obj, [CanBeNull] string value)
+        {
+            Contract.Requires(obj != null);
+            obj.SetValue(ProjectPropertyNameProperty, value);
+        }
+        [NotNull]
+        internal static readonly DependencyProperty ProjectPropertyNameProperty =
+            DependencyProperty.RegisterAttached("ProjectPropertyName", typeof(ProjectPropertyName), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
+
+
+        [CanBeNull]
+        public static string GetPropertyName([NotNull] DependencyObject obj)
+        {
+            Contract.Requires(obj != null);
+            return (string)obj.GetValue(PropertyNameProperty);
+        }
+        public static void SetPropertyName([NotNull] DependencyObject obj, [CanBeNull] string value)
+        {
+            Contract.Requires(obj != null);
+            obj.SetValue(PropertyNameProperty, value);
+        }
+        [NotNull]
+        public static readonly DependencyProperty PropertyNameProperty =
+            DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
+
+
+        [CanBeNull]
+        public ICollection Properties
+        {
+            get => (ICollection)GetValue(PropertiesProperty);
+            set => SetValue(PropertiesProperty, value);
+        }
+        [NotNull]
+        public static readonly DependencyProperty PropertiesProperty =
+            DependencyProperty.Register("Properties", typeof(ICollection), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null, (sender, e) => ((PropertiesColumnsManagerBehavior)sender).Properties_Changed(e.NewValue as IList<object>)));
 
 
         protected override void OnAttached()
@@ -92,7 +99,7 @@
             Initialize();
         }
 
-        private void Properties_Changed(IList<object> propertyGroups)
+        private void Properties_Changed([CanBeNull] IList<object> propertyGroups)
         {
             if (propertyGroups == null)
                 return;
@@ -155,9 +162,11 @@
             }
         }
 
+        [NotNull]
         private DataGridColumn CreateColumn([NotNull] ProjectPropertyName projectPropertyName)
         {
             Contract.Requires(projectPropertyName != null);
+            Contract.Ensures(Contract.Result<DataGridColumn>() != null);
 
             var column = new DataGridTextColumn
             {
@@ -177,14 +186,16 @@
             return column;
         }
 
-        private static int GetDisplayIndex(ProjectPropertyName projectPropertyName, Configuration configuration)
+        private static int GetDisplayIndex([CanBeNull] ProjectPropertyName projectPropertyName, [CanBeNull] Configuration configuration)
         {
             if ((projectPropertyName == null) || (configuration == null))
                 return -1;
 
-            string[] propertyColumnOrder;
+            var columnOrder = configuration.PropertyColumnOrder;
+            if (columnOrder == null)
+                return -1;
 
-            if (!configuration.PropertyColumnOrder.TryGetValue(projectPropertyName.GroupName.Name, out propertyColumnOrder) || (propertyColumnOrder == null))
+            if (!columnOrder.TryGetValue(projectPropertyName.GroupName.Name, out string[] propertyColumnOrder) || (propertyColumnOrder == null))
                 return -1;
 
             var index = propertyColumnOrder.IndexOf(projectPropertyName.Name);
@@ -197,7 +208,7 @@
             [NotNull]
             private readonly DataGridColumn _column;
 
-            public ColumInfo([NotNull] DataGridColumn column, Configuration configuration)
+            public ColumInfo([NotNull] DataGridColumn column, [CanBeNull] Configuration configuration)
             {
                 Contract.Requires(column != null);
 
@@ -244,10 +255,10 @@
                 dataGrid.Columns
                     .Skip(frozenColumnCount)
                     .Select(col => new ColumInfo(col, _configuration))
-                    .Where(item => item.ProjectPropertyName != null)
+                    .Where(col => col.ProjectPropertyName != null)
                     .OrderBy(col => col.ProjectPropertyName.GroupName.Index)
                     .ThenBy(col => col.DisplayIndex)
-                    .ForEach(item => item.Column.DisplayIndex = nextIndex++);
+                    .ForEach(col => col.Column.DisplayIndex = nextIndex++);
             }
             catch (Exception ex)
             {
@@ -273,8 +284,7 @@
                     .Where(property => property != null)
                     .GroupBy(property => property.GroupName);
 
-                var propertyColumnOrder = _configuration.PropertyColumnOrder;
-                var hasChanged = false;
+                var propertyColumnOrder = _configuration.PropertyColumnOrder ?? ImmutableDictionary<string, string[]>.Empty;
 
                 foreach (var group in columnsByGroup)
                 {
@@ -284,18 +294,11 @@
 
                     var columnNames = group.Select(property => property.Name).ToArray();
 
-                    string[] current;
-
-                    if (propertyColumnOrder.TryGetValue(groupName, out current) && (current?.SequenceEqual(columnNames) == true))
+                    if (propertyColumnOrder.TryGetValue(groupName, out string[] current) && (current?.SequenceEqual(columnNames) == true))
                         continue;
 
-                    propertyColumnOrder[groupName] = columnNames;
-                    hasChanged = true;
+                    _configuration.PropertyColumnOrder = propertyColumnOrder.SetItem(groupName, columnNames);
                 }
-
-                if (hasChanged)
-                    _configuration.Save();
-
             }
             catch (Exception ex)
             {

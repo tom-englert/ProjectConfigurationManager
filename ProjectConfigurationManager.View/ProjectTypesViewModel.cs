@@ -1,10 +1,8 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace tomenglertde.ProjectConfigurationManager.View
+﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System.Collections;
-    using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows.Input;
 
@@ -20,18 +18,18 @@ namespace tomenglertde.ProjectConfigurationManager.View
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 3)]
     class ProjectTypesViewModel : ObservableObject
     {
-        private readonly Solution _solution;
-
-        public ProjectTypesViewModel(Solution solution)
+        public ProjectTypesViewModel([NotNull] Solution solution)
         {
-            _solution = solution;
+            Solution = solution;
         }
 
-        public Solution Solution => _solution;
+        [NotNull]
+        public Solution Solution { get; }
 
+        [NotNull]
         public ICommand UnloadProjectsCommand => new DelegateCommand<IEnumerable>(UnloadProjects);
 
-        private void UnloadProjects([NotNull] IEnumerable projects)
+        private static void UnloadProjects([NotNull] IEnumerable projects)
         {
             Contract.Requires(projects != null);
 

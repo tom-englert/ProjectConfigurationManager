@@ -85,7 +85,7 @@
             _deferredUpdateThrottle.Tick();
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ObservableCollection<Project> Projects
         {
             get
@@ -95,7 +95,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ObservableCollection<SolutionConfiguration> SolutionConfigurations
         {
             get
@@ -105,7 +105,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IObservableCollection<ProjectConfiguration> ProjectConfigurations
         {
             get
@@ -340,7 +340,6 @@
 
             foreach (var projectHierarchy in GetProjectsInSolution(solution, __VSENUMPROJFLAGS.EPF_ALLINSOLUTION))
             {
-                Uri projectUri;
 
                 string fullName = null;
                 var vsProject = projectHierarchy as IVsProject;
@@ -352,8 +351,8 @@
                     projectHierarchy.GetCanonicalName(VSConstants.VSITEMID_ROOT, out fullName);
                 }
 
-                // Skip web pojects, we can't edit them.
-                if (!Uri.TryCreate(fullName, UriKind.Absolute, out projectUri) || !projectUri.IsFile || !File.Exists(fullName))
+                // Skip web projects, we can't edit them.
+                if (!Uri.TryCreate(fullName, UriKind.Absolute, out Uri projectUri) || !projectUri.IsFile || !File.Exists(fullName))
                     continue;
 
                 var existing = _projects.FirstOrDefault(p => string.Equals(p.FullName, fullName, StringComparison.OrdinalIgnoreCase));
@@ -370,22 +369,20 @@
         }
 
         [NotNull, ItemNotNull]
-        private static IEnumerable<IVsHierarchy> GetProjectsInSolution(IVsSolution solution, __VSENUMPROJFLAGS flags)
+        private static IEnumerable<IVsHierarchy> GetProjectsInSolution([CanBeNull] IVsSolution solution, __VSENUMPROJFLAGS flags)
         {
             Contract.Ensures(Contract.Result<IEnumerable<IVsHierarchy>>() != null);
 
             if (solution == null)
                 yield break;
 
-            IEnumHierarchies enumHierarchies;
             var guid = Guid.Empty;
-            solution.GetProjectEnum((uint)flags, ref guid, out enumHierarchies);
+            solution.GetProjectEnum((uint)flags, ref guid, out IEnumHierarchies enumHierarchies);
             if (enumHierarchies == null)
                 yield break;
 
             var hierarchy = new IVsHierarchy[1];
-            uint fetched;
-            while (enumHierarchies.Next(1, hierarchy, out fetched) == VSConstants.S_OK && fetched == 1)
+            while (enumHierarchies.Next(1, hierarchy, out uint fetched) == VSConstants.S_OK && fetched == 1)
             {
                 if (hierarchy.Length > 0 && hierarchy[0] != null)
                     yield return hierarchy[0];

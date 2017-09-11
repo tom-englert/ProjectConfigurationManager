@@ -65,7 +65,7 @@
 
     public class ProjectDependencyGroup : ObservableObject
     {
-        public ProjectDependencyGroup(string name, [NotNull] IList<ProjectDependency> items)
+        public ProjectDependencyGroup([NotNull] string name, [NotNull, ItemNotNull] IList<ProjectDependency> items)
         {
             Contract.Requires(items != null);
 
@@ -73,8 +73,10 @@
             Name = name;
         }
 
+        [NotNull]
         public string Name { get; }
 
+        [NotNull, ItemNotNull]
         public ICollectionView Items { get; }
     }
 
@@ -82,15 +84,10 @@
     {
         [NotNull]
         private readonly ProjectDependenciesViewModel _model;
-        [NotNull]
-        private readonly Project _project;
         [NotNull, ItemNotNull]
         private readonly IList<ProjectDependency> _children;
 
-        private bool _isSelected;
-        private bool _isProjectSelected;
-
-        public ProjectDependency([NotNull] ProjectDependenciesViewModel model, ProjectDependency parent, [NotNull] Project project, [NotNull] Func<Project, IList<Project>> getChildProjectsCallback)
+        public ProjectDependency([NotNull] ProjectDependenciesViewModel model, [CanBeNull] ProjectDependency parent, [NotNull] Project project, [NotNull] Func<Project, IList<Project>> getChildProjectsCallback)
         {
             Contract.Requires(model != null);
             Contract.Requires(project != null);
@@ -99,7 +96,7 @@
             _model = model;
 
             Level = (parent?.Level ?? -1) + 1;
-            _project = project;
+            Project = project;
 
             _children = GetChildren(project, getChildProjectsCallback);
 
@@ -107,47 +104,23 @@
         }
 
         [NotNull]
-        public Project Project
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Project>() != null);
-                return _project;
-            }
-        }
+        public Project Project { get; }
 
         public ICollectionView Children { get; }
 
         public int Level { get; }
 
-        public bool IsSelected
+        public bool IsSelected { get; set; }
+
+        [UsedImplicitly]
+        private void OnIsSelectedChanged()
         {
-            get
-            {
-                return _isSelected;
-            }
-            set
-            {
-                if (SetProperty(ref _isSelected, value))
-                {
-                    _model.UpdateSelection(_project, value);
-                }
-            }
+            _model.UpdateSelection(Project, IsSelected);
         }
 
-        public bool IsProjectSelected
-        {
-            get
-            {
-                return _isProjectSelected;
-            }
-            set
-            {
-                SetProperty(ref _isProjectSelected, value);
-            }
-        }
+        public bool IsProjectSelected { get; set; }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IEnumerable<ProjectDependency> DescendantsAndSelf
         {
             get
@@ -178,7 +151,7 @@
 
         public override string ToString()
         {
-            return _project.Name;
+            return Project.Name;
         }
 
         [ContractInvariantMethod]
@@ -186,7 +159,7 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_project != null);
+            Contract.Invariant(Project != null);
             Contract.Invariant(_model != null);
             Contract.Invariant(_children != null);
         }

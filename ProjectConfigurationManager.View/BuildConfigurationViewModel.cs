@@ -23,54 +23,43 @@
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 1)]
     class BuildConfigurationViewModel : ObservableObject
     {
-        [NotNull]
-        private readonly Solution _solution;
-        [NotNull]
-        private readonly ICollection<ProjectConfiguration> _selectedConfigurations = new ObservableCollection<ProjectConfiguration>();
-
         [ImportingConstructor]
         public BuildConfigurationViewModel([NotNull] Solution solution)
         {
             Contract.Requires(solution != null);
 
-            _solution = solution;
+            Solution = solution;
         }
 
         [NotNull]
-        public Solution Solution
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Solution>() != null);
+        public Solution Solution { get; }
 
-                return _solution;
-            }
-        }
+        [NotNull]
+        public ICollection<ProjectConfiguration> SelectedConfigurations { get; } = new ObservableCollection<ProjectConfiguration>();
 
-        public ICollection<ProjectConfiguration> SelectedConfigurations => _selectedConfigurations;
-
+        [NotNull]
         public ICommand DeleteCommand => new DelegateCommand(CanDelete, Delete);
 
         private void Delete()
         {
-            var configurations = _selectedConfigurations.ToArray();
+            var configurations = SelectedConfigurations.ToArray();
 
             configurations.ForEach(c => c.Delete());
 
-            _solution.Update();
+            Solution.Update();
         }
 
         private bool CanDelete()
         {
-            var canEditAllFiles = _selectedConfigurations
+            var canEditAllFiles = SelectedConfigurations
                 .Select(cfg => cfg.Project)
                 .Distinct()
                 .All(prj => prj.CanEdit());
 
-            var shouldNotBuildAny = _selectedConfigurations
+            var shouldNotBuildAny = SelectedConfigurations
                 .All(cfg => !cfg.ShouldBuildInAnyConfiguration());
 
-            return _selectedConfigurations.Any()
+            return SelectedConfigurations.Any()
                    && canEditAllFiles
                    && shouldNotBuildAny;
         }
@@ -80,8 +69,8 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_solution != null);
-            Contract.Invariant(_selectedConfigurations != null);
+            Contract.Invariant(Solution != null);
+            Contract.Invariant(SelectedConfigurations != null);
         }
     }
 }
