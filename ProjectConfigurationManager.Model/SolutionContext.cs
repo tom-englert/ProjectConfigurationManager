@@ -13,11 +13,7 @@
         [NotNull]
         private readonly Solution _solution;
         [NotNull]
-        private readonly SolutionConfiguration _solutionConfiguration;
-        [NotNull]
         private readonly EnvDTE.SolutionContext _context;
-        private string _configurationName;
-        private string _platformName;
 
         public SolutionContext([NotNull] Solution solution, [NotNull] SolutionConfiguration solutionConfiguration, [NotNull] EnvDTE.SolutionContext context)
         {
@@ -26,38 +22,19 @@
             Contract.Requires(context != null);
 
             _solution = solution;
-            _solutionConfiguration = solutionConfiguration;
+            SolutionConfiguration = solutionConfiguration;
             _context = context;
 
-            _configurationName = context.ConfigurationName;
-            _platformName = context.PlatformName;
-
+            ConfigurationName = context.ConfigurationName;
+            PlatformName = context.PlatformName;
             ProjectName = context.ProjectName;
         }
 
-        public string ConfigurationName
-        {
-            get
-            {
-                return _configurationName;
-            }
-            set
-            {
-                SetProperty(ref _configurationName, value);
-            }
-        }
+        [CanBeNull]
+        public string ConfigurationName { get; set; }
 
-        public string PlatformName
-        {
-            get
-            {
-                return _platformName;
-            }
-            set
-            {
-                SetProperty(ref _platformName, value);
-            }
-        }
+        [CanBeNull]
+        public string PlatformName { get; set; }
 
         public bool SetConfiguration([NotNull] ProjectConfiguration configuration)
         {
@@ -77,37 +54,22 @@
             return true;
         }
 
-        public string ProjectName
-        {
-            get;
-        }
+        public string ProjectName { get; }
 
         public bool ShouldBuild
         {
-            get
-            {
-                return ContextIsValid() && _context.ShouldBuild;
-            }
+            get => ContextIsValid() && _context.ShouldBuild;
             set
             {
                 if (!ContextIsValid())
                     return;
 
                 _context.ShouldBuild = value;
-
-                OnPropertyChanged();
             }
         }
 
         [NotNull]
-        public SolutionConfiguration SolutionConfiguration
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<SolutionConfiguration>() != null);
-                return _solutionConfiguration;
-            }
-        }
+        public SolutionConfiguration SolutionConfiguration { get; }
 
         private bool ContextIsValid()
         {
@@ -188,7 +150,7 @@
         private void ObjectInvariant()
         {
             Contract.Invariant(_solution != null);
-            Contract.Invariant(_solutionConfiguration != null);
+            Contract.Invariant(SolutionConfiguration != null);
             Contract.Invariant(_context != null);
         }
     }
