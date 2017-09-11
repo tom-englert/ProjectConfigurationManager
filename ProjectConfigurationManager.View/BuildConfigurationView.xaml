@@ -7,7 +7,7 @@
              xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
              xmlns:toms="urn:TomsToolbox"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
-             xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles;assembly=TomsToolbox.WpfStyles"
+             xmlns:styles="urn:TomsToolbox.Wpf.Styles"
              d:DataContext="{d:DesignInstance view:BuildConfigurationViewModel}">
   <UserControl.Resources>
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" />

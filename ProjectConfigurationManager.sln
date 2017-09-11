@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6FC4892-8BFD-44DA-A727-E8505C72E698}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,8 +17,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectConfigurationManager.View", "ProjectConfigurationManager.View\ProjectConfigurationManager.View.csproj", "{C116A68F-DF72-4738-86B7-EE28C87E08BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectConfigurationManager.Model", "ProjectConfigurationManager.Model\ProjectConfigurationManager.Model.csproj", "{821890AC-A0BE-41E6-B1CA-FF0E1075265F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TomsToolbox.WpfStyles", "TomsToolbox.Wpf.Styles\TomsToolbox.WpfStyles.csproj", "{E5D732D2-0294-48FD-8314-63DC1A9155FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,10 +36,6 @@ Global
 		{821890AC-A0BE-41E6-B1CA-FF0E1075265F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{821890AC-A0BE-41E6-B1CA-FF0E1075265F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{821890AC-A0BE-41E6-B1CA-FF0E1075265F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5D732D2-0294-48FD-8314-63DC1A9155FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5D732D2-0294-48FD-8314-63DC1A9155FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5D732D2-0294-48FD-8314-63DC1A9155FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5D732D2-0294-48FD-8314-63DC1A9155FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

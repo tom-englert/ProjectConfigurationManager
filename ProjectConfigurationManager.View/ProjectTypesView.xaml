@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:dgx="clr-namespace:DataGridExtensions;assembly=DataGridExtensions"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
-             xmlns:styles="clr-namespace:TomsToolbox.Wpf.Styles;assembly=TomsToolbox.WpfStyles"
+             xmlns:styles="urn:TomsToolbox.Wpf.Styles"
              d:DataContext="{d:DesignInstance local:ProjectTypesViewModel}">
   <Grid Margin="10">
     <DataGrid x:Name="DataGrid"
