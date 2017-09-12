@@ -3,6 +3,7 @@
     using System.Collections;
     using System.Collections.Specialized;
     using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Windows;
@@ -21,17 +22,19 @@
 
     static class BuildConfigurationColumnsManager
     {
+        [NotNull]
         private static readonly DependencyProperty _solutionConfigurationProperty =
             DependencyProperty.RegisterAttached("SolutionConfiguration", typeof(SolutionConfiguration), typeof(BuildConfigurationColumnsManager), new FrameworkPropertyMetadata(null));
 
 
+        [CanBeNull]
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
         public static ICollection GetConfigurations([NotNull] DependencyObject obj)
         {
             Contract.Requires(obj != null);
             return (ICollection)obj.GetValue(ConfigurationsProperty);
         }
-        public static void SetConfigurations([NotNull] DependencyObject obj, ICollection value)
+        public static void SetConfigurations([NotNull] DependencyObject obj, [CanBeNull] ICollection value)
         {
             Contract.Requires(obj != null);
             obj.SetValue(ConfigurationsProperty, value);
@@ -43,19 +46,16 @@
         /// <summary>
         /// </summary>
         /// </AttachedPropertyComments>
+        [NotNull]
         public static readonly DependencyProperty ConfigurationsProperty =
             DependencyProperty.RegisterAttached("Configurations", typeof(ICollection), typeof(BuildConfigurationColumnsManager), new FrameworkPropertyMetadata(null, Configurations_Changed));
 
-        private static void Configurations_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void Configurations_Changed([NotNull] DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var dataGrid = (DataGrid)d;
-            if (dataGrid == null)
-                return;
-
-            Register(dataGrid, (ICollection)e.NewValue);
+            Register((DataGrid)d, (ICollection)e.NewValue);
         }
 
-        private static void Register([NotNull] DataGrid dataGrid, ICollection configurations)
+        private static void Register([NotNull] DataGrid dataGrid, [CanBeNull] ICollection configurations)
         {
             Contract.Requires(dataGrid != null);
 
@@ -64,10 +64,13 @@
 
             dataGrid.Columns.AddRange(configurations.OfType<SolutionConfiguration>().Select(CreateColumn));
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             ((INotifyCollectionChanged)configurations).CollectionChanged += (sender, e) => SolutionConfigurations_CollectionChanged(dataGrid, e);
         }
 
         [ContractVerification(false)]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         private static void SolutionConfigurations_CollectionChanged([NotNull] DataGrid dataGrid, [NotNull] NotifyCollectionChangedEventArgs e)
         {
             Contract.Requires(dataGrid != null);
@@ -100,10 +103,12 @@
             };
 
             var visualTree = new FrameworkElementFactory(typeof(CheckBox));
+            // ReSharper disable AssignNullToNotNullAttribute
             visualTree.SetValue(ToggleButton.IsThreeStateProperty, true);
             visualTree.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
             visualTree.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
             visualTree.SetBinding(ToggleButton.IsCheckedProperty, binding);
+            // ReSharper restore AssignNullToNotNullAttribute
 
             var column = new DataGridTemplateColumn
             {

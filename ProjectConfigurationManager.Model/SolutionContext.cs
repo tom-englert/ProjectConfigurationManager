@@ -78,7 +78,7 @@
                 return true;
 
             // This context is no longer valid, schedule a solution update and return false...
-            Dispatcher.BeginInvoke(() => _solution.Update());
+            _solution.Update();
             return false;
         }
 

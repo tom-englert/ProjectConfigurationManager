@@ -16,13 +16,13 @@
 
     using JetBrains.Annotations;
 
+    using Throttle;
+
     using TomsToolbox.Wpf;
 
     [TemplatePart(Name = "PART_ListBox", Type = typeof(ListBox))]
     public abstract class MultipleChoiceFilterBase : Control
     {
-        [NotNull]
-        private readonly DispatcherThrottle _updateSourceValuesTargetThrottle;
         private ListBox _listBox;
 
         static MultipleChoiceFilterBase()
@@ -32,21 +32,19 @@
 
         protected MultipleChoiceFilterBase()
         {
-            _updateSourceValuesTargetThrottle = new DispatcherThrottle(() => BindingOperations.GetBindingExpression(this, SourceValuesProperty)?.UpdateTarget());
-
             Values = new ObservableCollection<string>();
-
         }
 
         public MultipleChoiceContentFilterBase Filter
         {
-            get { return (MultipleChoiceContentFilterBase)GetValue(FilterProperty); }
-            set { SetValue(FilterProperty, value); }
+            get => (MultipleChoiceContentFilterBase)GetValue(FilterProperty);
+            set => SetValue(FilterProperty, value);
         }
+        [NotNull]
         public static readonly DependencyProperty FilterProperty =
             DependencyProperty.Register("Filter", typeof(MultipleChoiceContentFilterBase), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (sender, e) => ((MultipleChoiceFilterBase)sender).Filter_Changed()));
 
-
+        [NotNull]
         private static readonly DependencyProperty SourceValuesProperty =
             DependencyProperty.Register("SourceValues", typeof(IList<string>), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(null, (sender, e) => ((MultipleChoiceFilterBase)sender).SourceValues_Changed((IList<string>)e.NewValue)));
 
@@ -59,15 +57,19 @@
         public IList<string> Values
         {
             // ReSharper disable once AssignNullToNotNullAttribute
-            get { return (IList<string>)GetValue(ValuesProperty); }
-            private set { SetValue(ValuesPropertyKey, value); }
+            get => (IList<string>)GetValue(ValuesProperty);
+            private set => SetValue(ValuesPropertyKey, value);
         }
+        [NotNull]
         private static readonly DependencyPropertyKey ValuesPropertyKey =
             DependencyProperty.RegisterReadOnly("Values", typeof(IList<string>), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata());
+        [NotNull]
         public static readonly DependencyProperty ValuesProperty = ValuesPropertyKey.DependencyProperty;
 
 
-        /// <summary>When overridden in a derived class, is invoked whenever application code or internal processes call <see cref="M:System.Windows.FrameworkElement.ApplyTemplate" />.</summary>
+        /// <summary>
+        /// When overridden in a derived class, is invoked whenever application code or internal processes call <see cref="M:System.Windows.FrameworkElement.ApplyTemplate" />.
+        /// </summary>
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -83,7 +85,7 @@
                 return;
 
             var dataGridItems = (INotifyCollectionChanged)dataGrid.Items;
-            dataGridItems.CollectionChanged += (_, __) => _updateSourceValuesTargetThrottle.Tick();
+            dataGridItems.CollectionChanged += (_, __) => UpdateSourceValuesTarget();
 
             _listBox = Template?.FindName("PART_ListBox", this) as ListBox;
             if (_listBox == null)
@@ -151,6 +153,12 @@
             Filter = CreateFilter(areAllItemsSelected ? null : selectedItems);
         }
 
+        [Throttled(typeof(DispatcherThrottle))]
+        private void UpdateSourceValuesTarget()
+        {
+            BindingOperations.GetBindingExpression(this, SourceValuesProperty)?.UpdateTarget();
+        }
+
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
@@ -162,11 +170,12 @@
 
     public abstract class MultipleChoiceContentFilterBase : IContentFilter
     {
-        protected MultipleChoiceContentFilterBase(IEnumerable<string> items)
+        protected MultipleChoiceContentFilterBase([CanBeNull] IEnumerable<string> items)
         {
             Items = items?.ToArray();
         }
 
+        [CanBeNull]
         public IList<string> Items
         {
             get;

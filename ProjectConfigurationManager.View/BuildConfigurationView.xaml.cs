@@ -27,7 +27,7 @@
             InitializeComponent();
         }
 
-        private void ConfirmedCommandConverter_Error(object sender, ErrorEventArgs e)
+        private void ConfirmedCommandConverter_Error([NotNull] object sender, [NotNull] ErrorEventArgs e)
         {
             var exception = e.GetException();
             if (exception == null)

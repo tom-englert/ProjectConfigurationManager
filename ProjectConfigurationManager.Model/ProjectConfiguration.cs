@@ -73,7 +73,9 @@
             var properties = projectFile
                 .GetPropertyGroups(Configuration, Platform)
                 .SelectMany(group => group.Properties)
+                // ReSharper disable once PossibleNullReferenceException
                 .Distinct(new DelegateEqualityComparer<IProjectProperty>(property => property.Name))
+                // ReSharper disable once PossibleNullReferenceException
                 .ToDictionary(property => property.Name);
 
             _properties = new Dictionary<string, IProjectProperty>(properties);
@@ -124,7 +126,10 @@
 
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        _projectConfiguration.Project.SpecificProjectConfigurations.ForEach(pc => pc.OnPropertyChanged(nameof(ShouldBuild)));
+                        foreach (var configuration in _projectConfiguration.Project.SpecificProjectConfigurations)
+                        {
+                            configuration.OnPropertyChanged(nameof(ShouldBuild));
+                        }
                     });
                 }
             }
@@ -152,10 +157,7 @@
 
             public string this[string propertyName]
             {
-                get
-                {
-                    return _projectConfiguration.Properties.GetValueOrDefault(propertyName)?.Value;
-                }
+                get => _projectConfiguration.Properties.GetValueOrDefault(propertyName)?.Value;
                 set
                 {
                     if (!_projectConfiguration.Properties.TryGetValue(propertyName, out IProjectProperty property) || (property == null))

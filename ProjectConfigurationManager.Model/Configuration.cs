@@ -1,7 +1,6 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.ComponentModel;
     using System.ComponentModel.Composition;
@@ -14,8 +13,6 @@
     using JetBrains.Annotations;
 
     using Newtonsoft.Json;
-
-    using TomsToolbox.Desktop;
 
     [Export]
     public sealed class Configuration : INotifyPropertyChanged

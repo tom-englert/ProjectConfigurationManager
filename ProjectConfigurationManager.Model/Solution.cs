@@ -10,12 +10,15 @@
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Windows.Input;
     using System.Windows.Threading;
 
     using JetBrains.Annotations;
 
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell.Interop;
+
+    using Throttle;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
@@ -25,27 +28,11 @@
     public class Solution : ObservableObject, IServiceProvider
     {
         [NotNull]
-        private readonly DispatcherThrottle _deferredUpdateThrottle;
-        [NotNull]
-        private readonly ITracer _tracer;
-        [NotNull]
         private readonly IVsServiceProvider _serviceProvider;
         [NotNull]
         private readonly PerformanceTracer _performanceTracer;
 
-        [NotNull]
-        private readonly ObservableCollection<Project> _projects = new ObservableCollection<Project>();
-        [NotNull]
-        private readonly ObservableCollection<SolutionConfiguration> _configurations = new ObservableCollection<SolutionConfiguration>();
-        [NotNull]
-        private readonly IObservableCollection<ProjectConfiguration> _specificProjectConfigurations;
-        [NotNull]
-        private readonly IObservableCollection<ProjectConfiguration> _projectConfigurations;
-        [NotNull]
-        private readonly ObservableCollection<ProjectPropertyName> _projectProperties = new ObservableCollection<ProjectPropertyName>();
-        [NotNull]
-        private readonly ObservableCollection<string> _projectTypeGuids = new ObservableCollection<string>();
-
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable => need to hold a ref to events
         private readonly EnvDTE.SolutionEvents _solutionEvents;
 
         private FileSystemWatcher _fileSystemWatcher;
@@ -57,14 +44,12 @@
             Contract.Requires(serviceProvider != null);
             Contract.Requires(performanceTracer != null);
 
-            _deferredUpdateThrottle = new DispatcherThrottle(DispatcherPriority.ApplicationIdle, Update);
-
-            _tracer = tracer;
+            Tracer = tracer;
             _serviceProvider = serviceProvider;
             _performanceTracer = performanceTracer;
 
-            _specificProjectConfigurations = _projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
-            _projectConfigurations = _projects.ObservableSelectMany(prj => prj.ProjectConfigurations);
+            SpecificProjectConfigurations = Projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
+            ProjectConfigurations = Projects.ObservableSelectMany(prj => prj.ProjectConfigurations);
 
             _solutionEvents = Dte?.Events?.SolutionEvents;
             if (_solutionEvents != null)
@@ -76,85 +61,40 @@
                 _solutionEvents.ProjectRenamed += (_, __) => Solution_Changed("Project renamed");
             }
 
+            Update(0);
+
+            CommandManager.RequerySuggested += (_, __) => Projects.ForEach(proj => proj?.InvalidateState());
+        }
+
+        private void Solution_Changed([NotNull] string action)
+        {
+            Tracer.WriteLine(action);
+
             Update();
         }
 
-        private void Solution_Changed(string action)
-        {
-            _tracer.WriteLine(action);
-            _deferredUpdateThrottle.Tick();
-        }
+        [NotNull, ItemNotNull]
+        public ObservableCollection<Project> Projects { get; } = new ObservableCollection<Project>();
 
         [NotNull, ItemNotNull]
-        public ObservableCollection<Project> Projects
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ObservableCollection<Project>>() != null);
-                return _projects;
-            }
-        }
+        public ObservableCollection<SolutionConfiguration> SolutionConfigurations { get; } = new ObservableCollection<SolutionConfiguration>();
 
         [NotNull, ItemNotNull]
-        public ObservableCollection<SolutionConfiguration> SolutionConfigurations
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ObservableCollection<SolutionConfiguration>>() != null);
-                return _configurations;
-            }
-        }
-
-        [NotNull, ItemNotNull]
-        public IObservableCollection<ProjectConfiguration> ProjectConfigurations
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IObservableCollection<ProjectConfiguration>>() != null);
-                return _projectConfigurations;
-            }
-        }
+        public IObservableCollection<ProjectConfiguration> ProjectConfigurations { get; }
 
         [NotNull]
-        public ITracer Tracer
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ITracer>() != null);
-                return _tracer;
-            }
-        }
+        public ITracer Tracer { get; }
 
         [NotNull]
-        public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IObservableCollection<ProjectConfiguration>>() != null);
-                return _specificProjectConfigurations;
-            }
-        }
+        public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations { get; }
 
         [NotNull]
-        public ObservableCollection<ProjectPropertyName> ProjectProperties
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ObservableCollection<ProjectPropertyName>>() != null);
-                return _projectProperties;
-            }
-        }
+        public ObservableCollection<ProjectPropertyName> ProjectProperties { get; } = new ObservableCollection<ProjectPropertyName>();
 
         [NotNull]
-        public ObservableCollection<string> ProjectTypeGuids
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<ObservableCollection<string>>() != null);
-                return _projectTypeGuids;
-            }
-        }
+        public ObservableCollection<string> ProjectTypeGuids { get; } = new ObservableCollection<string>();
 
+        [CanBeNull]
         public string SolutionFolder
         {
             get
@@ -168,23 +108,26 @@
                 }
                 catch
                 {
+                    // solution not available
                 }
 
                 return null;
             }
         }
 
-        public object GetService(Type serviceType)
+        [CanBeNull]
+        public object GetService([NotNull] Type serviceType)
         {
             return _serviceProvider.GetService(serviceType);
         }
 
+        [Throttled(typeof(DispatcherThrottle), (int)DispatcherPriority.ApplicationIdle)]
         public void Update()
         {
             Update(0);
         }
 
-        public void Update(int retry)
+        private void Update(int retry)
         {
             using (_performanceTracer.Start("Update"))
             {
@@ -195,13 +138,13 @@
                 }
                 catch (RetryException)
                 {
-                    _tracer.WriteLine("Retry Update...");
+                    Tracer.WriteLine("Retry Update...");
                     // could not access the project file, retry later...
                     Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () => Update(retry + 1));
                 }
                 catch (Exception ex)
                 {
-                    _tracer.TraceError(ex);
+                    Tracer.TraceError(ex);
                 }
             }
         }
@@ -233,20 +176,20 @@
             }
             catch (Exception ex)
             {
-                _tracer.TraceError(ex);
+                Tracer.TraceError(ex);
             }
         }
 
-        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        private void Watcher_Changed([NotNull] object sender, [NotNull] FileSystemEventArgs e)
         {
             Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e, 0));
         }
 
-        private void DeferredOnWatcherChanged(FileSystemEventArgs e, int retry)
+        private void DeferredOnWatcherChanged([NotNull] FileSystemEventArgs e, int retry)
         {
             try
             {
-                var project = _projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
+                var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
 
                 if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
                     return;
@@ -277,19 +220,19 @@
                     Dispatcher.BeginInvoke(DispatcherPriority.Background, () => DeferredOnWatcherChanged(e, retry + 1));
                 }
 
-                _tracer.TraceError(ex);
+                Tracer.TraceError(ex);
             }
         }
 
         private void SynchronizeCollections(bool retryOnErrors)
         {
-            _projects.SynchronizeWith(GetProjects(retryOnErrors).ToArray());
+            Projects.SynchronizeWith(GetProjects(retryOnErrors).ToArray());
 
-            _configurations.SynchronizeWith(GetConfigurations().ToArray());
+            SolutionConfigurations.SynchronizeWith(GetConfigurations().ToArray());
 
-            _projectProperties.SynchronizeWith(GetProjectProperties().ToArray());
+            ProjectProperties.SynchronizeWith(GetProjectProperties().ToArray());
 
-            _projectTypeGuids.SynchronizeWith(_projects.SelectMany(p => p.ProjectTypeGuids).ToArray());
+            ProjectTypeGuids.SynchronizeWith(Projects.SelectMany(p => p.ProjectTypeGuids).ToArray());
 
             UpdateReferences();
         }
@@ -298,12 +241,12 @@
         {
             var dependencies = new Dictionary<Project, IList<Project>>();
 
-            foreach (var project in _projects)
+            foreach (var project in Projects)
             {
-                project?.UpdateReferences();
+                project.UpdateReferences();
             }
 
-            foreach (var project in _projects)
+            foreach (var project in Projects)
             {
                 Contract.Assume(project != null);
                 foreach (var dependency in project.References)
@@ -313,7 +256,7 @@
                 }
             }
 
-            foreach (var project in _projects)
+            foreach (var project in Projects)
             {
                 Contract.Assume(project != null);
                 var dependentProjects = dependencies.ForceValue(project, _ => new List<Project>());
@@ -342,6 +285,7 @@
             {
 
                 string fullName = null;
+                // ReSharper disable once SuspiciousTypeConversion.Global
                 var vsProject = projectHierarchy as IVsProject;
                 vsProject?.GetMkDocument(VSConstants.VSITEMID_ROOT, out fullName);
 
@@ -355,14 +299,14 @@
                 if (!Uri.TryCreate(fullName, UriKind.Absolute, out Uri projectUri) || !projectUri.IsFile || !File.Exists(fullName))
                     continue;
 
-                var existing = _projects.FirstOrDefault(p => string.Equals(p.FullName, fullName, StringComparison.OrdinalIgnoreCase));
+                var existing = Projects.FirstOrDefault(p => string.Equals(p.FullName, fullName, StringComparison.OrdinalIgnoreCase));
                 if (existing != null)
                 {
                     existing.Reload(projectHierarchy);
                     yield return existing;
                 }
 
-                var project = Project.Create(this, fullName, projectHierarchy, retryOnErrors, _tracer);
+                var project = Project.Create(this, fullName, projectHierarchy, retryOnErrors, Tracer);
                 if (project != null)
                     yield return project;
             }
@@ -390,11 +334,13 @@
         }
 
         [NotNull]
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private IEnumerable<ProjectPropertyName> GetProjectProperties()
         {
             Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyName>>() != null);
 
-            return _projects
+            return Projects
                 .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties.Values))
                 .Select(prop => prop.Name)
                 .Distinct()
@@ -404,17 +350,20 @@
         }
 
         // ReSharper disable once SuspiciousTypeConversion.Global
+        [CanBeNull]
         private EnvDTE80.Solution2 DteSolution => Dte?.Solution as EnvDTE80.Solution2;
 
+        [CanBeNull]
         private EnvDTE80.DTE2 Dte => _serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
 
+        [CanBeNull, UsedImplicitly]
         private EnvDTE.Globals Globals
         {
             get
             {
                 var solution = DteSolution;
                 var fullName = solution?.FullName;
-                return string.IsNullOrEmpty(fullName) ? null : solution?.Globals;
+                return string.IsNullOrEmpty(fullName) ? null : solution.Globals;
             }
         }
 
@@ -423,16 +372,15 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_deferredUpdateThrottle != null);
-            Contract.Invariant(_tracer != null);
+            Contract.Invariant(Tracer != null);
             Contract.Invariant(_serviceProvider != null);
             Contract.Invariant(_performanceTracer != null);
-            Contract.Invariant(_projects != null);
-            Contract.Invariant(_configurations != null);
-            Contract.Invariant(_specificProjectConfigurations != null);
-            Contract.Invariant(_projectConfigurations != null);
-            Contract.Invariant(_projectProperties != null);
-            Contract.Invariant(_projectTypeGuids != null);
+            Contract.Invariant(Projects != null);
+            Contract.Invariant(SolutionConfigurations != null);
+            Contract.Invariant(SpecificProjectConfigurations != null);
+            Contract.Invariant(ProjectConfigurations != null);
+            Contract.Invariant(ProjectProperties != null);
+            Contract.Invariant(ProjectTypeGuids != null);
         }
     }
 }

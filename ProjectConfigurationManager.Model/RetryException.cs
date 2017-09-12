@@ -1,11 +1,16 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.Serialization;
 
+    using JetBrains.Annotations;
+
     [Serializable]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class RetryException : Exception
     {
+        [UsedImplicitly]
         public RetryException()
         {
         }

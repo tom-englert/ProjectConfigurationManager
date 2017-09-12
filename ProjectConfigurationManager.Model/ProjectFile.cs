@@ -54,15 +54,15 @@
             _projectGuid = solution.GetProjectGuid(project.ProjectHierarchy);
         }
 
-        [NotNull]
-        public IEnumerable<IProjectPropertyGroup> GetPropertyGroups(string configuration, string platform)
+        [NotNull, ItemNotNull]
+        public IEnumerable<IProjectPropertyGroup> GetPropertyGroups([CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Ensures(Contract.Result<IEnumerable<IProjectPropertyGroup>>() != null);
             return PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
         }
 
         [CanBeNull]
-        public IProjectProperty CreateProperty([NotNull] string propertyName, string configuration, string platform)
+        public IProjectProperty CreateProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(propertyName != null);
 
@@ -72,7 +72,7 @@
         }
 
         [CanBeNull]
-        private IProjectPropertyGroup CreateNewSpecificPropertyGroup(string configuration, string platform)
+        private IProjectPropertyGroup CreateNewSpecificPropertyGroup([CanBeNull] string configuration, [CanBeNull] string platform)
         {
             if (string.IsNullOrEmpty(configuration) || string.IsNullOrEmpty(platform))
                 return null;
@@ -81,7 +81,7 @@
                 return null;
 
             var lastGroupNode = Document.Descendants(_propertyGroupNodeName)
-                .LastOrDefault(node => node.Parent?.Name.LocalName == "Project");
+                .LastOrDefault(node => node?.Parent?.Name.LocalName == "Project");
 
             if (lastGroupNode == null)
                 return null;
@@ -99,13 +99,13 @@
             return group;
         }
 
-        public void DeleteProperty([NotNull] string propertyName, string configuration, string platform)
+        public void DeleteProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(propertyName != null);
 
             var item = GetPropertyGroups(configuration, platform)
                 .SelectMany(group => group.Properties)
-                .FirstOrDefault(property => property.Name == propertyName);
+                .FirstOrDefault(property => property?.Name == propertyName);
 
             item?.Delete();
         }
@@ -127,19 +127,19 @@
 
             var files = new[] { _project.FullName };
 
-            return (0 == service.QueryEditFiles(0, files.Length, files, null, null, out var editVerdict, out var moreInfo))
+            return (0 == service.QueryEditFiles(0, files.Length, files, null, null, out var editVerdict, out var _))
                 && (editVerdict == (uint)tagVSQueryEditResult.QER_EditOK);
         }
 
-        internal void DeleteConfiguration(string configuration, string platform)
+        internal void DeleteConfiguration([CanBeNull] string configuration, [CanBeNull] string platform)
         {
             var groupsToDelete = PropertyGroups
                 .Where(group => group.MatchesConfiguration(configuration, platform))
                 .ToArray();
 
-            _propertyGroups.RemoveRange(groupsToDelete);
+            _propertyGroups?.RemoveRange(groupsToDelete);
 
-            groupsToDelete.ForEach(group => group.Delete());
+            groupsToDelete.ForEach(group => group?.Delete());
 
             SaveChanges();
         }
@@ -276,7 +276,7 @@
             Contract.Ensures(Contract.Result<IList<IProjectPropertyGroup>>() != null);
 
             return Document.Descendants(_propertyGroupNodeName)
-                .Where(node => node.Parent?.Name.LocalName == "Project")
+                .Where(node => node?.Parent?.Name.LocalName == "Project")
                 .Select(node => new ProjectPropertyGroup(this, node))
                 .Cast<IProjectPropertyGroup>()
                 .ToList();
@@ -303,7 +303,7 @@
 
                 _properties = new ObservableCollection<ProjectProperty>(
                     _propertyGroupNode.Elements()
-                        .Where(node => node.GetAttribute(ConditionAttributeName) == null)
+                        .Where(node => node != null && node.GetAttribute(ConditionAttributeName) == null)
                         .Select(node => new ProjectProperty(projectFile, node)));
             }
 
@@ -333,6 +333,7 @@
                 return property;
             }
 
+            [CanBeNull]
             public string ConditionExpression => _propertyGroupNode.GetAttribute(ConditionAttributeName);
 
             public void Delete()

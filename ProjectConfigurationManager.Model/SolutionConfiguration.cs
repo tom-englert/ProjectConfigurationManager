@@ -18,12 +18,6 @@
         private readonly Solution _solution;
         [NotNull]
         private readonly EnvDTE80.SolutionConfiguration2 _solutionConfiguration;
-        [NotNull]
-        private readonly ObservableCollection<SolutionContext> _contexts = new ObservableCollection<SolutionContext>();
-        [NotNull]
-        private readonly string _name;
-        [NotNull]
-        private readonly string _platformName;
 
         internal SolutionConfiguration([NotNull] Solution solution, [NotNull] EnvDTE80.SolutionConfiguration2 solutionConfiguration)
         {
@@ -33,55 +27,31 @@
 
             _solution = solution;
             _solutionConfiguration = solutionConfiguration;
-            _name = _solutionConfiguration.Name;
-            _platformName = _solutionConfiguration.PlatformName;
+
+            // ReSharper disable AssignNullToNotNullAttribute
+            Name = _solutionConfiguration.Name;
+            PlatformName = _solutionConfiguration.PlatformName;
+            // ReSharper restore AssignNullToNotNullAttribute
 
             Update();
         }
 
-        [NotNull]
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _name;
-            }
-        }
+        [NotNull, UsedImplicitly]
+        public string Name { get; }
+
+        [NotNull, UsedImplicitly]
+        public string PlatformName { get; }
 
         [NotNull]
-        public string PlatformName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _platformName;
-            }
-        }
+        public string UniqueName => Name + "|" + PlatformName;
 
-        [NotNull]
-        public string UniqueName
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return Name + "|" + PlatformName;
-            }
-        }
+        [NotNull, ItemNotNull]
+        public ObservableCollection<SolutionContext> Contexts { get; } = new ObservableCollection<SolutionContext>();
 
-        [NotNull]
-        public ObservableCollection<SolutionContext> Contexts
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+        private void Update()
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<ObservableCollection<SolutionContext>>() != null);
-                return _contexts;
-            }
-        }
-
-        internal void Update()
-        {
-            _contexts.SynchronizeWith(_solutionConfiguration
+            Contexts.SynchronizeWith(_solutionConfiguration
                 .SolutionContexts.OfType<EnvDTE.SolutionContext>()
                 .Select(ctx => new SolutionContext(_solution, this, ctx))
                 .ToArray());
@@ -97,7 +67,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _contexts.Select(ctx => ctx.GetHashCode()).Aggregate(_solutionConfiguration.GetHashCode(), HashCode.Aggregate);
+            return Contexts.Select(ctx => ctx.GetHashCode()).Aggregate(_solutionConfiguration.GetHashCode(), HashCode.Aggregate);
         }
 
         /// <summary>
@@ -121,7 +91,7 @@
         }
 
         [ContractVerification(false)]
-        private static bool InternalEquals(SolutionConfiguration left, SolutionConfiguration right)
+        private static bool InternalEquals([CanBeNull] SolutionConfiguration left, [CanBeNull] SolutionConfiguration right)
         {
             if (ReferenceEquals(left, right))
                 return true;
@@ -131,20 +101,20 @@
                 return false;
 
             return left._solutionConfiguration == right._solutionConfiguration
-                && left._contexts.SequenceEqual(right.Contexts);
+                && left.Contexts.SequenceEqual(right.Contexts);
         }
 
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        public static bool operator ==(SolutionConfiguration left, SolutionConfiguration right)
+        public static bool operator ==([CanBeNull] SolutionConfiguration left, [CanBeNull] SolutionConfiguration right)
         {
             return InternalEquals(left, right);
         }
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        public static bool operator !=(SolutionConfiguration left, SolutionConfiguration right)
+        public static bool operator !=([CanBeNull] SolutionConfiguration left, [CanBeNull] SolutionConfiguration right)
         {
             return !InternalEquals(left, right);
         }
@@ -158,9 +128,9 @@
         {
             Contract.Invariant(_solution != null);
             Contract.Invariant(_solutionConfiguration != null);
-            Contract.Invariant(_name != null);
-            Contract.Invariant(_platformName != null);
-            Contract.Invariant(_contexts != null);
+            Contract.Invariant(Name != null);
+            Contract.Invariant(PlatformName != null);
+            Contract.Invariant(Contexts != null);
             Contract.Invariant(Contexts != null);
             Contract.Invariant(_solutionConfiguration.SolutionContexts != null);
         }

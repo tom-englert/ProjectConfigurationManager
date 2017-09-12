@@ -19,9 +19,7 @@
 
             while (true)
             {
-                var previous = element.PreviousNode as XText;
-
-                if ((previous != null) && string.IsNullOrWhiteSpace(previous.Value))
+                if ((element.PreviousNode is XText previous) && string.IsNullOrWhiteSpace(previous.Value))
                 {
                     previous.Remove();
                 }
@@ -37,7 +35,7 @@
             }
         }
 
-        public static bool MatchesConfiguration([NotNull] this IProjectPropertyGroup propertyGroup, string configuration, string platform)
+        public static bool MatchesConfiguration([NotNull] this IProjectPropertyGroup propertyGroup, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(propertyGroup != null);
 
@@ -46,10 +44,7 @@
             if (string.IsNullOrEmpty(conditionExpression))
                 return string.IsNullOrEmpty(configuration) && string.IsNullOrEmpty(platform);
 
-            string groupConfiguration;
-            string groupPlatform;
-
-            return conditionExpression.ParseCondition(out groupConfiguration, out groupPlatform)
+            return conditionExpression.ParseCondition(out string groupConfiguration, out string groupPlatform)
                    && configuration == groupConfiguration
                    && platform == groupPlatform;
         }
@@ -91,9 +86,7 @@
                 if (string.IsNullOrEmpty(conditionExpression))
                     continue;
 
-                string configuration, plattform;
-
-                if (!ParseCondition(conditionExpression, out configuration, out plattform))
+                if (!ParseCondition(conditionExpression, out string configuration, out string plattform))
                     continue;
 
                 configurationNames.Add(configuration);
@@ -101,7 +94,7 @@
             }
         }
 
-        internal static bool ParseCondition([NotNull] this string conditionExpression, out string configuration, out string platform)
+        private static bool ParseCondition([NotNull] this string conditionExpression, [CanBeNull] out string configuration, [NotNull] out string platform)
         {
             Contract.Requires(conditionExpression != null);
 
@@ -116,11 +109,13 @@
                 if (parts.Length != 2)
                     return false;
 
+                // ReSharper disable once PossibleNullReferenceException
                 var expression = parts[0].Trim().Replace("$(", "(?<").Replace(")", ">.+?)").Replace("|", "\\|");
 
                 // Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'"
                 // Regex: '(^<Configuration>.+?)\|(^Platform>.+?)'
                 var regex = new Regex(expression);
+                // ReSharper disable once PossibleNullReferenceException
                 var match = regex.Match(parts[1].Trim());
 
                 configuration = match.Groups["Configuration"]?.Value;
@@ -143,8 +138,7 @@
             var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
             Contract.Assume(solution != null);
 
-            Guid projectGuid;
-            solution.GetGuidOfProject(projectHierarchy, out projectGuid);
+            solution.GetGuidOfProject(projectHierarchy, out Guid projectGuid);
             return projectGuid;
         }
     }

@@ -22,6 +22,8 @@
     using tomenglertde.ProjectConfigurationManager.Model;
     using tomenglertde.ProjectConfigurationManager.View.Themes;
 
+    using Throttle;
+
     using TomsToolbox.Core;
     using TomsToolbox.ObservableCollections;
     using TomsToolbox.Wpf.Composition;
@@ -29,32 +31,10 @@
 
     public class PropertiesColumnsManagerBehavior : FrameworkElementBehavior<DataGrid>
     {
-        [NotNull]
-        private readonly DispatcherThrottle _displayIndexChangedThrottle;
-        [NotNull]
-        private readonly DispatcherThrottle _columnsCreatedThrottle;
-
         private IObservableCollection<object> _projectPropertyNames;
         private Configuration _configuration;
         private ITracer _tracer;
 
-        public PropertiesColumnsManagerBehavior()
-        {
-            _columnsCreatedThrottle = new DispatcherThrottle(DispatcherPriority.Background, ColumnsCreated);
-            _displayIndexChangedThrottle = new DispatcherThrottle(DispatcherPriority.Background, ColumnsDisplayIndexChanged);
-        }
-
-        [CanBeNull]
-        internal static string GetProjectPropertyName([NotNull] DependencyObject obj)
-        {
-            Contract.Requires(obj != null);
-            return (string)obj.GetValue(ProjectPropertyNameProperty);
-        }
-        internal static void SetProjectPropertyName([NotNull] DependencyObject obj, [CanBeNull] string value)
-        {
-            Contract.Requires(obj != null);
-            obj.SetValue(ProjectPropertyNameProperty, value);
-        }
         [NotNull]
         internal static readonly DependencyProperty ProjectPropertyNameProperty =
             DependencyProperty.RegisterAttached("ProjectPropertyName", typeof(ProjectPropertyName), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
@@ -120,7 +100,7 @@
                 return;
 
             dataGrid.Columns.AddRange(_projectPropertyNames.OfType<ProjectPropertyName>().Select(CreateColumn));
-            dataGrid.ColumnDisplayIndexChanged += (_, __) => _displayIndexChangedThrottle.Tick();
+            dataGrid.ColumnDisplayIndexChanged += (_, __) => OnColumnsDisplayIndexChanged();
         }
 
         private void ProjectProperties_CollectionChanged([NotNull] NotifyCollectionChangedEventArgs e)
@@ -181,7 +161,7 @@
             column.SetValue(ProjectPropertyNameProperty, projectPropertyName);
             column.SetValue(PropertyNameProperty, projectPropertyName.Name);
 
-            _columnsCreatedThrottle.Tick();
+            OnColumnCreated();
 
             return column;
         }
@@ -241,7 +221,8 @@
             }
         }
 
-        private void ColumnsCreated()
+        [Throttled(typeof(DispatcherThrottle), (int)DispatcherPriority.Background)]
+        private void OnColumnCreated()
         {
             try
             {
@@ -266,7 +247,8 @@
             }
         }
 
-        private void ColumnsDisplayIndexChanged()
+        [Throttled(typeof(DispatcherThrottle), (int)DispatcherPriority.Background)]
+        private void OnColumnsDisplayIndexChanged()
         {
             try
             {
@@ -304,15 +286,6 @@
             {
                 _tracer.TraceError(ex);
             }
-        }
-
-        [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_columnsCreatedThrottle != null);
-            Contract.Invariant(_displayIndexChangedThrottle != null);
         }
     }
 }

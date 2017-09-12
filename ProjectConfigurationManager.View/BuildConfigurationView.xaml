@@ -88,6 +88,7 @@
       <DataGrid.RowStyle>
         <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridRowStyle}}">
           <Style.Triggers>
+            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <DataTrigger Binding="{Binding Project.IsLoaded}" Value="False">
               <Setter Property="IsEnabled" Value="False"/>
             </DataTrigger>

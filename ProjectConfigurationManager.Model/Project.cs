@@ -8,7 +8,6 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-    using System.Windows.Input;
 
     using JetBrains.Annotations;
 
@@ -44,8 +43,6 @@
             ProjectConfigurations = ObservableCompositeCollection.FromSingleItemAndList(DefaultProjectConfiguration, _internalSpecificProjectConfigurations);
             IsProjectTypeGuidSelected = new ProjectTypeGuidIndexer(DefaultProjectConfiguration);
 
-            CommandManager.RequerySuggested += (_, __) => OnPropertyChanged(nameof(IsSaved));
-
             Update();
         }
 
@@ -75,13 +72,13 @@
         [NotNull]
         public IVsHierarchy ProjectHierarchy { get; private set; }
 
-        [NotNull]
+        [NotNull, UsedImplicitly]
         public Solution Solution { get; }
 
         [NotNull]
         public string Name => DteProject?.Name ?? Path.GetFileNameWithoutExtension(FullName);
 
-        [NotNull]
+        [NotNull, UsedImplicitly]
         public string UniqueName
         {
             get
@@ -107,30 +104,31 @@
         }
 
         [NotNull]
+        // ReSharper disable once AssignNullToNotNullAttribute
         public string RelativePath => Path.GetDirectoryName(UniqueName);
 
-        [NotNull]
+        [NotNull, UsedImplicitly]
         public string SortKey => Name + " (" + RelativePath + ")";
 
         [NotNull]
         public string FullName { get; }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IList<string> ProjectTypeGuids => RetrieveProjectTypeGuids();
 
-        [NotNull]
-        public IEnumerable<SolutionContext> SolutionContexts => Solution.SolutionConfigurations.SelectMany(cfg => cfg.Contexts).Where(context => context.ProjectName == UniqueName);
+        [NotNull, ItemNotNull]
+        public IEnumerable<SolutionContext> SolutionContexts => Solution.SolutionConfigurations.SelectMany(cfg => cfg.Contexts).Where(context => context?.ProjectName == UniqueName);
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations { get; }
 
         [NotNull]
         public ProjectConfiguration DefaultProjectConfiguration { get; }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IObservableCollection<ProjectConfiguration> ProjectConfigurations { get; }
 
-        [NotNull]
+        [NotNull, UsedImplicitly]
         public IIndexer<bool> IsProjectTypeGuidSelected { get; }
 
         public bool IsSaving => ProjectFile.IsSaving;
@@ -163,13 +161,15 @@
 
                     return projectItems?
                         .Cast<EnvDTE.ProjectItem>()
-                        .Select(p => p.Object)
+                        .Select(p => p?.Object)
                         .OfType<VSLangProj.References>()
                         .Take(1)
+                        // ReSharper disable once AssignNullToNotNullAttribute
                         .SelectMany(references => references.Cast<VSLangProj.Reference>());
                 }
                 catch
                 {
+                    // not an MPF project
                 }
 
                 return null;
@@ -262,8 +262,6 @@
             ProjectFile = new ProjectFile(Solution, this);
 
             Update();
-
-            OnPropertyChanged(nameof(IsLoaded));
         }
 
         public void UnloadProject()
@@ -272,10 +270,10 @@
 
             var projectGuid = Solution.GetProjectGuid(ProjectHierarchy);
 
-            solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+            solution?.UnloadProject(ref projectGuid, (int) _VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
         }
 
-        internal void Update()
+        private void Update()
         {
             var projectConfigurations = this.GetProjectConfigurations().ToArray();
 
@@ -283,7 +281,15 @@
 
             DefaultProjectConfiguration.SetProjectFile(ProjectFile);
 
-            _internalSpecificProjectConfigurations.ForEach(config => config.SetProjectFile(ProjectFile));
+            _internalSpecificProjectConfigurations.ForEach(config => config?.SetProjectFile(ProjectFile));
+
+            InvalidateState();
+        }
+
+        internal void InvalidateState()
+        {
+            OnPropertyChanged(nameof(IsSaved));
+            OnPropertyChanged(nameof(IsLoaded));
         }
 
         internal void UpdateReferences()
@@ -299,14 +305,14 @@
         }
 
         [CanBeNull]
-        internal IProjectProperty CreateProperty([NotNull] string propertyName, string configuration, string platform)
+        internal IProjectProperty CreateProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(propertyName != null);
 
             return ProjectFile.CreateProperty(propertyName, configuration, platform);
         }
 
-        internal void DeleteProperty([NotNull] string propertyName, string configuration, string platform)
+        internal void DeleteProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(propertyName != null);
 
@@ -330,6 +336,7 @@
 
             return (DefaultProjectConfiguration.PropertyValue[ProjectTypeGuidsPropertyKey] ?? ProjectTypeGuid.Unspecified)
                 .Split(';')
+                // ReSharper disable once PossibleNullReferenceException
                 .Select(item => item.Trim())
                 .Where(item => !string.IsNullOrEmpty(item))
                 .ToArray();
@@ -346,6 +353,7 @@
             }
             catch
             {
+                // invalid reference
             }
 
             return null;
@@ -365,10 +373,7 @@
 
             public bool this[string projectTypeGuid]
             {
-                get
-                {
-                    return ProjectTypeGuids.Contains(projectTypeGuid, StringComparer.OrdinalIgnoreCase);
-                }
+                get => ProjectTypeGuids.Contains(projectTypeGuid, StringComparer.OrdinalIgnoreCase);
                 set
                 {
                     ProjectTypeGuids = value
@@ -384,13 +389,10 @@
                 {
                     return _configuration.PropertyValue[ProjectTypeGuidsPropertyKey]
                         ?.Split(';')
-                        .Select(item => item.Trim())
+                        .Select(item => item?.Trim())
                         .Where(item => !string.IsNullOrEmpty(item)) ?? Enumerable.Empty<string>();
                 }
-                set
-                {
-                    _configuration.PropertyValue[ProjectTypeGuidsPropertyKey] = value == null ? null : string.Join(";", value);
-                }
+                set => _configuration.PropertyValue[ProjectTypeGuidsPropertyKey] = string.Join(";", value);
             }
 
 
@@ -413,6 +415,7 @@
         /// </returns>
         public override int GetHashCode()
         {
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
             return ProjectHierarchy.GetHashCode();
         }
 

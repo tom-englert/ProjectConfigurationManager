@@ -234,6 +234,10 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Throttle, Version=0.9.11.0, Culture=neutral, PublicKeyToken=4d0e9a1cbec0d397, processorArchitecture=MSIL">
+      <HintPath>..\packages\Throttle.Fody.0.9.11.0\lib\netstandard1.0\Throttle.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="TomsToolbox.Core, Version=1.0.62.0, Culture=neutral, PublicKeyToken=60b39f873a8e3fc2, processorArchitecture=MSIL">
       <HintPath>..\packages\TomsToolbox.Core.1.0.62\lib\net40-client\TomsToolbox.Core.dll</HintPath>
     </Reference>

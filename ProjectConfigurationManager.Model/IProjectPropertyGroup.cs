@@ -8,7 +8,7 @@
     [ContractClass(typeof (ProjectPropertyGroupContract))]
     interface IProjectPropertyGroup
     {
-        [NotNull]
+        [NotNull, ItemNotNull]
         IEnumerable<IProjectProperty> Properties { get; }
 
         string ConditionExpression { get; }

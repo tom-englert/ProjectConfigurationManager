@@ -10,18 +10,15 @@
 
     public class PropertyGroupName : IEquatable<PropertyGroupName>
     {
-        [NotNull]
-        private readonly string _name;
-        private readonly int _index;
-
         public PropertyGroupName([NotNull] string name, int index)
         {
             Contract.Requires(name != null);
 
-            _name = name;
-            _index = index;
+            Name = name;
+            Index = index;
         }
 
+        [NotNull]
         private static readonly HashSet<string> _projectSpecificProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "ProjectGuid",
@@ -32,6 +29,7 @@
             "Tags"
         };
 
+        [NotNull]
         private static readonly HashSet<string> _globalProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "ApplicationIcon",
@@ -52,6 +50,7 @@
             "GenerateSerializationAssemblies",
         };
 
+        [NotNull]
         private static readonly HashSet<string> _debugProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "UseVSHostingProcess",
@@ -60,6 +59,7 @@
             "Optimize",
         };
 
+        [NotNull]
         private static readonly HashSet<string> _publishProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "IsWebBootstrapper",
@@ -84,6 +84,7 @@
             "BootstrapperEnabled",
         };
 
+        [NotNull]
         private static readonly HashSet<string> _signingProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "SignAssembly",
@@ -95,20 +96,13 @@
         };
 
         [NotNull]
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _name;
-            }
-        }
+        public string Name { get; }
 
-        public int Index => _index;
+        public int Index { get; }
 
-        public static bool IsNotProjectSpecific(string propertyName)
+        public static bool IsNotProjectSpecific([CanBeNull] string propertyName)
         {
-            return !_projectSpecificProperties.Contains(propertyName);
+            return _projectSpecificProperties.Contains(propertyName) != true;
         }
 
         [NotNull]
@@ -143,7 +137,7 @@
 
         public override string ToString()
         {
-            return _name;
+            return Name;
         }
 
         #region IEquatable implementation
@@ -156,7 +150,7 @@
         /// </returns>
         public override int GetHashCode()
         {
-            return _name.GetHashCode();
+            return Name.GetHashCode();
         }
 
         /// <summary>
@@ -179,7 +173,7 @@
             return InternalEquals(this, other);
         }
 
-        private static bool InternalEquals(PropertyGroupName left, PropertyGroupName right)
+        private static bool InternalEquals([CanBeNull] PropertyGroupName left, [CanBeNull] PropertyGroupName right)
         {
             if (ReferenceEquals(left, right))
                 return true;
@@ -194,14 +188,14 @@
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        public static bool operator ==(PropertyGroupName left, PropertyGroupName right)
+        public static bool operator ==([CanBeNull] PropertyGroupName left, [CanBeNull] PropertyGroupName right)
         {
             return InternalEquals(left, right);
         }
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        public static bool operator !=(PropertyGroupName left, PropertyGroupName right)
+        public static bool operator !=([CanBeNull] PropertyGroupName left, [CanBeNull] PropertyGroupName right)
         {
             return !InternalEquals(left, right);
         }
@@ -213,7 +207,7 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_name != null);
+            Contract.Invariant(Name != null);
         }
 
     }
