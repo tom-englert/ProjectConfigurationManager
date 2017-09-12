@@ -7,7 +7,8 @@
 
     using JetBrains.Annotations;
 
-    public class ProjectPropertyName : IEquatable<ProjectPropertyName>
+    [Equals]
+    public class ProjectPropertyName
     {
         internal ProjectPropertyName([NotNull] string name, [NotNull] PropertyGroupName groupName)
         {
@@ -39,67 +40,17 @@
         [NotNull]
         public string DisplayName { get; }
 
-        #region IEquatable implementation
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
+        [CustomGetHashCode, UsedImplicitly]
+        private int CustomGetHashCode()
         {
             return Name.ToUpperInvariant().GetHashCode();
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        [CustomEqualsInternal, UsedImplicitly]
+        private bool CustomEquals([NotNull] ProjectPropertyName other)
         {
-            return Equals(obj as ProjectPropertyName);
+            return string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase);
         }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="ProjectPropertyName"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="ProjectPropertyName"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="ProjectPropertyName"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(ProjectPropertyName other)
-        {
-            return InternalEquals(this, other);
-        }
-
-        private static bool InternalEquals(ProjectPropertyName left, ProjectPropertyName right)
-        {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return string.Equals(left.Name, right.Name, StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==(ProjectPropertyName left, ProjectPropertyName right)
-        {
-            return InternalEquals(left, right);
-        }
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=(ProjectPropertyName left, ProjectPropertyName right)
-        {
-            return !InternalEquals(left, right);
-        }
-
-        #endregion
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]

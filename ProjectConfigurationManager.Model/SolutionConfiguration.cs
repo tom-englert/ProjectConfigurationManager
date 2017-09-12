@@ -1,18 +1,19 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
-    using System;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using System.Runtime.CompilerServices;
 
     using JetBrains.Annotations;
 
     using TomsToolbox.Core;
-    using TomsToolbox.Desktop;
 
-    public class SolutionConfiguration : ObservableObject, IEquatable<SolutionConfiguration>
+    [Equals]
+    public sealed class SolutionConfiguration : INotifyPropertyChanged
     {
         [NotNull]
         private readonly Solution _solution;
@@ -51,75 +52,33 @@
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         private void Update()
         {
-            Contexts.SynchronizeWith(_solutionConfiguration
-                .SolutionContexts.OfType<EnvDTE.SolutionContext>()
+            Contexts.SynchronizeWith(_solutionConfiguration.SolutionContexts
+                .OfType<EnvDTE.SolutionContext>()
                 .Select(ctx => new SolutionContext(_solution, this, ctx))
                 .ToArray());
         }
 
-        #region IEquatable implementation
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
+        [CustomGetHashCode, UsedImplicitly]
+        private int CustomGetHashCode()
         {
             return Contexts.Select(ctx => ctx.GetHashCode()).Aggregate(_solutionConfiguration.GetHashCode(), HashCode.Aggregate);
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as SolutionConfiguration);
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="SolutionConfiguration"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="SolutionConfiguration"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="SolutionConfiguration"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(SolutionConfiguration other)
-        {
-            return InternalEquals(this, other);
-        }
-
+        [CustomEqualsInternal, UsedImplicitly]
         [ContractVerification(false)]
-        private static bool InternalEquals([CanBeNull] SolutionConfiguration left, [CanBeNull] SolutionConfiguration right)
+        private bool CustomEquals([NotNull] SolutionConfiguration other)
         {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return left._solutionConfiguration == right._solutionConfiguration
-                && left.Contexts.SequenceEqual(right.Contexts);
+            return _solutionConfiguration == other._solutionConfiguration
+                && Contexts.SequenceEqual(other.Contexts);
         }
 
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==([CanBeNull] SolutionConfiguration left, [CanBeNull] SolutionConfiguration right)
-        {
-            return InternalEquals(left, right);
-        }
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=([CanBeNull] SolutionConfiguration left, [CanBeNull] SolutionConfiguration right)
-        {
-            return !InternalEquals(left, right);
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        #endregion
+        [NotifyPropertyChangedInvocator, UsedImplicitly]
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]

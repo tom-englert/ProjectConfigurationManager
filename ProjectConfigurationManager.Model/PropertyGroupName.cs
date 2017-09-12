@@ -8,7 +8,8 @@
 
     using JetBrains.Annotations;
 
-    public class PropertyGroupName : IEquatable<PropertyGroupName>
+    [Equals]
+    public class PropertyGroupName
     {
         public PropertyGroupName([NotNull] string name, int index)
         {
@@ -98,6 +99,7 @@
         [NotNull]
         public string Name { get; }
 
+        [IgnoreDuringEquals]
         public int Index { get; }
 
         public static bool IsNotProjectSpecific([CanBeNull] string propertyName)
@@ -139,68 +141,6 @@
         {
             return Name;
         }
-
-        #region IEquatable implementation
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as PropertyGroupName);
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="PropertyGroupName"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="PropertyGroupName"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="PropertyGroupName"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(PropertyGroupName other)
-        {
-            return InternalEquals(this, other);
-        }
-
-        private static bool InternalEquals([CanBeNull] PropertyGroupName left, [CanBeNull] PropertyGroupName right)
-        {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return left.Name.Equals(right.Name);
-        }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==([CanBeNull] PropertyGroupName left, [CanBeNull] PropertyGroupName right)
-        {
-            return InternalEquals(left, right);
-        }
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=([CanBeNull] PropertyGroupName left, [CanBeNull] PropertyGroupName right)
-        {
-            return !InternalEquals(left, right);
-        }
-
-        #endregion
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]

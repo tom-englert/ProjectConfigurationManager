@@ -3,11 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
 
     using JetBrains.Annotations;
 
@@ -18,7 +20,8 @@
     using TomsToolbox.Desktop;
     using TomsToolbox.ObservableCollections;
 
-    public class Project : ObservableObject, IEquatable<Project>
+    [Equals]
+    public sealed class Project : INotifyPropertyChanged
     {
         private const string ProjectTypeGuidsPropertyKey = "ProjectTypeGuids";
 
@@ -405,68 +408,25 @@
             }
         }
 
-        #region IEquatable implementation
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
+        [CustomGetHashCode, UsedImplicitly]
+        private int CustomGetHashCode()
         {
-            // ReSharper disable once NonReadonlyMemberInGetHashCode
             return ProjectHierarchy.GetHashCode();
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        [CustomEqualsInternal, UsedImplicitly]
+        private bool CustomEquals([NotNull] Project other)
         {
-            return Equals(obj as Project);
+            return ProjectHierarchy == other.ProjectHierarchy;
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="Project"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="Project"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="Project"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(Project other)
-        {
-            return InternalEquals(this, other);
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private static bool InternalEquals(Project left, Project right)
+        [NotifyPropertyChangedInvocator]
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return left.ProjectHierarchy == right.ProjectHierarchy;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==(Project left, Project right)
-        {
-            return InternalEquals(left, right);
-        }
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=(Project left, Project right)
-        {
-            return !InternalEquals(left, right);
-        }
-
-        #endregion
 
         public override string ToString()
         {

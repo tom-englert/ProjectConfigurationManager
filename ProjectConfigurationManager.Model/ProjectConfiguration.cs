@@ -3,10 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Windows.Threading;
 
     using JetBrains.Annotations;
@@ -14,7 +16,8 @@
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
-    public class ProjectConfiguration : ObservableObject, IEquatable<ProjectConfiguration>
+    [Equals]
+    public sealed class ProjectConfiguration : INotifyPropertyChanged
     {
         [NotNull]
         private IDictionary<string, IProjectProperty> _properties = new Dictionary<string, IProjectProperty>();
@@ -34,16 +37,21 @@
         [NotNull]
         public Project Project { get; }
 
+        [CanBeNull]
         public string Configuration { get; }
 
+        [CanBeNull]
         public string Platform { get; }
 
+        [IgnoreDuringEquals]
         [NotNull] // ReSharper disable once MemberCanBePrivate.Global - used in column binding
         public IIndexer<bool?> ShouldBuild { get; }
 
+        [IgnoreDuringEquals]
         [NotNull]
         public IIndexer<string> PropertyValue { get; }
 
+        [IgnoreDuringEquals]
         [NotNull]
         internal IDictionary<string, IProjectProperty> Properties => new ReadOnlyDictionary<string, IProjectProperty>(_properties);
 
@@ -200,71 +208,13 @@
                 OnPropertyChanged(nameof(PropertyValue));
         }
 
-        #region IEquatable implementation
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
+        [NotifyPropertyChangedInvocator]
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            return HashCode.Aggregate(Project.GetHashCode(), HashCode.Aggregate((Configuration?.GetHashCode()).GetValueOrDefault(), (Platform?.GetHashCode()).GetValueOrDefault()));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as ProjectConfiguration);
-        }
-
-        /// <summary>
-        /// Determines whether the specified <see cref="ProjectConfiguration"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="ProjectConfiguration"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="ProjectConfiguration"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(ProjectConfiguration other)
-        {
-            return InternalEquals(this, other);
-        }
-
-        [ContractVerification(false)]
-        private static bool InternalEquals(ProjectConfiguration left, ProjectConfiguration right)
-        {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return (left.Project == right.Project)
-                   && (left.Configuration == right.Configuration)
-                   && (left.Platform == right.Platform);
-        }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==(ProjectConfiguration left, ProjectConfiguration right)
-        {
-            return InternalEquals(left, right);
-        }
-
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=(ProjectConfiguration left, ProjectConfiguration right)
-        {
-            return !InternalEquals(left, right);
-        }
-
-        #endregion
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]

@@ -1,14 +1,14 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
-    using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
+    using System.Runtime.CompilerServices;
 
     using JetBrains.Annotations;
 
-    using TomsToolbox.Desktop;
-
-    public class SolutionContext : ObservableObject, IEquatable<SolutionContext>
+    [Equals]
+    public sealed class SolutionContext : INotifyPropertyChanged
     {
         [NotNull]
         private readonly Solution _solution;
@@ -31,10 +31,10 @@
         }
 
         [CanBeNull]
-        public string ConfigurationName { get; set; }
+        public string ConfigurationName { get; private set; }
 
         [CanBeNull]
-        public string PlatformName { get; set; }
+        public string PlatformName { get; private set; }
 
         public bool SetConfiguration([NotNull] ProjectConfiguration configuration)
         {
@@ -82,67 +82,25 @@
             return false;
         }
 
-        #region IEquatable implementation
-
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-        /// </returns>
-        public override int GetHashCode()
+        [CustomGetHashCode, UsedImplicitly]
+        private int CustomGetHashCode()
         {
             return _context.GetHashCode();
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        [CustomEqualsInternal, UsedImplicitly]
+        private bool CustomEquals([NotNull] SolutionContext other)
         {
-            return Equals(obj as SolutionContext);
+            return _context == other._context;
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="SolutionContext"/> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="SolutionContext"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="SolutionContext"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(SolutionContext other)
-        {
-            return InternalEquals(this, other);
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private static bool InternalEquals(SolutionContext left, SolutionContext right)
+        [NotifyPropertyChangedInvocator, UsedImplicitly]
+        private void OnPropertyChanged([CallerMemberName, CanBeNull] string propertyName = null)
         {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-            if (ReferenceEquals(right, null))
-                return false;
-
-            return left._context == right._context;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        public static bool operator ==(SolutionContext left, SolutionContext right)
-        {
-            return InternalEquals(left, right);
-        }
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        public static bool operator !=(SolutionContext left, SolutionContext right)
-        {
-            return !InternalEquals(left, right);
-        }
-
-        #endregion
 
         [ContractInvariantMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]

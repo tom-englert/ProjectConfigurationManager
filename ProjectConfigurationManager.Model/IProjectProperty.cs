@@ -4,7 +4,7 @@
 
     using JetBrains.Annotations;
 
-    [ContractClass(typeof (ProjectPropertyContract))]
+    [ContractClass(typeof(ProjectPropertyContract))]
     interface IProjectProperty
     {
         [NotNull]
@@ -20,7 +20,7 @@
         void Delete();
     }
 
-    [ContractClassFor(typeof (IProjectProperty))]
+    [ContractClassFor(typeof(IProjectProperty))]
     abstract class ProjectPropertyContract : IProjectProperty
     {
         public string Name

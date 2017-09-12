@@ -17,6 +17,8 @@
 
     using Microsoft.VisualStudio.Shell.Interop;
 
+    using Throttle;
+
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
@@ -26,8 +28,6 @@
 
         [NotNull]
         private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
-        [NotNull]
-        private readonly DispatcherThrottle _deferredSaveThrottle;
         [NotNull]
         private readonly Solution _solution;
         [NotNull]
@@ -45,7 +45,6 @@
             Contract.Requires(solution != null);
             Contract.Requires(project != null);
 
-            _deferredSaveThrottle = new DispatcherThrottle(SaveProjectFile);
             _solution = solution;
             _project = project;
 
@@ -144,12 +143,8 @@
             SaveChanges();
         }
 
+        [Throttled(typeof(DispatcherThrottle))]
         private void SaveChanges()
-        {
-            _deferredSaveThrottle.Tick();
-        }
-
-        private void SaveProjectFile()
         {
             IsSaving = true;
 
@@ -411,7 +406,6 @@
             Contract.Invariant(_project != null);
             Contract.Invariant(_solution != null);
             Contract.Invariant(_dispatcher != null);
-            Contract.Invariant(_deferredSaveThrottle != null);
         }
     }
 }
