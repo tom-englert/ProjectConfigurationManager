@@ -82,7 +82,7 @@
             OnPropertyChanged(nameof(PropertyValue));
         }
 
-        private class ShouldBuildIndexer : IIndexer<bool?>
+        private sealed class ShouldBuildIndexer : IIndexer<bool?>
         {
             [NotNull]
             private readonly ProjectConfiguration _projectConfiguration;
@@ -142,7 +142,7 @@
             }
         }
 
-        private class PropertyValueIndexer : IIndexer<string>
+        private sealed class PropertyValueIndexer : IIndexer<string>
         {
             [NotNull]
             private readonly ProjectConfiguration _projectConfiguration;

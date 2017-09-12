@@ -18,7 +18,7 @@
     using TomsToolbox.Core;
 
     [Export]
-    public class CellToBackgroundBrushConverter : IValueConverter, IMultiValueConverter
+    public sealed class CellToBackgroundBrushConverter : IValueConverter, IMultiValueConverter
     {
         [NotNull]
         private readonly ThemeManager _themeManager;

@@ -9,7 +9,7 @@
     using JetBrains.Annotations;
 
     [Equals]
-    public class PropertyGroupName
+    public sealed class PropertyGroupName
     {
         public PropertyGroupName([NotNull] string name, int index)
         {

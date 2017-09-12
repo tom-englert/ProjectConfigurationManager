@@ -20,7 +20,7 @@
 
     using TomsToolbox.Core;
 
-    static class BuildConfigurationColumnsManager
+    internal static class BuildConfigurationColumnsManager
     {
         [NotNull]
         private static readonly DependencyProperty _solutionConfigurationProperty =

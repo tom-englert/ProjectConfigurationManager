@@ -25,7 +25,7 @@
     using TomsToolbox.ObservableCollections;
 
     [Export]
-    public class Solution : ObservableObject, IServiceProvider
+    public sealed class Solution : ObservableObject, IServiceProvider
     {
         [NotNull]
         private readonly IVsServiceProvider _serviceProvider;

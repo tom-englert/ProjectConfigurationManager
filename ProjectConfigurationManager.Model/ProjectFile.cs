@@ -22,7 +22,7 @@
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
-    internal class ProjectFile
+    internal sealed class ProjectFile
     {
         private const string ConditionAttributeName = "Condition";
 
@@ -277,7 +277,7 @@
                 .ToList();
         }
 
-        private class ProjectPropertyGroup : IProjectPropertyGroup
+        private sealed class ProjectPropertyGroup : IProjectPropertyGroup
         {
             [NotNull]
             private readonly ProjectFile _projectFile;
@@ -347,7 +347,7 @@
             }
         }
 
-        private class ProjectProperty : IProjectProperty
+        private sealed class ProjectProperty : IProjectProperty
         {
             [NotNull]
             private readonly ProjectFile _projectFile;

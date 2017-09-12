@@ -8,7 +8,7 @@
 
     using TomsToolbox.Core;
 
-    public class ProjectTypeGuidToDisplayNameConverter : IValueConverter
+    public sealed class ProjectTypeGuidToDisplayNameConverter : IValueConverter
     {
         /// <summary>
         /// Converts a value. 

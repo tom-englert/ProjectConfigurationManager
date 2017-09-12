@@ -5,7 +5,7 @@
     using TomsToolbox.Desktop;
 
     [Export]
-    public class ThemeManager : ObservableObject
+    public sealed class ThemeManager : ObservableObject
     {
         public bool IsDarkTheme { get; set; }
     }

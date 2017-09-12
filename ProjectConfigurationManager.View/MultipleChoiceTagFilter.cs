@@ -12,7 +12,7 @@
     /// <summary>
     /// Interaction logic for MultipleChoiceFilter.xaml
     /// </summary>
-    public class MultipleChoiceTagFilter : MultipleChoiceFilterBase
+    public sealed class MultipleChoiceTagFilter : MultipleChoiceFilterBase
     {
         [NotNull]
         private static readonly Regex Regex = new Regex(@"\W+", RegexOptions.Compiled);
@@ -36,7 +36,7 @@
             return new TagsContentFilter(items);
         }
 
-        private class TagsContentFilter : MultipleChoiceContentFilterBase
+        private sealed class TagsContentFilter : MultipleChoiceContentFilterBase
         {
             public TagsContentFilter([CanBeNull] IEnumerable<string> items)
                 : base(items)

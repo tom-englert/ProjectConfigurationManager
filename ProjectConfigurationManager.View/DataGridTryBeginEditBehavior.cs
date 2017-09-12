@@ -8,7 +8,7 @@
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
-    public class DataGridTryBeginEditBehavior : Behavior<DataGrid>
+    public sealed class DataGridTryBeginEditBehavior : Behavior<DataGrid>
     {
         protected override void OnAttached()
         {

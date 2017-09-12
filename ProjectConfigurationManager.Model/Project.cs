@@ -362,7 +362,7 @@
             return null;
         }
 
-        private class ProjectTypeGuidIndexer : IIndexer<bool>
+        private sealed class ProjectTypeGuidIndexer : IIndexer<bool>
         {
             [NotNull]
             private readonly ProjectConfiguration _configuration;

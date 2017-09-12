@@ -8,7 +8,7 @@
 
     [Serializable]
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-    public class RetryException : Exception
+    public sealed class RetryException : Exception
     {
         [UsedImplicitly]
         public RetryException()

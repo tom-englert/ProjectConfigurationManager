@@ -11,7 +11,7 @@
     /// <summary>
     /// Interaction logic for MultipleChoiceFilter.xaml
     /// </summary>
-    public class MultipleChoiceFilter : MultipleChoiceFilterBase
+    public sealed class MultipleChoiceFilter : MultipleChoiceFilterBase
     {
         static MultipleChoiceFilter()
         {
@@ -32,7 +32,7 @@
             return new MultipleChoicesContentFilter(items);
         }
 
-        private class MultipleChoicesContentFilter : MultipleChoiceContentFilterBase
+        private sealed class MultipleChoicesContentFilter : MultipleChoiceContentFilterBase
         {
             public MultipleChoicesContentFilter([CanBeNull] IEnumerable<string> items)
                 : base(items)

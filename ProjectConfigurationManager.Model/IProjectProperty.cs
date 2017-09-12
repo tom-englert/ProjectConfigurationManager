@@ -5,7 +5,7 @@
     using JetBrains.Annotations;
 
     [ContractClass(typeof(ProjectPropertyContract))]
-    interface IProjectProperty
+    internal interface IProjectProperty
     {
         [NotNull]
         string Name { get; }
@@ -21,7 +21,7 @@
     }
 
     [ContractClassFor(typeof(IProjectProperty))]
-    abstract class ProjectPropertyContract : IProjectProperty
+    internal abstract class ProjectPropertyContract : IProjectProperty
     {
         public string Name
         {

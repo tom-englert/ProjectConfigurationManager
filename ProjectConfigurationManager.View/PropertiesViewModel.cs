@@ -22,7 +22,7 @@
 
     [DisplayName("Properties")]
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 2)]
-    class PropertiesViewModel : ObservableObject
+    internal sealed class PropertiesViewModel : ObservableObject
     {
         [ImportingConstructor]
         public PropertiesViewModel([NotNull] Solution solution)

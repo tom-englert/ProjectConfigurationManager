@@ -5,7 +5,7 @@ namespace tomenglertde.ProjectConfigurationManager
 {
     using System;
 
-    static class GuidList
+    internal static class GuidList
     {
         public const string guidProjectConfigurationManagerPkgString = "e31595c9-3e0c-4f5c-b35c-dd8d61e364d1";
         public const string guidProjectConfigurationManagerCmdSetString = "21c19afd-a1ab-47f2-8df3-daa27df56e46";

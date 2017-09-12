@@ -39,7 +39,7 @@
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
     [Guid("01a9a1a2-ea6f-4cb6-ae33-996b06435a62")]
-    public class MyToolWindow : ToolWindowPane, IVsServiceProvider
+    public sealed class MyToolWindow : ToolWindowPane, IVsServiceProvider
     {
         private const string _introMessage = "Project Configuration Manager loaded."
             + "\nHome: https://github.com/tom-englert/ProjectConfigurationManager"

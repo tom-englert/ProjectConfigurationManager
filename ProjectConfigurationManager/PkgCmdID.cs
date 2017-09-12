@@ -3,7 +3,7 @@
 
 namespace tomenglertde.ProjectConfigurationManager
 {
-    static class PkgCmdIDList
+    internal static class PkgCmdIDList
     {
         public const uint cmdidProjectConfigurationManager =    0x100;
     };

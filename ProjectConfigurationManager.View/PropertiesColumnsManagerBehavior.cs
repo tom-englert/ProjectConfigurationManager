@@ -29,7 +29,7 @@
     using TomsToolbox.Wpf.Composition;
     using TomsToolbox.Wpf.Interactivity;
 
-    public class PropertiesColumnsManagerBehavior : FrameworkElementBehavior<DataGrid>
+    public sealed class PropertiesColumnsManagerBehavior : FrameworkElementBehavior<DataGrid>
     {
         private IObservableCollection<object> _projectPropertyNames;
         private Configuration _configuration;
@@ -187,7 +187,7 @@
             return index;
         }
 
-        private class ColumInfo
+        private sealed class ColumInfo
         {
             [NotNull]
             private readonly DataGridColumn _column;

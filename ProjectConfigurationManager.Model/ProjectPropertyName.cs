@@ -8,7 +8,7 @@
     using JetBrains.Annotations;
 
     [Equals]
-    public class ProjectPropertyName
+    public sealed class ProjectPropertyName
     {
         internal ProjectPropertyName([NotNull] string name, [NotNull] PropertyGroupName groupName)
         {

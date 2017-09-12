@@ -6,7 +6,7 @@
     using JetBrains.Annotations;
 
     [ContractClass(typeof (ProjectPropertyGroupContract))]
-    interface IProjectPropertyGroup
+    internal interface IProjectPropertyGroup
     {
         [NotNull, ItemNotNull]
         IEnumerable<IProjectProperty> Properties { get; }

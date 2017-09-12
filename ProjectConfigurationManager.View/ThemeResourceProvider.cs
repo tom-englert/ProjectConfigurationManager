@@ -6,7 +6,7 @@
     using TomsToolbox.Wpf.Styles;
 
     [Export(typeof(IThemeResourceProvider))]
-    internal class ThemeResourceProvider : IThemeResourceProvider
+    internal sealed class ThemeResourceProvider : IThemeResourceProvider
     {
         public void LoadThemeResources(ResourceDictionary resource)
         {

@@ -21,7 +21,7 @@
 
     [DisplayName("Dependencies")]
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 4)]
-    public class ProjectDependenciesViewModel : ObservableObject
+    public sealed class ProjectDependenciesViewModel : ObservableObject
     {
         [NotNull, ItemNotNull]
         private readonly IObservableCollection<ProjectDependency> _references;
@@ -63,7 +63,7 @@
         }
     }
 
-    public class ProjectDependencyGroup : ObservableObject
+    public sealed class ProjectDependencyGroup : ObservableObject
     {
         public ProjectDependencyGroup([NotNull] string name, [NotNull, ItemNotNull] IList<ProjectDependency> items)
         {
@@ -80,7 +80,7 @@
         public ICollectionView Items { get; }
     }
 
-    public class ProjectDependency : ObservableObject
+    public sealed class ProjectDependency : ObservableObject
     {
         [NotNull]
         private readonly ProjectDependenciesViewModel _model;

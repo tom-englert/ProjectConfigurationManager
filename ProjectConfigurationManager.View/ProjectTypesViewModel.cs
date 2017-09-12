@@ -16,7 +16,7 @@
 
     [DisplayName("Project Types")]
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 3)]
-    class ProjectTypesViewModel : ObservableObject
+    internal sealed class ProjectTypesViewModel : ObservableObject
     {
         public ProjectTypesViewModel([NotNull] Solution solution)
         {

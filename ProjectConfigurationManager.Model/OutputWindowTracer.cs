@@ -11,7 +11,7 @@
     using Microsoft.VisualStudio.Shell.Interop;
 
     [Export(typeof(ITracer))]
-    public class OutputWindowTracer : ITracer
+    public sealed class OutputWindowTracer : ITracer
     {
         [NotNull]
         private readonly IServiceProvider _serviceProvider;

@@ -21,7 +21,7 @@
 
     [DisplayName("Build Configuration")]
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 1)]
-    class BuildConfigurationViewModel : ObservableObject
+    internal sealed class BuildConfigurationViewModel : ObservableObject
     {
         [ImportingConstructor]
         public BuildConfigurationViewModel([NotNull] Solution solution)

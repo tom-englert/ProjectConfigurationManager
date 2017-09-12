@@ -11,7 +11,7 @@
     using JetBrains.Annotations;
 
     [Export]
-    public class PerformanceTracer
+    public sealed class PerformanceTracer
     {
         [NotNull]
         private readonly ITracer _tracer;
