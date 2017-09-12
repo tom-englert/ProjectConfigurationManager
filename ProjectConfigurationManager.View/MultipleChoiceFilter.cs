@@ -4,6 +4,8 @@
     using System.Linq;
     using System.Windows;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Core;
 
     /// <summary>
@@ -13,10 +15,11 @@
     {
         static MultipleChoiceFilter()
         {
+            // ReSharper disable once PossibleNullReferenceException
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MultipleChoiceFilter), new FrameworkPropertyMetadata(typeof(MultipleChoiceFilterBase)));
         }
 
-        protected override void OnSourceValuesChanged(IEnumerable<string> newValue)
+        protected override void OnSourceValuesChanged([CanBeNull] IEnumerable<string> newValue)
         {
             if (newValue == null)
                 Values.Clear();
@@ -24,14 +27,14 @@
                 Values.SynchronizeWith(newValue.ToArray());
         }
 
-        protected override MultipleChoiceContentFilterBase CreateFilter(IEnumerable<string> items)
+        protected override MultipleChoiceContentFilterBase CreateFilter([CanBeNull] IEnumerable<string> items)
         {
             return new MultipleChoicesContentFilter(items);
         }
 
         private class MultipleChoicesContentFilter : MultipleChoiceContentFilterBase
         {
-            public MultipleChoicesContentFilter(IEnumerable<string> items)
+            public MultipleChoicesContentFilter([CanBeNull] IEnumerable<string> items)
                 : base(items)
             {
             }

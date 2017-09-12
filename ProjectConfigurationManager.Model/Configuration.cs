@@ -17,9 +17,11 @@
     [Export]
     public sealed class Configuration : INotifyPropertyChanged
     {
+        private const string FileName = "config.json";
+
         [NotNull]
         private readonly ITracer _tracer;
-        private const string FileName = "config.json";
+        [NotNull]
         private static readonly string _directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "tom-englert.de", "ProjectConfigurationManager");
 
         [NotNull]

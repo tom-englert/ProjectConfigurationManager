@@ -27,6 +27,7 @@
       <DataGrid.RowStyle>
         <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridRowStyle}}">
           <Style.Triggers>
+            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <DataTrigger Binding="{Binding IsLoaded}" Value="False">
               <Setter Property="IsEnabled" Value="False"/>
             </DataTrigger>
@@ -45,6 +46,7 @@
         <ItemsPanelTemplate>
           <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}">
             <VirtualizingStackPanel.ContextMenu>
+              <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
               <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
                            Style="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
                 <MenuItem Header="Unload selected project(s)" Command="{Binding DataContext.UnloadProjectsCommand}" CommandParameter="{Binding SelectedItems}"/>

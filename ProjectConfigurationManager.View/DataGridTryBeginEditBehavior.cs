@@ -26,15 +26,10 @@
             AssociatedObject.BeginningEdit -= DataGrid_BeginningEdit;
         }
 
-        private static void DataGrid_BeginningEdit([NotNull] object sender, DataGridBeginningEditEventArgs e)
+        private static void DataGrid_BeginningEdit([NotNull] object sender, [NotNull] DataGridBeginningEditEventArgs e)
         {
-            Contract.Requires(sender != null);
-            Contract.Requires(e.Row != null);
-            Contract.Requires(e.Row.Item != null);
-            Contract.Requires(e.Column != null);
-
             var dataGridRow = e.Row;
-            var configuration = dataGridRow.Item as ProjectConfiguration;
+            var configuration = dataGridRow?.Item as ProjectConfiguration;
             var project = configuration?.Project;
 
             if (project == null || !project.CanEdit())

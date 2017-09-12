@@ -27,6 +27,7 @@
 
         static MultipleChoiceFilterBase()
         {
+            // ReSharper disable once PossibleNullReferenceException
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(typeof(MultipleChoiceFilterBase)));
         }
 
@@ -35,6 +36,7 @@
             Values = new ObservableCollection<string>();
         }
 
+        [CanBeNull]
         public MultipleChoiceContentFilterBase Filter
         {
             get => (MultipleChoiceContentFilterBase)GetValue(FilterProperty);
@@ -42,13 +44,15 @@
         }
         [NotNull]
         public static readonly DependencyProperty FilterProperty =
+            // ReSharper disable once PossibleNullReferenceException
             DependencyProperty.Register("Filter", typeof(MultipleChoiceContentFilterBase), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (sender, e) => ((MultipleChoiceFilterBase)sender).Filter_Changed()));
 
         [NotNull]
         private static readonly DependencyProperty SourceValuesProperty =
+            // ReSharper disable once PossibleNullReferenceException
             DependencyProperty.Register("SourceValues", typeof(IList<string>), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(null, (sender, e) => ((MultipleChoiceFilterBase)sender).SourceValues_Changed((IList<string>)e.NewValue)));
 
-        private void SourceValues_Changed(IEnumerable<string> newValue)
+        private void SourceValues_Changed([CanBeNull] IEnumerable<string> newValue)
         {
             OnSourceValuesChanged(newValue);
         }
@@ -64,6 +68,7 @@
         private static readonly DependencyPropertyKey ValuesPropertyKey =
             DependencyProperty.RegisterReadOnly("Values", typeof(IList<string>), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata());
         [NotNull]
+        // ReSharper disable once AssignNullToNotNullAttribute
         public static readonly DependencyProperty ValuesProperty = ValuesPropertyKey.DependencyProperty;
 
 
@@ -109,7 +114,7 @@
 
         protected abstract void OnSourceValuesChanged(IEnumerable<string> newValue);
 
-        private void ListBox_ItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        private void ListBox_ItemsCollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             var filter = Filter;
 
@@ -141,7 +146,7 @@
             }
         }
 
-        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ListBox_SelectionChanged([NotNull] object sender, [NotNull] SelectionChangedEventArgs e)
         {
             var listBox = (ListBox)sender;
             Contract.Assume(listBox != null);

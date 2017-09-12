@@ -44,7 +44,7 @@
 
         public ICollection<ProjectDependencyGroup> Groups { get; }
 
-        public void UpdateSelection(Project project, bool value)
+        public void UpdateSelection([CanBeNull] Project project, bool value)
         {
             _references.Concat(_referencedBy)
                 // ReSharper disable once PossibleNullReferenceException
@@ -110,7 +110,7 @@
 
         public int Level { get; }
 
-        public bool IsSelected { get; set; }
+        public bool IsSelected { get; [UsedImplicitly] set; }
 
         [UsedImplicitly]
         private void OnIsSelectedChanged()
@@ -131,6 +131,7 @@
 
                 foreach (var item in _children.SelectMany(p => p.DescendantsAndSelf))
                 {
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     yield return item;
                 }
             }

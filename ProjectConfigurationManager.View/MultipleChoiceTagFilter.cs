@@ -5,6 +5,8 @@
     using System.Text.RegularExpressions;
     using System.Windows;
 
+    using JetBrains.Annotations;
+
     using TomsToolbox.Core;
 
     /// <summary>
@@ -12,14 +14,16 @@
     /// </summary>
     public class MultipleChoiceTagFilter : MultipleChoiceFilterBase
     {
-        internal static readonly Regex Regex = new Regex(@"\W+", RegexOptions.Compiled);
+        [NotNull]
+        private static readonly Regex Regex = new Regex(@"\W+", RegexOptions.Compiled);
 
         static MultipleChoiceTagFilter()
         {
+            // ReSharper disable once PossibleNullReferenceException
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MultipleChoiceTagFilter), new FrameworkPropertyMetadata(typeof(MultipleChoiceFilterBase)));
         }
 
-        protected override void OnSourceValuesChanged(IEnumerable<string> newValue)
+        protected override void OnSourceValuesChanged([CanBeNull, ItemNotNull] IEnumerable<string> newValue)
         {
             if (newValue == null)
                 Values.Clear();
@@ -27,14 +31,14 @@
                 Values.SynchronizeWith(new[] { string.Empty }.Concat(newValue.SelectMany(x => Regex.Split(x))).Distinct().ToArray());
         }
 
-        protected override MultipleChoiceContentFilterBase CreateFilter(IEnumerable<string> items)
+        protected override MultipleChoiceContentFilterBase CreateFilter([CanBeNull] IEnumerable<string> items)
         {
             return new TagsContentFilter(items);
         }
 
         private class TagsContentFilter : MultipleChoiceContentFilterBase
         {
-            public TagsContentFilter(IEnumerable<string> items)
+            public TagsContentFilter([CanBeNull] IEnumerable<string> items)
                 : base(items)
             {
             }

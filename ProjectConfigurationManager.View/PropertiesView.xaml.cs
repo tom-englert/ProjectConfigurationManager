@@ -61,7 +61,7 @@
             DataGridFilter.SetGlobalFilter(DataGrid, item => FilterPredicate(item as ProjectConfiguration, selectedGuids));
         }
 
-        private void ProjectTypeGuids_Loaded([NotNull] object sender, RoutedEventArgs e)
+        private void ProjectTypeGuids_Loaded([NotNull] object sender, [NotNull] RoutedEventArgs e)
         {
             Contract.Requires(sender != null);
 
@@ -70,7 +70,7 @@
             listBox.BeginInvoke(() => listBox.SelectAll());
         }
 
-        private void ConfirmedCommandConverter_Error(object sender, ErrorEventArgs e)
+        private void ConfirmedCommandConverter_Error([NotNull] object sender, [NotNull] ErrorEventArgs e)
         {
             var exception = e.GetException();
             if (exception == null)
@@ -79,7 +79,7 @@
             _tracer.TraceError(exception);
         }
 
-        private void ConfirmedCommandConverter_OnExecuting(object sender, ConfirmedCommandEventArgs e)
+        private void ConfirmedCommandConverter_OnExecuting([NotNull] object sender, [NotNull] ConfirmedCommandEventArgs e)
         {
             WaitCursor.StartLocal(this);
         }

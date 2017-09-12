@@ -3,12 +3,15 @@
     using System;
     using System.Collections.Generic;
 
+    using JetBrains.Annotations;
+
     public static class ProjectTypeGuid
     {
         public const string Unspecified = "{00000000-0000-0000-0000-000000000000}";
 
         // e.g. http://www.mztools.com/articles/2008/MZ2008017.aspx
 
+        [NotNull]
         public static readonly Dictionary<string, string> WellKnown = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "{603C0E0B-DB56-11DC-BE95-000D561079B0}", "ASP.NET MVC 1"},

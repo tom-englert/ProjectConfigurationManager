@@ -34,7 +34,7 @@
         [NotNull]
         public Solution Solution { get; }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ICollection<ProjectConfiguration> SelectedConfigurations { get; } = new ObservableCollection<ProjectConfiguration>();
 
         [NotNull]
@@ -44,7 +44,7 @@
         {
             var configurations = SelectedConfigurations.ToArray();
 
-            configurations.ForEach(c => c.Delete());
+            configurations.ForEach(c => c?.Delete());
 
             Solution.Update();
         }
@@ -54,6 +54,7 @@
             var canEditAllFiles = SelectedConfigurations
                 .Select(cfg => cfg.Project)
                 .Distinct()
+                // ReSharper disable once PossibleNullReferenceException
                 .All(prj => prj.CanEdit());
 
             var shouldNotBuildAny = SelectedConfigurations

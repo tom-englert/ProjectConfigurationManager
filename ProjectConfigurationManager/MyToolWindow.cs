@@ -66,6 +66,7 @@
 
             var context = CreateRegistrationContext();
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             _compositionHost.AddCatalog(new DirectoryCatalog(path, "*.dll", context));
             _compositionHost.ComposeExportedValue((IVsServiceProvider)this);
 
@@ -90,6 +91,7 @@
                 var view = _compositionHost.GetExportedValue<ShellView>();
                 view.Resources.MergedDictionaries.Add(DataTemplateManager.CreateDynamicDataTemplates(_compositionHost.Container));
 
+                // ReSharper disable once AssignNullToNotNullAttribute
                 view.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler(Navigate_Click));
 
                 Content = view;
@@ -107,9 +109,9 @@
             _compositionHost.Dispose();
         }
 
-        private void Navigate_Click(object sender, RoutedEventArgs e)
+        private void Navigate_Click([NotNull] object sender, [NotNull] RoutedEventArgs e)
         {
-            string url = null;
+            string url;
 
             var source = e.OriginalSource as FrameworkElement;
             if (source != null)
@@ -159,6 +161,7 @@
 
         [ContractVerification(false)]
         [NotNull]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private static RegistrationBuilder CreateRegistrationContext()
         {
             Contract.Ensures(Contract.Result<RegistrationBuilder>() != null);
@@ -170,7 +173,8 @@
             return context;
         }
 
-        private static ConstructorInfo SelectConstructor([NotNull] ConstructorInfo[] constructors)
+        [CanBeNull]
+        private static ConstructorInfo SelectConstructor([NotNull, ItemNotNull] ConstructorInfo[] constructors)
         {
             Contract.Requires(constructors != null);
 

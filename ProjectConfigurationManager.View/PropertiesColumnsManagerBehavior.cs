@@ -56,7 +56,7 @@
             DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
 
 
-        [CanBeNull]
+        [CanBeNull, UsedImplicitly]
         public ICollection Properties
         {
             get => (ICollection)GetValue(PropertiesProperty);
@@ -64,6 +64,7 @@
         }
         [NotNull]
         public static readonly DependencyProperty PropertiesProperty =
+            // ReSharper disable once PossibleNullReferenceException
             DependencyProperty.Register("Properties", typeof(ICollection), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null, (sender, e) => ((PropertiesColumnsManagerBehavior)sender).Properties_Changed(e.NewValue as IList<object>)));
 
 
@@ -85,6 +86,7 @@
                 return;
 
             _projectPropertyNames = propertyGroups.ObservableSelectMany(group => ((CollectionViewGroup)group).Items);
+            // ReSharper disable once AssignNullToNotNullAttribute
             _projectPropertyNames.CollectionChanged += (sender, e) => ProjectProperties_CollectionChanged(e);
 
             Initialize();
@@ -127,6 +129,7 @@
                         .ToArray();
 
                     var columnsToRemove = dataGrid.Columns
+                        // ReSharper disable once PossibleNullReferenceException
                         .Where(col => (oldColumns?.Contains(col.GetValue(ProjectPropertyNameProperty))).GetValueOrDefault())
                         .ToArray();
 
@@ -157,6 +160,7 @@
 
             column.EnableMultilineEditing();
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             column.SetValue(DataGridFilterColumn.TemplateProperty, AssociatedObject?.FindResource(ResourceKeys.MultipleChoiceFilterTemplate));
             column.SetValue(ProjectPropertyNameProperty, projectPropertyName);
             column.SetValue(PropertyNameProperty, projectPropertyName.Name);
@@ -235,15 +239,18 @@
 
                 dataGrid.Columns
                     .Skip(frozenColumnCount)
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     .Select(col => new ColumInfo(col, _configuration))
                     .Where(col => col.ProjectPropertyName != null)
                     .OrderBy(col => col.ProjectPropertyName.GroupName.Index)
+                    // ReSharper disable PossibleNullReferenceException
                     .ThenBy(col => col.DisplayIndex)
                     .ForEach(col => col.Column.DisplayIndex = nextIndex++);
+                // ReSharper restore PossibleNullReferenceException
             }
             catch (Exception ex)
             {
-                _tracer.TraceError(ex);
+                _tracer?.TraceError(ex);
             }
         }
 
@@ -261,7 +268,9 @@
 
                 var columnsByGroup = dataGrid.Columns
                     .Skip(dataGrid.FrozenColumnCount)
+                    // ReSharper disable once PossibleNullReferenceException
                     .OrderBy(col => col.DisplayIndex)
+                    // ReSharper disable once PossibleNullReferenceException
                     .Select(col => col.GetValue(ProjectPropertyNameProperty) as ProjectPropertyName)
                     .Where(property => property != null)
                     .GroupBy(property => property.GroupName);
@@ -274,8 +283,10 @@
                     if (groupName == null)
                         continue;
 
+                    // ReSharper disable once PossibleNullReferenceException
                     var columnNames = group.Select(property => property.Name).ToArray();
 
+                    // ReSharper disable once PossibleNullReferenceException
                     if (propertyColumnOrder.TryGetValue(groupName, out string[] current) && (current?.SequenceEqual(columnNames) == true))
                         continue;
 
@@ -284,7 +295,7 @@
             }
             catch (Exception ex)
             {
-                _tracer.TraceError(ex);
+                _tracer?.TraceError(ex);
             }
         }
     }

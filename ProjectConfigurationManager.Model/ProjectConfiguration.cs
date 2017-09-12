@@ -17,15 +17,13 @@
     public class ProjectConfiguration : ObservableObject, IEquatable<ProjectConfiguration>
     {
         [NotNull]
-        private readonly Project _project;
-        [NotNull]
         private IDictionary<string, IProjectProperty> _properties = new Dictionary<string, IProjectProperty>();
 
         internal ProjectConfiguration([NotNull] Project project, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(project != null);
 
-            _project = project;
+            Project = project;
             Configuration = configuration;
             Platform = platform;
 
@@ -34,14 +32,7 @@
         }
 
         [NotNull]
-        public Project Project
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Project>() != null);
-                return _project;
-            }
-        }
+        public Project Project { get; }
 
         public string Configuration { get; }
 
@@ -280,7 +271,7 @@
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_project != null);
+            Contract.Invariant(Project != null);
             Contract.Invariant(ShouldBuild != null);
             Contract.Invariant(PropertyValue != null);
             Contract.Invariant(_properties != null);

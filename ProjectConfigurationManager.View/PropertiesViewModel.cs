@@ -67,6 +67,7 @@
 
         private static bool CanPaste([CanBeNull] DataGrid dataGrid)
         {
+            // ReSharper disable once PossibleNullReferenceException
             return Clipboard.ContainsText() && (dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false);
         }
 
@@ -78,6 +79,7 @@
             Contract.Requires(dataGrid != null);
             Contract.Requires(dataGrid.SelectedCells != null);
 
+            // ReSharper disable once PossibleNullReferenceException
             foreach (var cell in dataGrid.SelectedCells)
             {
                 var configuration = (ProjectConfiguration)cell.Item;
@@ -98,8 +100,9 @@
             }
         }
 
-        private static bool CanDelete(DataGrid dataGrid)
+        private static bool CanDelete([CanBeNull] DataGrid dataGrid)
         {
+            // ReSharper disable once PossibleNullReferenceException
             return dataGrid?.SelectedCells?.Any(cell => cell.Column.IsReadOnly) == false;
         }
 

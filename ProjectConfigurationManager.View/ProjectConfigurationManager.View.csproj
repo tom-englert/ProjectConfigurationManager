@@ -305,7 +305,6 @@
     <Compile Include="ThemeManager.cs" />
     <Compile Include="ThemeResourceProvider.cs" />
     <Compile Include="Themes\ResourceKeys.cs" />
-    <Compile Include="Themes\ResourceLocator.cs" />
     <Page Include="BuildConfigurationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

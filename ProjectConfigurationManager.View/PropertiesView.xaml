@@ -60,7 +60,6 @@
     </Style>
     <dgx:RegexContentFilterFactory x:Key="RegexContentFilterFactory" />
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" Executing="ConfirmedCommandConverter_OnExecuting" />
-    <themes:ResourceLocator x:Key="ResourceLocator" />
   </UserControl.Resources>
 
   <DockPanel>
@@ -98,15 +97,16 @@
               AutoGenerateColumns="False" FrozenColumnCount="4"
               dgx:Tools.ApplyInitialSorting="True"
               dgx:DataGridFilter.IsAutoFilterEnabled="True"
-              dgx:DataGridFilter.ResourceLocator="{StaticResource ResourceLocator}"
               dgx:DataGridFilter.ContentFilterFactory="{StaticResource RegexContentFilterFactory}">
       <DataGrid.Resources>
         <ContextMenu x:Key="ContextMenu" Style="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
+          <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
           <MenuItem Header="Copy" InputGestureText="Ctrl+C" Command="{Binding CopyCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
           <MenuItem Header="Paste" InputGestureText="Ctrl+V" Command="{Binding PasteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
           <MenuItem Header="Delete" InputGestureText="Del" Command="{Binding DeleteCommand, Converter={StaticResource ErrorHandlerCommandConverter}}" CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+          <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
         </ContextMenu>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Static themes:ResourceKeys.AutoToolTipTextBoxStyle}}">
+        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Static toms:ResourceKeys.AutoToolTipTextBoxStyle}}">
           <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         </Style>
       </DataGrid.Resources>
@@ -148,6 +148,7 @@
               <ToolTip>
                 <StackPanel d:DataContext="{d:DesignInstance model:ProjectConfiguration}">
                   <Decorator Height="2" />
+                  <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
                   <TextBlock Text="{Binding Column.Header.Text}" DataContext="{Binding PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType=ToolTip}}" d:DataContext="{d:DesignInstance DataGridCell}" />
                   <Decorator Height="4" />
                   <TextBlock Foreground="{StaticResource {x:Static SystemColors.MenuTextBrushKey}}">
@@ -168,9 +169,11 @@
             <Setter.Value>
               <MultiBinding Converter="{toms:Import local:CellToBackgroundBrushConverter}">
                 <Binding RelativeSource="{RelativeSource Self}" />
+                <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
                 <Binding Path="PropertyValue" />
                 <Binding Path="Project.DefaultProjectConfiguration.PropertyValue" />
                 <Binding Path="IsDarkTheme" Source="{toms:Import local:ThemeManager}"/>
+                <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
               </MultiBinding>
             </Setter.Value>
           </Setter>
@@ -186,6 +189,7 @@
       <DataGrid.RowStyle>
         <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridRowStyle}}">
           <Style.Triggers>
+            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <DataTrigger Binding="{Binding Project.IsSaved}" Value="False">
               <Setter Property="IsEnabled" Value="False"/>
             </DataTrigger>
@@ -197,7 +201,7 @@
         <dgb:BeginEditOnCtrlEnterBehavior />
         <local:DataGridTryBeginEditBehavior />
         <toms:ZoomFontSizeOnMouseWheelBehavior />
-        <dgb:ExtendedStarSizeBehavior ResourceLocator="{StaticResource ResourceLocator}" />
+        <dgb:ExtendedStarSizeBehavior />
       </i:Interaction.Behaviors>
     </DataGrid>
   </DockPanel>

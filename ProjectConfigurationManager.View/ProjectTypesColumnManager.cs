@@ -30,10 +30,11 @@
             Contract.Requires(obj != null);
             obj.SetValue(IsAttachedProperty, value);
         }
+        [NotNull]
         public static readonly DependencyProperty IsAttachedProperty =
             DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(ProjectTypesColumnManager), new FrameworkPropertyMetadata(false, IsAttached_Changed));
 
-        private static void IsAttached_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void IsAttached_Changed([NotNull] DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var dataGrid = (DataGrid)d;
 
@@ -56,9 +57,11 @@
             };
 
             var visualTree = new FrameworkElementFactory(typeof(CheckBox));
+            // ReSharper disable AssignNullToNotNullAttribute
             visualTree.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
             visualTree.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
             visualTree.SetBinding(ToggleButton.IsCheckedProperty, binding);
+            // ReSharper restore AssignNullToNotNullAttribute
 
             var column = new DataGridTemplateColumn
             {

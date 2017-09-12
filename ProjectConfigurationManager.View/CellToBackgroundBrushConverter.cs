@@ -76,6 +76,7 @@
             return new SolidColorBrush(color);
         }
 
+        [CanBeNull]
         private static string GetColumnText([NotNull] DataGridColumn column, [NotNull] object dataContext)
         {
             Contract.Requires(column != null);
@@ -123,7 +124,6 @@
             throw new NotImplementedException();
         }
 
-        [NotNull]
         [ContractVerification(false)]
         private Color GetNextColor([CanBeNull] string text)
         {
