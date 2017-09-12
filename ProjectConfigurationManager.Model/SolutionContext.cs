@@ -30,10 +30,10 @@
             ProjectName = context.ProjectName;
         }
 
-        [CanBeNull]
+        [CanBeNull, IgnoreDuringEquals]
         public string ConfigurationName { get; private set; }
 
-        [CanBeNull]
+        [CanBeNull, IgnoreDuringEquals]
         public string PlatformName { get; private set; }
 
         public bool SetConfiguration([NotNull] ProjectConfiguration configuration)
@@ -54,8 +54,10 @@
             return true;
         }
 
+        [CanBeNull, IgnoreDuringEquals]
         public string ProjectName { get; }
 
+        [IgnoreDuringEquals]
         public bool ShouldBuild
         {
             get => ContextIsValid() && _context.ShouldBuild;
@@ -68,7 +70,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public SolutionConfiguration SolutionConfiguration { get; }
 
         private bool ContextIsValid()

@@ -43,16 +43,13 @@
         [CanBeNull]
         public string Platform { get; }
 
-        [IgnoreDuringEquals]
-        [NotNull] // ReSharper disable once MemberCanBePrivate.Global - used in column binding
+        [NotNull, IgnoreDuringEquals] // ReSharper disable once MemberCanBePrivate.Global - used in column binding
         public IIndexer<bool?> ShouldBuild { get; }
 
-        [IgnoreDuringEquals]
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public IIndexer<string> PropertyValue { get; }
 
-        [IgnoreDuringEquals]
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         internal IDictionary<string, IProjectProperty> Properties => new ReadOnlyDictionary<string, IProjectProperty>(_properties);
 
         public void Delete()

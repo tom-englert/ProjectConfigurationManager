@@ -17,7 +17,6 @@
     using Microsoft.VisualStudio.Shell.Interop;
 
     using TomsToolbox.Core;
-    using TomsToolbox.Desktop;
     using TomsToolbox.ObservableCollections;
 
     [Equals]
@@ -75,13 +74,13 @@
         [NotNull]
         public IVsHierarchy ProjectHierarchy { get; private set; }
 
-        [NotNull, UsedImplicitly]
+        [NotNull, UsedImplicitly, IgnoreDuringEquals]
         public Solution Solution { get; }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public string Name => DteProject?.Name ?? Path.GetFileNameWithoutExtension(FullName);
 
-        [NotNull, UsedImplicitly]
+        [NotNull, UsedImplicitly, IgnoreDuringEquals]
         public string UniqueName
         {
             get
@@ -106,42 +105,44 @@
             }
         }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         // ReSharper disable once AssignNullToNotNullAttribute
         public string RelativePath => Path.GetDirectoryName(UniqueName);
 
-        [NotNull, UsedImplicitly]
+        [NotNull, UsedImplicitly, IgnoreDuringEquals]
         public string SortKey => Name + " (" + RelativePath + ")";
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public string FullName { get; }
 
-        [NotNull, ItemNotNull]
+        [NotNull, ItemNotNull, IgnoreDuringEquals]
         public IList<string> ProjectTypeGuids => RetrieveProjectTypeGuids();
 
-        [NotNull, ItemNotNull]
+        [NotNull, ItemNotNull, IgnoreDuringEquals]
         public IEnumerable<SolutionContext> SolutionContexts => Solution.SolutionConfigurations.SelectMany(cfg => cfg.Contexts).Where(context => context?.ProjectName == UniqueName);
 
-        [NotNull, ItemNotNull]
+        [NotNull, ItemNotNull, IgnoreDuringEquals]
         public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations { get; }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public ProjectConfiguration DefaultProjectConfiguration { get; }
 
-        [NotNull, ItemNotNull]
+        [NotNull, ItemNotNull, IgnoreDuringEquals]
         public IObservableCollection<ProjectConfiguration> ProjectConfigurations { get; }
 
-        [NotNull, UsedImplicitly]
+        [NotNull, UsedImplicitly, IgnoreDuringEquals]
         public IIndexer<bool> IsProjectTypeGuidSelected { get; }
 
+        [IgnoreDuringEquals]
         public bool IsSaving => ProjectFile.IsSaving;
 
+        [IgnoreDuringEquals]
         public DateTime FileTime => ProjectFile.FileTime;
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public ObservableCollection<Project> References { get; } = new ObservableCollection<Project>();
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public ObservableCollection<Project> ReferencedBy { get; } = new ObservableCollection<Project>();
 
         [NotNull]
@@ -152,7 +153,7 @@
             return VsProjectReferences ?? MpfProjectReferences ?? Enumerable.Empty<VSLangProj.Reference>();
         }
 
-        [CanBeNull]
+        [CanBeNull, IgnoreDuringEquals]
         [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> MpfProjectReferences
         {
@@ -179,7 +180,7 @@
             }
         }
 
-        [CanBeNull]
+        [CanBeNull, IgnoreDuringEquals]
         [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> VsProjectReferences
         {
@@ -198,7 +199,7 @@
             }
         }
 
-        [CanBeNull]
+        [CanBeNull, IgnoreDuringEquals]
         private EnvDTE.Project DteProject
         {
             get
@@ -209,6 +210,7 @@
             }
         }
 
+        [IgnoreDuringEquals]
         public bool IsSaved
         {
             get
@@ -225,6 +227,7 @@
             }
         }
 
+        [IgnoreDuringEquals]
         public bool IsLoaded
         {
             get
@@ -243,7 +246,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         internal ProjectFile ProjectFile { get; private set; }
 
         public bool CanEdit()
@@ -406,18 +409,6 @@
             {
                 Contract.Invariant(_configuration != null);
             }
-        }
-
-        [CustomGetHashCode, UsedImplicitly]
-        private int CustomGetHashCode()
-        {
-            return ProjectHierarchy.GetHashCode();
-        }
-
-        [CustomEqualsInternal, UsedImplicitly]
-        private bool CustomEquals([NotNull] Project other)
-        {
-            return ProjectHierarchy == other.ProjectHierarchy;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

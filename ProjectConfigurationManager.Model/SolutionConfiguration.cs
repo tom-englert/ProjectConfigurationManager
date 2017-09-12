@@ -37,16 +37,16 @@
             Update();
         }
 
-        [NotNull, UsedImplicitly]
+        [NotNull, UsedImplicitly, IgnoreDuringEquals]
         public string Name { get; }
 
-        [NotNull, UsedImplicitly]
+        [NotNull, UsedImplicitly, IgnoreDuringEquals]
         public string PlatformName { get; }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public string UniqueName => Name + "|" + PlatformName;
 
-        [NotNull, ItemNotNull]
+        [NotNull, ItemNotNull, IgnoreDuringEquals]
         public ObservableCollection<SolutionContext> Contexts { get; } = new ObservableCollection<SolutionContext>();
 
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]

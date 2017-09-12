@@ -31,13 +31,13 @@
             return name.Length > length && name.StartsWith(groupName, StringComparison.Ordinal) && char.IsUpper(name[length]);
         }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public string Name { get; }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public PropertyGroupName GroupName { get; }
 
-        [NotNull]
+        [NotNull, IgnoreDuringEquals]
         public string DisplayName { get; }
 
         [CustomGetHashCode, UsedImplicitly]
