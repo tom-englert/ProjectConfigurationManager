@@ -6,6 +6,8 @@
     using System.Globalization;
     using System.Runtime.InteropServices;
 
+    using JetBrains.Annotations;
+
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -50,7 +52,7 @@
         /// tool window. See the Initialize method to see how the menu item is associated to 
         /// this function using the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
-        private void ShowToolWindow(object sender, EventArgs e)
+        private void ShowToolWindow([NotNull] object sender, [NotNull] EventArgs e)
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
@@ -78,14 +80,13 @@
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if ( null != mcs )
-            {
-                // Create the command for the tool window
-                var toolwndCommandID = new CommandID(GuidList.guidProjectConfigurationManagerCmdSet, (int)PkgCmdIDList.cmdidProjectConfigurationManager);
-                var menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-                mcs.AddCommand( menuToolWin );
-            }
+            if (!(GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs))
+                return;
+
+            // Create the command for the tool window
+            var toolwndCommandID = new CommandID(GuidList.guidProjectConfigurationManagerCmdSet, (int)PkgCmdIDList.cmdidProjectConfigurationManager);
+            var menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
+            mcs.AddCommand(menuToolWin);
         }
         #endregion
     }

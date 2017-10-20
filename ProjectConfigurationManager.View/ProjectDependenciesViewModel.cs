@@ -42,6 +42,7 @@
             };
         }
 
+        [NotNull, ItemNotNull]
         public ICollection<ProjectDependencyGroup> Groups { get; }
 
         public void UpdateSelection([CanBeNull] Project project, bool value)
@@ -106,6 +107,7 @@
         [NotNull]
         public Project Project { get; }
 
+        [NotNull, ItemNotNull]
         public ICollectionView Children { get; }
 
         public int Level { get; }
@@ -168,8 +170,8 @@
 
     internal static class ExtensionMethods
     {
-        [NotNull]
-        public static ICollectionView ToCollectionView([NotNull] this IList<ProjectDependency> items)
+        [NotNull, ItemNotNull]
+        public static ICollectionView ToCollectionView([NotNull, ItemNotNull] this IList<ProjectDependency> items)
         {
             Contract.Requires(items != null);
             Contract.Ensures(Contract.Result<ICollectionView>() != null);

@@ -12,7 +12,6 @@
     using System.Windows.Data;
 
     using DataGridExtensions;
-    using DataGridExtensions.Framework;
 
     using JetBrains.Annotations;
 
@@ -23,6 +22,7 @@
     [TemplatePart(Name = "PART_ListBox", Type = typeof(ListBox))]
     public abstract class MultipleChoiceFilterBase : Control
     {
+        [CanBeNull]
         private ListBox _listBox;
 
         static MultipleChoiceFilterBase()
@@ -52,12 +52,12 @@
             // ReSharper disable once PossibleNullReferenceException
             DependencyProperty.Register("SourceValues", typeof(IList<string>), typeof(MultipleChoiceFilterBase), new FrameworkPropertyMetadata(null, (sender, e) => ((MultipleChoiceFilterBase)sender).SourceValues_Changed((IList<string>)e.NewValue)));
 
-        private void SourceValues_Changed([CanBeNull] IEnumerable<string> newValue)
+        private void SourceValues_Changed([CanBeNull, ItemCanBeNull] IEnumerable<string> newValue)
         {
             OnSourceValuesChanged(newValue);
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IList<string> Values
         {
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -92,27 +92,27 @@
             var dataGridItems = (INotifyCollectionChanged)dataGrid.Items;
             dataGridItems.CollectionChanged += (_, __) => UpdateSourceValuesTarget();
 
-            _listBox = Template?.FindName("PART_ListBox", this) as ListBox;
-            if (_listBox == null)
+            var listBox = _listBox = Template?.FindName("PART_ListBox", this) as ListBox;
+            if (listBox == null)
                 return;
 
             var filter = Filter;
 
             if (filter?.Items == null)
             {
-                _listBox.SelectAll();
+                listBox.SelectAll();
             }
 
-            _listBox.SelectionChanged += ListBox_SelectionChanged;
-            var items = (INotifyCollectionChanged)_listBox.Items;
+            listBox.SelectionChanged += ListBox_SelectionChanged;
+            var items = (INotifyCollectionChanged)listBox.Items;
 
             items.CollectionChanged += ListBox_ItemsCollectionChanged;
         }
 
         [NotNull]
-        protected abstract MultipleChoiceContentFilterBase CreateFilter(IEnumerable<string> items);
+        protected abstract MultipleChoiceContentFilterBase CreateFilter([CanBeNull, ItemCanBeNull] IEnumerable<string> items);
 
-        protected abstract void OnSourceValuesChanged(IEnumerable<string> newValue);
+        protected abstract void OnSourceValuesChanged([CanBeNull, ItemCanBeNull] IEnumerable<string> newValue);
 
         private void ListBox_ItemsCollectionChanged([NotNull] object sender, [NotNull] NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
@@ -158,7 +158,7 @@
             Filter = CreateFilter(areAllItemsSelected ? null : selectedItems);
         }
 
-        [Throttled(typeof(DispatcherThrottle))]
+        [Throttled(typeof(TomsToolbox.Desktop.DispatcherThrottle))]
         private void UpdateSourceValuesTarget()
         {
             BindingOperations.GetBindingExpression(this, SourceValuesProperty)?.UpdateTarget();
@@ -175,12 +175,12 @@
 
     public abstract class MultipleChoiceContentFilterBase : IContentFilter
     {
-        protected MultipleChoiceContentFilterBase([CanBeNull] IEnumerable<string> items)
+        protected MultipleChoiceContentFilterBase([CanBeNull, ItemCanBeNull] IEnumerable<string> items)
         {
             Items = items?.ToArray();
         }
 
-        [CanBeNull]
+        [CanBeNull, ItemCanBeNull]
         public IList<string> Items
         {
             get;

@@ -84,8 +84,8 @@
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 var folder = Path.GetDirectoryName(executingAssembly.Location);
 
-                _tracer.WriteLine("Assembly location: {0}", folder);
-                _tracer.WriteLine("Version: {0}", new AssemblyName(executingAssembly.FullName).Version);
+                _tracer.WriteLine($"Assembly location: {folder}");
+                _tracer.WriteLine($"Version: {new AssemblyName(executingAssembly.FullName).Version}");
 
 
                 var view = _compositionHost.GetExportedValue<ShellView>();
@@ -113,8 +113,7 @@
         {
             string url;
 
-            var source = e.OriginalSource as FrameworkElement;
-            if (source != null)
+            if (e.OriginalSource is FrameworkElement source)
             {
                 var button = source.TryFindAncestorOrSelf<ButtonBase>();
                 if (button == null)
@@ -146,8 +145,7 @@
             var webBrowsingService = (IVsWebBrowsingService)GetService(typeof(SVsWebBrowsingService));
             if (webBrowsingService != null)
             {
-                IVsWindowFrame pFrame;
-                var hr = webBrowsingService.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_WebURLOnly, out pFrame);
+                var hr = webBrowsingService.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_WebURLOnly, out var pFrame);
                 if (ErrorHandler.Succeeded(hr) && (pFrame != null))
                 {
                     hr = pFrame.Show();

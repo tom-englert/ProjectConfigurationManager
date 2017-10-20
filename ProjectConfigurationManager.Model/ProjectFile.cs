@@ -34,7 +34,9 @@
         private readonly Project _project;
         private readonly Guid _projectGuid;
 
+        [CanBeNull]
         private XDocument _document;
+        [CanBeNull, ItemNotNull]
         private IList<IProjectPropertyGroup> _propertyGroups;
 
         [NotNull]
@@ -283,7 +285,7 @@
             private readonly ProjectFile _projectFile;
             [NotNull]
             private readonly XElement _propertyGroupNode;
-            [NotNull]
+            [NotNull, ItemNotNull]
             private readonly ObservableCollection<ProjectProperty> _properties;
             [NotNull]
             private XNamespace _xmlns => _propertyGroupNode.Document?.Root?.GetDefaultNamespace() ?? XNamespace.None;
@@ -328,7 +330,6 @@
                 return property;
             }
 
-            [CanBeNull]
             public string ConditionExpression => _propertyGroupNode.GetAttribute(ConditionAttributeName);
 
             public void Delete()

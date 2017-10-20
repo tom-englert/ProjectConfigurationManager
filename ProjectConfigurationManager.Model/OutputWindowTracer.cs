@@ -23,7 +23,7 @@
             _serviceProvider = serviceProvider;
         }
 
-        private void LogMessageToOutputWindow(string value)
+        private void LogMessageToOutputWindow([CanBeNull] string value)
         {
             var outputWindow = _serviceProvider.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
             if (outputWindow == null)
@@ -31,8 +31,7 @@
 
             var outputPaneGuid = new Guid("{4FDC5538-066E-4942-A1FC-15BCB6602D30}");
 
-            IVsOutputWindowPane pane;
-            var errorCode = outputWindow.GetPane(ref outputPaneGuid, out pane);
+            var errorCode = outputWindow.GetPane(ref outputPaneGuid, out var pane);
 
             if ((errorCode < 0) || pane == null)
             {

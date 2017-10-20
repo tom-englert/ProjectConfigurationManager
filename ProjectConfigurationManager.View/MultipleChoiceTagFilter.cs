@@ -23,22 +23,23 @@
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MultipleChoiceTagFilter), new FrameworkPropertyMetadata(typeof(MultipleChoiceFilterBase)));
         }
 
-        protected override void OnSourceValuesChanged([CanBeNull, ItemNotNull] IEnumerable<string> newValue)
+        protected override void OnSourceValuesChanged(IEnumerable<string> newValue)
         {
             if (newValue == null)
                 Values.Clear();
             else
+                // ReSharper disable once AssignNullToNotNullAttribute
                 Values.SynchronizeWith(new[] { string.Empty }.Concat(newValue.SelectMany(x => Regex.Split(x))).Distinct().ToArray());
         }
 
-        protected override MultipleChoiceContentFilterBase CreateFilter([CanBeNull] IEnumerable<string> items)
+        protected override MultipleChoiceContentFilterBase CreateFilter(IEnumerable<string> items)
         {
             return new TagsContentFilter(items);
         }
 
         private sealed class TagsContentFilter : MultipleChoiceContentFilterBase
         {
-            public TagsContentFilter([CanBeNull] IEnumerable<string> items)
+            public TagsContentFilter([CanBeNull, ItemCanBeNull] IEnumerable<string> items)
                 : base(items)
             {
             }

@@ -43,14 +43,14 @@
             InitializeComponent();
         }
 
-        private static bool FilterPredicate(ProjectConfiguration item, [NotNull] IEnumerable<string> selectedGuids)
+        private static bool FilterPredicate([CanBeNull] ProjectConfiguration item, [NotNull, ItemNotNull] IEnumerable<string> selectedGuids)
         {
             Contract.Requires(selectedGuids != null);
 
             return (item != null) && item.Project.ProjectTypeGuids.All(guid => selectedGuids.Contains(guid, StringComparer.OrdinalIgnoreCase));
         }
 
-        private void ProjectTypeGuids_SelectionChanged([NotNull] object sender, SelectionChangedEventArgs e)
+        private void ProjectTypeGuids_SelectionChanged([NotNull] object sender, [NotNull] SelectionChangedEventArgs e)
         {
             Contract.Requires(sender != null);
 
@@ -58,7 +58,9 @@
 
             var selectedGuids = listBox.SelectedItems.OfType<string>().ToArray();
 
-            DataGridFilter.SetGlobalFilter(DataGrid, item => FilterPredicate(item as ProjectConfiguration, selectedGuids));
+            var dataGrid = DataGrid;
+            Contract.Assume(dataGrid != null);
+            DataGridFilter.SetGlobalFilter(dataGrid, item => FilterPredicate(item as ProjectConfiguration, selectedGuids));
         }
 
         private void ProjectTypeGuids_Loaded([NotNull] object sender, [NotNull] RoutedEventArgs e)

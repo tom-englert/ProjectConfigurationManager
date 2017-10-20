@@ -20,8 +20,8 @@
               FrozenColumnCount="1">
       <DataGrid.ColumnHeaderStyle>
         <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridColumnHeaderStyle}}">
-          <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+          <Setter Property="VerticalContentAlignment" Value="Bottom" />
+          <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
       </DataGrid.ColumnHeaderStyle>
       <DataGrid.RowStyle>
@@ -29,7 +29,7 @@
           <Style.Triggers>
             <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <DataTrigger Binding="{Binding IsLoaded}" Value="False">
-              <Setter Property="IsEnabled" Value="False"/>
+              <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
           </Style.Triggers>
         </Style>
@@ -49,7 +49,7 @@
               <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
               <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
                            Style="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
-                <MenuItem Header="Unload selected project(s)" Command="{Binding DataContext.UnloadProjectsCommand}" CommandParameter="{Binding SelectedItems}"/>
+                <MenuItem Header="Unload selected project(s)" Command="{Binding DataContext.UnloadProjectsCommand}" CommandParameter="{Binding SelectedItems}" />
               </ContextMenu>
             </VirtualizingStackPanel.ContextMenu>
           </VirtualizingStackPanel>

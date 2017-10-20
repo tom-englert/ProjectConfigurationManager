@@ -27,14 +27,14 @@
             DependencyProperty.RegisterAttached("SolutionConfiguration", typeof(SolutionConfiguration), typeof(BuildConfigurationColumnsManager), new FrameworkPropertyMetadata(null));
 
 
-        [CanBeNull]
+        [CanBeNull, ItemNotNull]
         [AttachedPropertyBrowsableForType(typeof(DataGrid))]
         public static ICollection GetConfigurations([NotNull] DependencyObject obj)
         {
             Contract.Requires(obj != null);
             return (ICollection)obj.GetValue(ConfigurationsProperty);
         }
-        public static void SetConfigurations([NotNull] DependencyObject obj, [CanBeNull] ICollection value)
+        public static void SetConfigurations([NotNull] DependencyObject obj, [CanBeNull, ItemNotNull] ICollection value)
         {
             Contract.Requires(obj != null);
             obj.SetValue(ConfigurationsProperty, value);
@@ -55,7 +55,7 @@
             Register((DataGrid)d, (ICollection)e.NewValue);
         }
 
-        private static void Register([NotNull] DataGrid dataGrid, [CanBeNull] ICollection configurations)
+        private static void Register([NotNull] DataGrid dataGrid, [CanBeNull, ItemNotNull] ICollection configurations)
         {
             Contract.Requires(dataGrid != null);
 

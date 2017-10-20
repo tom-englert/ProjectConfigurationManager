@@ -6,16 +6,17 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Runtime.CompilerServices;
+
+    using Equatable;
 
     using JetBrains.Annotations;
 
     using TomsToolbox.Core;
 
-    [Equals]
+    [ImplementsEquatable]
     public sealed class SolutionConfiguration : INotifyPropertyChanged
     {
-        [NotNull]
+        [NotNull, Equals]
         private readonly Solution _solution;
         [NotNull]
         private readonly EnvDTE80.SolutionConfiguration2 _solutionConfiguration;
@@ -37,16 +38,16 @@
             Update();
         }
 
-        [NotNull, UsedImplicitly, IgnoreDuringEquals]
+        [NotNull, UsedImplicitly]
         public string Name { get; }
 
-        [NotNull, UsedImplicitly, IgnoreDuringEquals]
+        [NotNull, UsedImplicitly]
         public string PlatformName { get; }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public string UniqueName => Name + "|" + PlatformName;
 
-        [NotNull, ItemNotNull, IgnoreDuringEquals]
+        [NotNull, ItemNotNull]
         public ObservableCollection<SolutionContext> Contexts { get; } = new ObservableCollection<SolutionContext>();
 
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
@@ -61,21 +62,20 @@
         [CustomGetHashCode, UsedImplicitly]
         private int CustomGetHashCode()
         {
-            return Contexts.Select(ctx => ctx.GetHashCode()).Aggregate(_solutionConfiguration.GetHashCode(), HashCode.Aggregate);
+            return Contexts.Select(ctx => ctx.GetHashCode()).Aggregate(HashCode.Aggregate);
         }
 
-        [CustomEqualsInternal, UsedImplicitly]
+        [CustomEquals, UsedImplicitly]
         [ContractVerification(false)]
         private bool CustomEquals([NotNull] SolutionConfiguration other)
         {
-            return _solutionConfiguration == other._solutionConfiguration
-                && Contexts.SequenceEqual(other.Contexts);
+            return Contexts.SequenceEqual(other.Contexts);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator, UsedImplicitly]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        [UsedImplicitly]
+        private void OnPropertyChanged([NotNull] string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

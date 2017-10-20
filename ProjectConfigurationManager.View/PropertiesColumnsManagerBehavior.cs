@@ -31,8 +31,11 @@
 
     public sealed class PropertiesColumnsManagerBehavior : FrameworkElementBehavior<DataGrid>
     {
+        [CanBeNull, ItemNotNull]
         private IObservableCollection<object> _projectPropertyNames;
+        [CanBeNull]
         private Configuration _configuration;
+        [CanBeNull]
         private ITracer _tracer;
 
         [NotNull]
@@ -56,7 +59,7 @@
             DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(PropertiesColumnsManagerBehavior), new FrameworkPropertyMetadata(null));
 
 
-        [CanBeNull, UsedImplicitly]
+        [CanBeNull, ItemNotNull, UsedImplicitly]
         public ICollection Properties
         {
             get => (ICollection)GetValue(PropertiesProperty);
@@ -80,7 +83,7 @@
             Initialize();
         }
 
-        private void Properties_Changed([CanBeNull] IList<object> propertyGroups)
+        private void Properties_Changed([CanBeNull, ItemNotNull] IList<object> propertyGroups)
         {
             if (propertyGroups == null)
                 return;
@@ -179,7 +182,7 @@
             if (columnOrder == null)
                 return -1;
 
-            if (!columnOrder.TryGetValue(projectPropertyName.GroupName.Name, out string[] propertyColumnOrder) || (propertyColumnOrder == null))
+            if (!columnOrder.TryGetValue(projectPropertyName.GroupName.Name, out var propertyColumnOrder) || (propertyColumnOrder == null))
                 return -1;
 
             var index = propertyColumnOrder.IndexOf(projectPropertyName.Name);
@@ -212,6 +215,7 @@
                 }
             }
 
+            [CanBeNull]
             public ProjectPropertyName ProjectPropertyName { get; }
 
             public int DisplayIndex { get; }
@@ -279,7 +283,7 @@
 
                 foreach (var group in columnsByGroup)
                 {
-                    var groupName = group?.Key?.Name;
+                    var groupName = group.Key?.Name;
                     if (groupName == null)
                         continue;
 
@@ -287,7 +291,7 @@
                     var columnNames = group.Select(property => property.Name).ToArray();
 
                     // ReSharper disable once PossibleNullReferenceException
-                    if (propertyColumnOrder.TryGetValue(groupName, out string[] current) && (current?.SequenceEqual(columnNames) == true))
+                    if (propertyColumnOrder.TryGetValue(groupName, out var current) && (current?.SequenceEqual(columnNames) == true))
                         continue;
 
                     _configuration.PropertyColumnOrder = propertyColumnOrder.SetItem(groupName, columnNames);

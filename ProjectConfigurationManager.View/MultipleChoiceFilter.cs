@@ -19,7 +19,7 @@
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MultipleChoiceFilter), new FrameworkPropertyMetadata(typeof(MultipleChoiceFilterBase)));
         }
 
-        protected override void OnSourceValuesChanged([CanBeNull] IEnumerable<string> newValue)
+        protected override void OnSourceValuesChanged(IEnumerable<string> newValue)
         {
             if (newValue == null)
                 Values.Clear();
@@ -27,14 +27,14 @@
                 Values.SynchronizeWith(newValue.ToArray());
         }
 
-        protected override MultipleChoiceContentFilterBase CreateFilter([CanBeNull] IEnumerable<string> items)
+        protected override MultipleChoiceContentFilterBase CreateFilter(IEnumerable<string> items)
         {
             return new MultipleChoicesContentFilter(items);
         }
 
         private sealed class MultipleChoicesContentFilter : MultipleChoiceContentFilterBase
         {
-            public MultipleChoicesContentFilter([CanBeNull] IEnumerable<string> items)
+            public MultipleChoicesContentFilter([CanBeNull, ItemCanBeNull] IEnumerable<string> items)
                 : base(items)
             {
             }

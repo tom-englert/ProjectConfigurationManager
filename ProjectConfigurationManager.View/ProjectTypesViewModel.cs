@@ -29,7 +29,7 @@
         [NotNull]
         public ICommand UnloadProjectsCommand => new DelegateCommand<IEnumerable>(UnloadProjects);
 
-        private static void UnloadProjects([NotNull] IEnumerable projects)
+        private static void UnloadProjects([NotNull, ItemNotNull] IEnumerable projects)
         {
             Contract.Requires(projects != null);
 

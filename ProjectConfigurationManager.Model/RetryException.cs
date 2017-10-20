@@ -2,7 +2,6 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.Serialization;
 
     using JetBrains.Annotations;
 
@@ -15,23 +14,18 @@
         {
         }
 
-        public RetryException(string message)
+        public RetryException([NotNull] string message)
             : base(message)
         {
         }
 
-        public RetryException(string message, Exception inner)
+        public RetryException([NotNull] string message, [NotNull] Exception inner)
             : base(message, inner)
         {
         }
 
-        public RetryException(Exception inner)
+        public RetryException([NotNull] Exception inner)
             : base(string.Empty, inner)
-        {
-        }
-
-        protected RetryException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

@@ -11,8 +11,8 @@
              d:DataContext="{d:DesignInstance view:BuildConfigurationViewModel}">
   <UserControl.Resources>
     <toms:ConfirmedCommandConverter x:Key="ErrorHandlerCommandConverter" Error="ConfirmedCommandConverter_Error" />
-    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Static styles:ResourceKeys.CheckBoxStyle}}"/>
-    <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridStyle}}"/>
+    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Static styles:ResourceKeys.CheckBoxStyle}}" />
+    <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Static styles:ResourceKeys.DataGridStyle}}" />
   </UserControl.Resources>
   <DockPanel Margin="10">
     <Border DockPanel.Dock="Right" Margin="5">
@@ -88,7 +88,7 @@
           <Style.Triggers>
             <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <DataTrigger Binding="{Binding Project.IsLoaded}" Value="False">
-              <Setter Property="IsEnabled" Value="False"/>
+              <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
           </Style.Triggers>
         </Style>

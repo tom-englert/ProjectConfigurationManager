@@ -8,13 +8,13 @@
 
     public interface ITracer
     {
-        void TraceError(string value);
-        void WriteLine(string value);
+        void TraceError([CanBeNull] string value);
+        void WriteLine([CanBeNull] string value);
     }
 
     public static class TracerExtensions
     {
-        public static void TraceError([NotNull] this ITracer tracer, [NotNull] string format, [NotNull] params object[] args)
+        public static void TraceError([NotNull] this ITracer tracer, [NotNull] string format, [NotNull, ItemNotNull] params object[] args)
         {
             Contract.Requires(tracer != null);
             Contract.Requires(format != null);
@@ -22,7 +22,7 @@
             tracer.TraceError(string.Format(CultureInfo.CurrentCulture, format, args));
         }
 
-        public static void WriteLine([NotNull] this ITracer tracer, [NotNull] string format, [NotNull] params object[] args)
+        public static void WriteLine([NotNull] this ITracer tracer, [NotNull] string format, [NotNull, ItemNotNull] params object[] args)
         {
             Contract.Requires(tracer != null);
             Contract.Requires(format != null);

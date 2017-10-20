@@ -172,7 +172,7 @@
                 <!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
                 <Binding Path="PropertyValue" />
                 <Binding Path="Project.DefaultProjectConfiguration.PropertyValue" />
-                <Binding Path="IsDarkTheme" Source="{toms:Import local:ThemeManager}"/>
+                <Binding Path="IsDarkTheme" Source="{toms:Import local:ThemeManager}" />
                 <!-- ReSharper restore Xaml.BindingWithContextNotResolved -->
               </MultiBinding>
             </Setter.Value>
@@ -191,7 +191,7 @@
           <Style.Triggers>
             <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <DataTrigger Binding="{Binding Project.IsSaved}" Value="False">
-              <Setter Property="IsEnabled" Value="False"/>
+              <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
           </Style.Triggers>
         </Style>

@@ -2,17 +2,19 @@
 {
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
-    using System.Runtime.CompilerServices;
+
+    using Equatable;
 
     using JetBrains.Annotations;
 
-    [Equals]
+    [ImplementsEquatable]
     public sealed class SolutionContext : INotifyPropertyChanged
     {
         [NotNull]
         private readonly Solution _solution;
-        [NotNull]
+        [NotNull, Equals]
         private readonly EnvDTE.SolutionContext _context;
 
         public SolutionContext([NotNull] Solution solution, [NotNull] SolutionConfiguration solutionConfiguration, [NotNull] EnvDTE.SolutionContext context)
@@ -30,10 +32,10 @@
             ProjectName = context.ProjectName;
         }
 
-        [CanBeNull, IgnoreDuringEquals]
+        [CanBeNull]
         public string ConfigurationName { get; private set; }
 
-        [CanBeNull, IgnoreDuringEquals]
+        [CanBeNull]
         public string PlatformName { get; private set; }
 
         public bool SetConfiguration([NotNull] ProjectConfiguration configuration)
@@ -54,10 +56,9 @@
             return true;
         }
 
-        [CanBeNull, IgnoreDuringEquals]
+        [CanBeNull]
         public string ProjectName { get; }
 
-        [IgnoreDuringEquals]
         public bool ShouldBuild
         {
             get => ContextIsValid() && _context.ShouldBuild;
@@ -70,7 +71,7 @@
             }
         }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public SolutionConfiguration SolutionConfiguration { get; }
 
         private bool ContextIsValid()
@@ -84,28 +85,16 @@
             return false;
         }
 
-        [CustomGetHashCode, UsedImplicitly]
-        private int CustomGetHashCode()
-        {
-            return _context.GetHashCode();
-        }
-
-        [CustomEqualsInternal, UsedImplicitly]
-        private bool CustomEquals([NotNull] SolutionContext other)
-        {
-            return _context == other._context;
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator, UsedImplicitly]
-        private void OnPropertyChanged([CallerMemberName, CanBeNull] string propertyName = null)
+        [UsedImplicitly]
+        private void OnPropertyChanged([NotNull] string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         [ContractInvariantMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {

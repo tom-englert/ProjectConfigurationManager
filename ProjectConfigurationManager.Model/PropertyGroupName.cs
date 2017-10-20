@@ -6,9 +6,11 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
+    using Equatable;
+
     using JetBrains.Annotations;
 
-    [Equals]
+    [ImplementsEquatable]
     public sealed class PropertyGroupName
     {
         public PropertyGroupName([NotNull] string name, int index)
@@ -19,7 +21,7 @@
             Index = index;
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private static readonly HashSet<string> _projectSpecificProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "ProjectGuid",
@@ -30,7 +32,7 @@
             "Tags"
         };
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private static readonly HashSet<string> _globalProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "ApplicationIcon",
@@ -51,7 +53,7 @@
             "GenerateSerializationAssemblies",
         };
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private static readonly HashSet<string> _debugProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "UseVSHostingProcess",
@@ -60,7 +62,7 @@
             "Optimize",
         };
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private static readonly HashSet<string> _publishProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "IsWebBootstrapper",
@@ -85,7 +87,7 @@
             "BootstrapperEnabled",
         };
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private static readonly HashSet<string> _signingProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "SignAssembly",
@@ -96,10 +98,9 @@
             "GenerateManifests",
         };
 
-        [NotNull]
+        [NotNull, Equals]
         public string Name { get; }
 
-        [IgnoreDuringEquals]
         public int Index { get; }
 
         public static bool IsNotProjectSpecific([CanBeNull] string propertyName)

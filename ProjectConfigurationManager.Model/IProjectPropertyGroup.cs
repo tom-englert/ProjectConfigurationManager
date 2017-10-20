@@ -11,6 +11,7 @@
         [NotNull, ItemNotNull]
         IEnumerable<IProjectProperty> Properties { get; }
 
+        [CanBeNull]
         string ConditionExpression { get; }
 
         [NotNull]

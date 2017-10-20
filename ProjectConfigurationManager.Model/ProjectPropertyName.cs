@@ -5,9 +5,11 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
+    using Equatable;
+
     using JetBrains.Annotations;
 
-    [Equals]
+    [ImplementsEquatable]
     public sealed class ProjectPropertyName
     {
         internal ProjectPropertyName([NotNull] string name, [NotNull] PropertyGroupName groupName)
@@ -31,26 +33,14 @@
             return name.Length > length && name.StartsWith(groupName, StringComparison.Ordinal) && char.IsUpper(name[length]);
         }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull, Equals(StringComparison.OrdinalIgnoreCase)]
         public string Name { get; }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public PropertyGroupName GroupName { get; }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public string DisplayName { get; }
-
-        [CustomGetHashCode, UsedImplicitly]
-        private int CustomGetHashCode()
-        {
-            return Name.ToUpperInvariant().GetHashCode();
-        }
-
-        [CustomEqualsInternal, UsedImplicitly]
-        private bool CustomEquals([NotNull] ProjectPropertyName other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase);
-        }
 
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]

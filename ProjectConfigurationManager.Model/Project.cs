@@ -9,7 +9,8 @@
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
-    using System.Runtime.CompilerServices;
+
+    using Equatable;
 
     using JetBrains.Annotations;
 
@@ -19,12 +20,12 @@
     using TomsToolbox.Core;
     using TomsToolbox.ObservableCollections;
 
-    [Equals]
+    [ImplementsEquatable]
     public sealed class Project : INotifyPropertyChanged
     {
         private const string ProjectTypeGuidsPropertyKey = "ProjectTypeGuids";
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private readonly ObservableCollection<ProjectConfiguration> _internalSpecificProjectConfigurations = new ObservableCollection<ProjectConfiguration>();
 
         private Project([NotNull] Solution solution, [NotNull] string fullName, [NotNull] IVsHierarchy projectHierarchy)
@@ -71,16 +72,16 @@
             return null;
         }
 
-        [NotNull]
+        [NotNull, Equals]
         public IVsHierarchy ProjectHierarchy { get; private set; }
 
-        [NotNull, UsedImplicitly, IgnoreDuringEquals]
+        [NotNull, UsedImplicitly]
         public Solution Solution { get; }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public string Name => DteProject?.Name ?? Path.GetFileNameWithoutExtension(FullName);
 
-        [NotNull, UsedImplicitly, IgnoreDuringEquals]
+        [NotNull, UsedImplicitly]
         public string UniqueName
         {
             get
@@ -105,47 +106,45 @@
             }
         }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         // ReSharper disable once AssignNullToNotNullAttribute
         public string RelativePath => Path.GetDirectoryName(UniqueName);
 
-        [NotNull, UsedImplicitly, IgnoreDuringEquals]
+        [NotNull, UsedImplicitly]
         public string SortKey => Name + " (" + RelativePath + ")";
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public string FullName { get; }
 
-        [NotNull, ItemNotNull, IgnoreDuringEquals]
+        [NotNull, ItemNotNull]
         public IList<string> ProjectTypeGuids => RetrieveProjectTypeGuids();
 
-        [NotNull, ItemNotNull, IgnoreDuringEquals]
+        [NotNull, ItemNotNull]
         public IEnumerable<SolutionContext> SolutionContexts => Solution.SolutionConfigurations.SelectMany(cfg => cfg.Contexts).Where(context => context?.ProjectName == UniqueName);
 
-        [NotNull, ItemNotNull, IgnoreDuringEquals]
+        [NotNull, ItemNotNull]
         public ReadOnlyObservableCollection<ProjectConfiguration> SpecificProjectConfigurations { get; }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public ProjectConfiguration DefaultProjectConfiguration { get; }
 
-        [NotNull, ItemNotNull, IgnoreDuringEquals]
+        [NotNull, ItemNotNull]
         public IObservableCollection<ProjectConfiguration> ProjectConfigurations { get; }
 
-        [NotNull, UsedImplicitly, IgnoreDuringEquals]
+        [NotNull, UsedImplicitly]
         public IIndexer<bool> IsProjectTypeGuidSelected { get; }
 
-        [IgnoreDuringEquals]
         public bool IsSaving => ProjectFile.IsSaving;
 
-        [IgnoreDuringEquals]
         public DateTime FileTime => ProjectFile.FileTime;
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull, ItemNotNull]
         public ObservableCollection<Project> References { get; } = new ObservableCollection<Project>();
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull, ItemNotNull]
         public ObservableCollection<Project> ReferencedBy { get; } = new ObservableCollection<Project>();
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private IEnumerable<VSLangProj.Reference> GetReferences()
         {
             Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
@@ -153,7 +152,7 @@
             return VsProjectReferences ?? MpfProjectReferences ?? Enumerable.Empty<VSLangProj.Reference>();
         }
 
-        [CanBeNull, IgnoreDuringEquals]
+        [CanBeNull, ItemNotNull]
         [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> MpfProjectReferences
         {
@@ -180,7 +179,7 @@
             }
         }
 
-        [CanBeNull, IgnoreDuringEquals]
+        [CanBeNull, ItemNotNull]
         [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> VsProjectReferences
         {
@@ -199,18 +198,17 @@
             }
         }
 
-        [CanBeNull, IgnoreDuringEquals]
+        [CanBeNull]
         private EnvDTE.Project DteProject
         {
             get
             {
-                ProjectHierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out object obj);
+                ProjectHierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out var obj);
                 return obj as EnvDTE.Project;
 
             }
         }
 
-        [IgnoreDuringEquals]
         public bool IsSaved
         {
             get
@@ -227,7 +225,6 @@
             }
         }
 
-        [IgnoreDuringEquals]
         public bool IsLoaded
         {
             get
@@ -246,7 +243,7 @@
             }
         }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         internal ProjectFile ProjectFile { get; private set; }
 
         public bool CanEdit()
@@ -335,7 +332,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private string[] RetrieveProjectTypeGuids()
         {
             Contract.Ensures(Contract.Result<string[]>() != null);
@@ -413,8 +410,7 @@
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([NotNull] string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

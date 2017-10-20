@@ -8,7 +8,6 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.IO;
-    using System.Runtime.CompilerServices;
 
     using JetBrains.Annotations;
 
@@ -77,8 +76,8 @@
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator, UsedImplicitly]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        [UsedImplicitly]
+        private void OnPropertyChanged([NotNull] string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

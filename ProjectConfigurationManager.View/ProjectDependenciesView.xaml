@@ -8,7 +8,8 @@
   <UserControl.Resources>
 
     <HierarchicalDataTemplate DataType="{x:Type local:ProjectDependency}" ItemsSource="{Binding Children}">
-      <TextBlock Margin="1"><Run Text="{Binding Project.Name, Mode=OneWay}" />
+      <TextBlock Margin="1">
+        <Run Text="{Binding Project.Name, Mode=OneWay}" />
         <Span Foreground="Gray">(<Run Text="{Binding Project.RelativePath, Mode=OneWay}" />)</Span>
       </TextBlock>
     </HierarchicalDataTemplate>
@@ -18,19 +19,19 @@
     </HierarchicalDataTemplate>
 
     <Style x:Key="ItemContainerStyle" TargetType="TreeViewItem">
-      <Setter Property="IsSelected" Value="{Binding Path=(local:ProjectDependency.IsSelected)}"/>
-      <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded"/>
-      <EventSetter Event="Collapsed" Handler="TreeViewItem_Collapsed"/>
+      <Setter Property="IsSelected" Value="{Binding Path=(local:ProjectDependency.IsSelected)}" />
+      <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded" />
+      <EventSetter Event="Collapsed" Handler="TreeViewItem_Collapsed" />
       <Style.Triggers>
         <DataTrigger Binding="{Binding Path=(local:ProjectDependency.Level), FallbackValue=0}" Value="0">
-          <Setter Property="IsExpanded" Value="True"/>
-          <Setter Property="Background" Value="#40808080"/>
+          <Setter Property="IsExpanded" Value="True" />
+          <Setter Property="Background" Value="#40808080" />
         </DataTrigger>
         <DataTrigger Binding="{Binding Path=(local:ProjectDependency.Level)}" Value="{x:Null}">
-          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="Background" Value="Transparent" />
         </DataTrigger>
         <DataTrigger Binding="{Binding Path=(local:ProjectDependency.IsProjectSelected)}" Value="True">
-          <Setter Property="Background" Value="LightSkyBlue"/>
+          <Setter Property="Background" Value="LightSkyBlue" />
         </DataTrigger>
       </Style.Triggers>
     </Style>

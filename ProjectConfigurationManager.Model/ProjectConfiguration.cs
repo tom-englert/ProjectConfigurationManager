@@ -8,15 +8,16 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Windows.Threading;
+
+    using Equatable;
 
     using JetBrains.Annotations;
 
     using TomsToolbox.Core;
     using TomsToolbox.Desktop;
 
-    [Equals]
+    [ImplementsEquatable]
     public sealed class ProjectConfiguration : INotifyPropertyChanged
     {
         [NotNull]
@@ -34,22 +35,22 @@
             PropertyValue = new PropertyValueIndexer(this);
         }
 
-        [NotNull]
+        [NotNull, Equals]
         public Project Project { get; }
 
-        [CanBeNull]
+        [CanBeNull, Equals]
         public string Configuration { get; }
 
-        [CanBeNull]
+        [CanBeNull, Equals]
         public string Platform { get; }
 
-        [NotNull, IgnoreDuringEquals] // ReSharper disable once MemberCanBePrivate.Global - used in column binding
+        [NotNull] // ReSharper disable once MemberCanBePrivate.Global - used in column binding
         public IIndexer<bool?> ShouldBuild { get; }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         public IIndexer<string> PropertyValue { get; }
 
-        [NotNull, IgnoreDuringEquals]
+        [NotNull]
         internal IDictionary<string, IProjectProperty> Properties => new ReadOnlyDictionary<string, IProjectProperty>(_properties);
 
         public void Delete()
@@ -156,7 +157,7 @@
                 get => _projectConfiguration.Properties.GetValueOrDefault(propertyName)?.Value;
                 set
                 {
-                    if (!_projectConfiguration.Properties.TryGetValue(propertyName, out IProjectProperty property) || (property == null))
+                    if (!_projectConfiguration.Properties.TryGetValue(propertyName, out var property) || (property == null))
                     {
                         if (string.IsNullOrEmpty(value)) // do not create empty entries.
                             return;
@@ -202,13 +203,14 @@
             Project.DeleteProperty(propertyName, Configuration, Platform);
 
             if (_properties.Remove(propertyName))
+            {
                 OnPropertyChanged(nameof(PropertyValue));
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([NotNull] string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

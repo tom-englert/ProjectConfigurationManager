@@ -32,9 +32,9 @@
         [NotNull]
         private readonly PerformanceTracer _performanceTracer;
 
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable => need to hold a ref to events
-        private readonly EnvDTE.SolutionEvents _solutionEvents;
-
+        [CanBeNull, UsedImplicitly]
+        private readonly EnvDTE.SolutionEvents _solutionEvents; // => need to hold a ref to events!
+        [CanBeNull]
         private FileSystemWatcher _fileSystemWatcher;
 
         [ImportingConstructor]
@@ -51,15 +51,17 @@
             SpecificProjectConfigurations = Projects.ObservableSelectMany(prj => prj.SpecificProjectConfigurations);
             ProjectConfigurations = Projects.ObservableSelectMany(prj => prj.ProjectConfigurations);
 
-            _solutionEvents = Dte?.Events?.SolutionEvents;
-            if (_solutionEvents != null)
+            var solutionEvents = Dte?.Events?.SolutionEvents;
+            if (solutionEvents != null)
             {
-                _solutionEvents.Opened += () => Solution_Changed("Solution opened");
-                _solutionEvents.AfterClosing += () => Solution_Changed("Solution after closing");
-                _solutionEvents.ProjectAdded += _ => Solution_Changed("Project added");
-                _solutionEvents.ProjectRemoved += _ => Solution_Changed("Project removed");
-                _solutionEvents.ProjectRenamed += (_, __) => Solution_Changed("Project renamed");
+                solutionEvents.Opened += () => Solution_Changed("Solution opened");
+                solutionEvents.AfterClosing += () => Solution_Changed("Solution after closing");
+                solutionEvents.ProjectAdded += _ => Solution_Changed("Project added");
+                solutionEvents.ProjectRemoved += _ => Solution_Changed("Project removed");
+                solutionEvents.ProjectRenamed += (_, __) => Solution_Changed("Project renamed");
             }
+
+            _solutionEvents = solutionEvents;
 
             Update(0);
 
@@ -85,13 +87,13 @@
         [NotNull]
         public ITracer Tracer { get; }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public IObservableCollection<ProjectConfiguration> SpecificProjectConfigurations { get; }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ObservableCollection<ProjectPropertyName> ProjectProperties { get; } = new ObservableCollection<ProjectPropertyName>();
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ObservableCollection<string> ProjectTypeGuids { get; } = new ObservableCollection<string>();
 
         [CanBeNull]
@@ -265,7 +267,7 @@
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private IEnumerable<SolutionConfiguration> GetConfigurations()
         {
             Contract.Ensures(Contract.Result<IEnumerable<SolutionConfiguration>>() != null);
@@ -274,7 +276,7 @@
                 .Select(item => new SolutionConfiguration(this, item)) ?? Enumerable.Empty<SolutionConfiguration>();
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         private IEnumerable<Project> GetProjects(bool retryOnErrors)
         {
             Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
@@ -296,7 +298,7 @@
                 }
 
                 // Skip web projects, we can't edit them.
-                if (!Uri.TryCreate(fullName, UriKind.Absolute, out Uri projectUri) || !projectUri.IsFile || !File.Exists(fullName))
+                if (!Uri.TryCreate(fullName, UriKind.Absolute, out var projectUri) || !projectUri.IsFile || !File.Exists(fullName))
                     continue;
 
                 var existing = Projects.FirstOrDefault(p => string.Equals(p.FullName, fullName, StringComparison.OrdinalIgnoreCase));
@@ -321,19 +323,19 @@
                 yield break;
 
             var guid = Guid.Empty;
-            solution.GetProjectEnum((uint)flags, ref guid, out IEnumHierarchies enumHierarchies);
+            solution.GetProjectEnum((uint)flags, ref guid, out var enumHierarchies);
             if (enumHierarchies == null)
                 yield break;
 
             var hierarchy = new IVsHierarchy[1];
-            while (enumHierarchies.Next(1, hierarchy, out uint fetched) == VSConstants.S_OK && fetched == 1)
+            while (enumHierarchies.Next(1, hierarchy, out var fetched) == VSConstants.S_OK && fetched == 1)
             {
                 if (hierarchy.Length > 0 && hierarchy[0] != null)
                     yield return hierarchy[0];
             }
         }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private IEnumerable<ProjectPropertyName> GetProjectProperties()
@@ -350,7 +352,7 @@
         }
 
         // ReSharper disable once SuspiciousTypeConversion.Global
-        [CanBeNull]
+        [CanBeNull, ItemNotNull]
         private EnvDTE80.Solution2 DteSolution => Dte?.Solution as EnvDTE80.Solution2;
 
         [CanBeNull]

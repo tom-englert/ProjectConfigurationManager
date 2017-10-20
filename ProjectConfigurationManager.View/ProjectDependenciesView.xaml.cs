@@ -19,6 +19,7 @@
     [DataTemplate(typeof(ProjectDependenciesViewModel))]
     public partial class ProjectDependenciesView
     {
+        [CanBeNull, ItemNotNull]
         private TreeViewItem[] _ancestors;
 
         public ProjectDependenciesView()

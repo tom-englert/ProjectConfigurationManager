@@ -44,7 +44,7 @@
             if (string.IsNullOrEmpty(conditionExpression))
                 return string.IsNullOrEmpty(configuration) && string.IsNullOrEmpty(platform);
 
-            return conditionExpression.ParseCondition(out string groupConfiguration, out string groupPlatform)
+            return conditionExpression.ParseCondition(out var groupConfiguration, out string groupPlatform)
                    && configuration == groupConfiguration
                    && platform == groupPlatform;
         }
@@ -71,7 +71,7 @@
             return projectConfigurations;
         }
 
-        private static void ParseConfigurations([NotNull] this ProjectFile projectFile, [NotNull] ICollection<string> configurationNames, [NotNull] ICollection<string> platformNames)
+        private static void ParseConfigurations([NotNull] this ProjectFile projectFile, [NotNull, ItemNotNull] ICollection<string> configurationNames, [NotNull, ItemNotNull] ICollection<string> platformNames)
         {
             Contract.Requires(projectFile != null);
             Contract.Requires(configurationNames != null);
@@ -86,7 +86,7 @@
                 if (string.IsNullOrEmpty(conditionExpression))
                     continue;
 
-                if (!ParseCondition(conditionExpression, out string configuration, out string plattform))
+                if (!ParseCondition(conditionExpression, out var configuration, out var plattform))
                     continue;
 
                 configurationNames.Add(configuration);
@@ -138,7 +138,7 @@
             var solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
             Contract.Assume(solution != null);
 
-            solution.GetGuidOfProject(projectHierarchy, out Guid projectGuid);
+            solution.GetGuidOfProject(projectHierarchy, out var projectGuid);
             return projectGuid;
         }
     }
