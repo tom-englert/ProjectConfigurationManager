@@ -23,30 +23,31 @@
     [VisualCompositionExport(GlobalId.ShellRegion, Sequence = 4)]
     public sealed class ProjectDependenciesViewModel : ObservableObject
     {
-        [NotNull, ItemNotNull]
-        private readonly IObservableCollection<ProjectDependency> _references;
-        [NotNull, ItemNotNull]
-        private readonly IObservableCollection<ProjectDependency> _referencedBy;
+        [NotNull]
+        private readonly Solution _solution;
+
+        [CanBeNull, ItemNotNull]
+        private IObservableCollection<ProjectDependency> _references;
+        [CanBeNull, ItemNotNull]
+        private IObservableCollection<ProjectDependency> _referencedBy;
+        [CanBeNull, ItemNotNull]
+        private ICollection<ProjectDependencyGroup> _groups;
 
         public ProjectDependenciesViewModel([NotNull] Solution solution)
         {
             Contract.Requires(solution != null);
 
-            _references = solution.Projects.ObservableSelect(project => new ProjectDependency(this, null, project, proj => proj.References));
-            _referencedBy = solution.Projects.ObservableSelect(project => new ProjectDependency(this, null, project, proj => proj.ReferencedBy));
-
-            Groups = new[]
-            {
-                new ProjectDependencyGroup("References", _references),
-                new ProjectDependencyGroup("Referenced By", _referencedBy),
-            };
+            _solution = solution;
         }
 
         [NotNull, ItemNotNull]
-        public ICollection<ProjectDependencyGroup> Groups { get; }
+        public ICollection<ProjectDependencyGroup> Groups => _groups ?? (_groups = CreateGroups());
 
         public void UpdateSelection([CanBeNull] Project project, bool value)
         {
+            if ((_references == null) || (_referencedBy == null))
+                return;
+
             _references.Concat(_referencedBy)
                 // ReSharper disable once PossibleNullReferenceException
                 .SelectMany(p => p.DescendantsAndSelf)
@@ -54,13 +55,25 @@
                 .ForEach(p => p.IsProjectSelected = value && (p.Project == project));
         }
 
+        [NotNull, ItemNotNull]
+        private ICollection<ProjectDependencyGroup> CreateGroups()
+        {
+            _references = _solution.Projects.ObservableSelect(project => new ProjectDependency(this, null, project, proj => proj.References));
+            _referencedBy = _solution.Projects.ObservableSelect(project => new ProjectDependency(this, null, project, proj => proj.ReferencedBy));
+
+            return new[]
+            {
+                new ProjectDependencyGroup("References", _references),
+                new ProjectDependencyGroup("Referenced By", _referencedBy),
+            };
+        }
+
         [ContractInvariantMethod]
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
         [Conditional("CONTRACTS_FULL")]
         private void ObjectInvariant()
         {
-            Contract.Invariant(_references != null);
-            Contract.Invariant(_referencedBy != null);
+            Contract.Invariant(_solution != null);
         }
     }
 

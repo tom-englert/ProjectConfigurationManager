@@ -5,9 +5,11 @@
 
     using JetBrains.Annotations;
 
-    [Serializable]
+    [SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
+    [SuppressMessage("Microsoft.Design", "CA1064:ExceptionsShouldBePublic")]
+    [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-    public sealed class RetryException : Exception
+    internal sealed class RetryException : Exception
     {
         [UsedImplicitly]
         public RetryException()

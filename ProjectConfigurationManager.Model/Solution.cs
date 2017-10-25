@@ -32,6 +32,7 @@
         [NotNull]
         private readonly PerformanceTracer _performanceTracer;
 
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         [CanBeNull, UsedImplicitly]
         private readonly EnvDTE.SolutionEvents _solutionEvents; // => need to hold a ref to events!
         [CanBeNull]

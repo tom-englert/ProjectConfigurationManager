@@ -8,6 +8,7 @@
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -84,8 +85,8 @@
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 var folder = Path.GetDirectoryName(executingAssembly.Location);
 
-                _tracer.WriteLine($"Assembly location: {folder}");
-                _tracer.WriteLine($"Version: {new AssemblyName(executingAssembly.FullName).Version}");
+                _tracer.WriteLine(string.Format(CultureInfo.InvariantCulture, "Assembly location: {0}", folder));
+                _tracer.WriteLine(string.Format(CultureInfo.InvariantCulture, "Version: {0}", new AssemblyName(executingAssembly.FullName).Version));
 
 
                 var view = _compositionHost.GetExportedValue<ShellView>();
