@@ -125,8 +125,7 @@
                                 IsReadOnly="True" Width="150"
                                 SortMemberPath="Project.SortKey"
                                 SortDirection="Ascending"
-                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}}"
-                                dgx:DataGridFilterColumn.Template="{StaticResource {x:Static themes:ResourceKeys.MultipleChoiceFilterTemplate}}" />
+                                CellTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectConfigurationNameTemplate}}" />
         <DataGridTextColumn Header="Configuration" DisplayIndex="1" CanUserReorder="False"
                             IsReadOnly="True" Width="110"
                             Binding="{Binding Configuration}"
