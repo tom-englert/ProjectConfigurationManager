@@ -5,6 +5,7 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Xml;
     using System.Xml.Linq;
 
     using JetBrains.Annotations;
@@ -35,7 +36,7 @@
             }
         }
 
-        public static bool MatchesConfiguration([NotNull] this IProjectPropertyGroup propertyGroup, [CanBeNull] string configuration, [CanBeNull] string platform)
+        public static bool MatchesConfiguration([NotNull] this IPropertyGroup propertyGroup, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
             Contract.Requires(propertyGroup != null);
 
@@ -130,7 +131,7 @@
             }
         }
 
-        internal static Guid GetProjectGuid([NotNull] this IServiceProvider serviceProvider, [NotNull] IVsHierarchy projectHierarchy)
+        public static Guid GetProjectGuid([NotNull] this IServiceProvider serviceProvider, [NotNull] IVsHierarchy projectHierarchy)
         {
             Contract.Requires(serviceProvider != null);
             Contract.Requires(projectHierarchy != null);
@@ -141,5 +142,25 @@
             solution.GetGuidOfProject(projectHierarchy, out var projectGuid);
             return projectGuid;
         }
+
+        [NotNull]
+        public static XElement AddElement([NotNull] this XElement parent, [NotNull] XElement child)
+        {
+            var lastNode = parent.LastNode;
+
+            if (lastNode?.NodeType == XmlNodeType.Text)
+            {
+                var lastDelimiter = lastNode.PreviousNode?.PreviousNode as XText;
+                var whiteSpace = new XText(lastDelimiter?.Value ?? "\n    ");
+                lastNode.AddBeforeSelf(whiteSpace, child);
+            }
+            else
+            {
+                parent.Add(child);
+            }
+
+            return child;
+        }
+
     }
 }

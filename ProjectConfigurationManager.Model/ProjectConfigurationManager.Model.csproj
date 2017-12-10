@@ -280,7 +280,7 @@
     <Compile Include="ProjectFile.cs" />
     <Compile Include="IProjectProperty.cs" />
     <Compile Include="ProjectPropertyName.cs" />
-    <Compile Include="IProjectPropertyGroup.cs" />
+    <Compile Include="IPropertyGroup.cs" />
     <Compile Include="ProjectTypeGuid.cs" />
     <Compile Include="PropertyGroupName.cs" />
     <Compile Include="RetryException.cs" />

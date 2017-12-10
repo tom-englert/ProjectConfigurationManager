@@ -114,6 +114,9 @@
             Contract.Requires(propertyName != null);
             Contract.Ensures(Contract.Result<PropertyGroupName>() != null);
 
+            if (propertyName.Contains("."))
+                return new PropertyGroupName(propertyName.Split('.')[0], 7);
+
             if (_globalProperties.Contains(propertyName))
                 return new PropertyGroupName("Global", 0);
 
@@ -135,7 +138,7 @@
             if (propertyName.Contains("CodeAnalysis"))
                 return new PropertyGroupName("CodeAnalysis", 6);
 
-            return new PropertyGroupName("Other", 7);
+            return new PropertyGroupName("Other", 8);
         }
 
         public override string ToString()

@@ -14,23 +14,26 @@
     {
         internal ProjectPropertyName([NotNull] string name, [NotNull] PropertyGroupName groupName)
         {
-            Contract.Requires(name != null);
-            Contract.Requires(groupName != null);
-
             Name = name;
             GroupName = groupName;
-            DisplayName = HasGroupNamePrefix(name, groupName.Name) ? name.Substring(groupName.Name.Length) : name;
+            DisplayName = GetDisplayName(name, groupName.Name);
         }
 
-        private static bool HasGroupNamePrefix([NotNull] string name, [NotNull] string groupName)
+        [NotNull]
+        private static string GetDisplayName([NotNull] string name, [NotNull] string groupName)
         {
-            Contract.Requires(name != null);
-            Contract.Requires(groupName != null);
-            Contract.Ensures((Contract.Result<bool>() == false) || (name.Length > groupName.Length));
+            var groupNameLength = groupName.Length;
 
-            var length = groupName.Length;
+            if (name.Length > groupNameLength && name.StartsWith(groupName, StringComparison.Ordinal))
+            {
+                if (name[groupNameLength] == '.')
+                    return name.Substring(groupNameLength + 1);
 
-            return name.Length > length && name.StartsWith(groupName, StringComparison.Ordinal) && char.IsUpper(name[length]);
+                if (char.IsUpper(name[groupNameLength]))
+                    return name.Substring(groupNameLength);
+            }
+
+            return name;
         }
 
         [NotNull, Equals(StringComparison.OrdinalIgnoreCase)]
@@ -41,15 +44,5 @@
 
         [NotNull]
         public string DisplayName { get; }
-
-        [ContractInvariantMethod]
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Name != null);
-            Contract.Invariant(GroupName != null);
-            Contract.Invariant(DisplayName != null);
-        }
     }
 }

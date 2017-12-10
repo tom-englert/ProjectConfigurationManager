@@ -3,9 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -37,16 +34,15 @@
         [CanBeNull]
         private XDocument _document;
         [CanBeNull, ItemNotNull]
-        private IList<IProjectPropertyGroup> _propertyGroups;
+        private IList<IPropertyGroup> _propertyGroups;
 
         [NotNull]
-        private XName _propertyGroupNodeName => DefaultNamespace.GetName("PropertyGroup");
+        private XName PropertyGroupNodeName => DefaultNamespace.GetName("PropertyGroup");
+        [NotNull]
+        private XName ItemDefinitionGroupNodeName => DefaultNamespace.GetName("ItemDefinitionGroup");
 
         public ProjectFile([NotNull] Solution solution, [NotNull] Project project)
         {
-            Contract.Requires(solution != null);
-            Contract.Requires(project != null);
-
             _solution = solution;
             _project = project;
 
@@ -56,54 +52,78 @@
         }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<IProjectPropertyGroup> GetPropertyGroups([CanBeNull] string configuration, [CanBeNull] string platform)
+        public IEnumerable<IPropertyGroup> GetPropertyGroups([CanBeNull] string configuration, [CanBeNull] string platform)
         {
-            Contract.Ensures(Contract.Result<IEnumerable<IProjectPropertyGroup>>() != null);
-            return PropertyGroups.Where(group => group.MatchesConfiguration(configuration, platform));
+            return PropertyGroups
+                .Where(group => group.MatchesConfiguration(configuration, platform));
         }
 
         [CanBeNull]
         public IProjectProperty CreateProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
-            Contract.Requires(propertyName != null);
+            var parts = propertyName.Split('.');
 
-            var group = GetPropertyGroups(configuration, platform).FirstOrDefault() ?? CreateNewSpecificPropertyGroup(configuration, platform);
+            if (parts.Length == 2)
+            {
+                var itemGroupName = parts[0];
+                propertyName = parts[1];
 
-            return group?.AddProperty(propertyName);
+                var group = GetPropertyGroups(configuration, platform)
+                    .OfType<IItemDefinitionGroup>()
+                    .FirstOrDefault();
+
+                group = group ?? CreateNewPropertyGroup(configuration, platform, ItemDefinitionGroupNodeName, element => new ItemDefinitionGroup(this, element));
+
+                return group?.AddProperty(itemGroupName, propertyName);
+            }
+            else
+            {
+                var group = GetPropertyGroups(configuration, platform)
+                    .OfType<IProjectPropertyGroup>()
+                    .FirstOrDefault();
+
+                group = group ?? CreateNewPropertyGroup(configuration, platform, PropertyGroupNodeName, element => new ProjectPropertyGroup(this, element));
+
+                return group?.AddProperty(propertyName);
+            }
         }
 
         [CanBeNull]
-        private IProjectPropertyGroup CreateNewSpecificPropertyGroup([CanBeNull] string configuration, [CanBeNull] string platform)
+        private T CreateNewPropertyGroup<T>([CanBeNull] string configuration, [CanBeNull] string platform, [NotNull] XName nodeName, [NotNull] Func<XElement, T> groupFactory)
+            where T : class, IPropertyGroup
         {
-            if (string.IsNullOrEmpty(configuration) || string.IsNullOrEmpty(platform))
+            var propertyGroups = _propertyGroups;
+
+            if (propertyGroups == null)
                 return null;
 
-            if (_propertyGroups == null)
-                return null;
-
-            var lastGroupNode = Document.Descendants(_propertyGroupNodeName)
-                .LastOrDefault(node => node?.Parent?.Name.LocalName == "Project");
+            var lastGroupNode = Root
+                .Elements(nodeName)
+                .LastOrDefault();
 
             if (lastGroupNode == null)
                 return null;
 
-            var conditionExpression = string.Format(CultureInfo.InvariantCulture, "'$(Configuration)|$(Platform)'=='{0}|{1}'", configuration, platform.Replace(" ", ""));
-            var newGroupNode = new XElement(_propertyGroupNodeName, new XAttribute(ConditionAttributeName, conditionExpression), new XText("\n  "));
+            var newGroupNode = new XElement(nodeName, new XText("\n  "));
+
+            if (!string.IsNullOrEmpty(configuration) && !string.IsNullOrEmpty(platform))
+            {
+                var conditionExpression = string.Format(CultureInfo.InvariantCulture, "'$(Configuration)|$(Platform)'=='{0}|{1}'", configuration, platform.Replace(" ", ""));
+                newGroupNode.Add(new XAttribute(ConditionAttributeName, conditionExpression));
+            }
 
             lastGroupNode.AddAfterSelf(newGroupNode);
             newGroupNode.AddBeforeSelf(new XText("\n  "));
 
-            var group = new ProjectPropertyGroup(this, newGroupNode);
+            var group = groupFactory(newGroupNode);
 
-            _propertyGroups.Add(group);
+            propertyGroups.Add(group);
 
             return group;
         }
 
         public void DeleteProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
-            Contract.Requires(propertyName != null);
-
             var item = GetPropertyGroups(configuration, platform)
                 .SelectMany(group => group.Properties)
                 .FirstOrDefault(property => property?.Name == propertyName);
@@ -161,8 +181,6 @@
             var projectGuid = _projectGuid;
             var solution = _solution.GetService(typeof(SVsSolution)) as IVsSolution4;
 
-            Contract.Assume(solution != null);
-
             if (!_project.IsSaved)
                 return;
 
@@ -171,7 +189,7 @@
             if (_project.IsLoaded)
             {
                 reloadProject = true;
-                solution.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+                solution?.UnloadProject(ref projectGuid, (int)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
             }
 
             var settings = new XmlWriterSettings
@@ -190,7 +208,7 @@
             if (!reloadProject)
                 return;
 
-            var result = solution.ReloadProject(ref projectGuid);
+            var result = solution?.ReloadProject(ref projectGuid);
 
             if (result == 0)
                 return;
@@ -203,9 +221,6 @@
 
         private static void ReloadProject([NotNull] Dispatcher dispatcher, [NotNull] IVsSolution4 solution, int retry, Guid projectGuid)
         {
-            Contract.Requires(dispatcher != null);
-            Contract.Requires(solution != null);
-
             var hr = solution.ReloadProject(ref projectGuid);
             if (hr == 0)
                 return;
@@ -238,114 +253,127 @@
         }
 
         [NotNull]
-        private XDocument Document
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<XDocument>() != null);
-                return _document ?? (_document = XDocument.Load(_project.FullName, LoadOptions.PreserveWhitespace));
-            }
-        }
+        private XDocument Document => _document ?? (_document = XDocument.Load(_project.FullName, LoadOptions.PreserveWhitespace));
 
         [NotNull]
-        private XNamespace DefaultNamespace
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<XNamespace>() != null);
-                return Document.Root?.GetDefaultNamespace() ?? XNamespace.None;
-            }
-        }
+        // ReSharper disable once AssignNullToNotNullAttribute
+        private XElement Root => Document.Root;
+
+        [NotNull]
+        private XNamespace DefaultNamespace => Root.GetDefaultNamespace();
 
         [NotNull, ItemNotNull]
-        internal IEnumerable<IProjectPropertyGroup> PropertyGroups
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<IProjectPropertyGroup>>() != null);
-                return _propertyGroups ?? (_propertyGroups = GeneratePropertyGroups());
-            }
-        }
+        internal IEnumerable<IPropertyGroup> PropertyGroups => _propertyGroups ?? (_propertyGroups = GeneratePropertyGroups());
 
         [NotNull, ItemNotNull]
-        private IList<IProjectPropertyGroup> GeneratePropertyGroups()
+        private IList<IPropertyGroup> GeneratePropertyGroups()
         {
-            Contract.Ensures(Contract.Result<IList<IProjectPropertyGroup>>() != null);
-
-            return Document.Descendants(_propertyGroupNodeName)
-                .Where(node => node?.Parent?.Name.LocalName == "Project")
+            var projectPropertyGroups = Root.Elements(PropertyGroupNodeName)
                 .Select(node => new ProjectPropertyGroup(this, node))
-                .Cast<IProjectPropertyGroup>()
+                .Cast<IPropertyGroup>();
+
+            var itemDefinitionGroups = Root.Elements(ItemDefinitionGroupNodeName)
+                .Select(definitionNode => new ItemDefinitionGroup(this, definitionNode))
+                .Cast<IPropertyGroup>();
+
+            return projectPropertyGroups
+                .Concat(itemDefinitionGroups)
                 .ToList();
         }
 
-        private sealed class ProjectPropertyGroup : IProjectPropertyGroup
+        private abstract class PropertyGroup : IPropertyGroup
         {
-            [NotNull]
-            private readonly ProjectFile _projectFile;
-            [NotNull]
-            private readonly XElement _propertyGroupNode;
-            [NotNull, ItemNotNull]
-            private readonly ObservableCollection<ProjectProperty> _properties;
-            [NotNull]
-            private XNamespace _xmlns => _propertyGroupNode.Document?.Root?.GetDefaultNamespace() ?? XNamespace.None;
-
-            public ProjectPropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement propertyGroupNode)
+            protected PropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement node, [NotNull] IEnumerable<IProjectProperty> properties)
             {
-                Contract.Requires(projectFile != null);
-                Contract.Requires(propertyGroupNode != null);
+                ProjectFile = projectFile;
+                Node = node;
 
-                _projectFile = projectFile;
-                _propertyGroupNode = propertyGroupNode;
-
-                _properties = new ObservableCollection<ProjectProperty>(
-                    _propertyGroupNode.Elements()
-                        .Where(node => node != null && node.GetAttribute(ConditionAttributeName) == null)
-                        .Select(node => new ProjectProperty(projectFile, node)));
+                Items = new ObservableCollection<IProjectProperty>(properties);
+                Properties = new ReadOnlyObservableCollection<IProjectProperty>(Items);
             }
 
-            public IEnumerable<IProjectProperty> Properties => _properties;
+            [NotNull]
+            protected ProjectFile ProjectFile { get; }
+            [NotNull]
+            protected XElement Node { get; }
+            [NotNull]
+            protected XNamespace Xmlns => Node.Document?.Root?.GetDefaultNamespace() ?? XNamespace.None;
+
+            public IEnumerable<IProjectProperty> Properties { get; }
+
+            [NotNull]
+            protected ObservableCollection<IProjectProperty> Items { get; }
+
+            public string ConditionExpression => Node.GetAttribute(ConditionAttributeName);
+
+            public void Delete()
+            {
+                Node.RemoveSelfAndWhitespace();
+            }
+        }
+
+        private sealed class ProjectPropertyGroup : PropertyGroup, IProjectPropertyGroup
+        {
+            public ProjectPropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement node)
+                : base(projectFile, node, EnumerateProperties(projectFile, node))
+            {
+            }
+
+            [NotNull]
+            private static IEnumerable<ProjectProperty> EnumerateProperties([NotNull] ProjectFile projectFile, [NotNull] XElement groupNode)
+            {
+                return groupNode.Elements()
+                    .Where(node => node != null && node.GetAttribute(ConditionAttributeName) == null)
+                    .Select(propertyNode => new ProjectProperty(projectFile, propertyNode, propertyNode.Name.LocalName));
+            }
 
             public IProjectProperty AddProperty(string propertyName)
             {
-                var node = new XElement(_xmlns.GetName(propertyName));
+                var propertyNode = new XElement(Xmlns.GetName(propertyName));
 
-                var lastNode = _propertyGroupNode.LastNode;
+                Node.Add(propertyNode);
 
-                if (lastNode?.NodeType == XmlNodeType.Text)
-                {
-                    var lastDelimiter = lastNode.PreviousNode?.PreviousNode as XText;
-                    var whiteSpace = new XText(lastDelimiter?.Value ?? "\n    ");
-                    lastNode.AddBeforeSelf(whiteSpace, node);
-                }
-                else
-                {
-                    _propertyGroupNode.Add(node);
-                }
+                var property = new ProjectProperty(ProjectFile, propertyNode, propertyNode.Name.LocalName);
 
-                var property = new ProjectProperty(_projectFile, node);
+                Items.Add(property);
 
-                _properties.Add(property);
+                return property;
+
+            }
+        }
+
+        private sealed class ItemDefinitionGroup : PropertyGroup, IItemDefinitionGroup
+        {
+            public ItemDefinitionGroup([NotNull] ProjectFile projectFile, [NotNull] XElement node)
+                : base(projectFile, node, EnumerateProperties(projectFile, node))
+            {
+            }
+
+            [NotNull]
+            private static IEnumerable<ProjectProperty> EnumerateProperties([NotNull] ProjectFile projectFile, [NotNull] XElement groupNode)
+            {
+                return groupNode.Elements()
+                    .SelectMany(propertyGroupNode => propertyGroupNode
+                        .Elements()
+                        .Select(propertyNode => new ProjectProperty(projectFile, propertyNode, propertyGroupNode.Name.LocalName + "." + propertyNode.Name.LocalName))
+                    );
+            }
+
+            public IProjectProperty AddProperty(string itemGroupName, string propertyName)
+            {
+                var propertyNode = new XElement(Xmlns.GetName(propertyName));
+
+                var groupNode = Node.Elements().FirstOrDefault(n => n.Name.LocalName == itemGroupName) ?? Node.AddElement(new XElement(Xmlns.GetName(itemGroupName)));
+
+                groupNode.AddElement(propertyNode);
+
+                var property = new ProjectProperty(ProjectFile, propertyNode, groupNode.Name.LocalName + "." + propertyNode.Name.LocalName);
+
+                Items.Add(property);
 
                 return property;
             }
 
-            public string ConditionExpression => _propertyGroupNode.GetAttribute(ConditionAttributeName);
-
-            public void Delete()
-            {
-                _propertyGroupNode.RemoveSelfAndWhitespace();
-            }
-
-            [ContractInvariantMethod]
-            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-            [Conditional("CONTRACTS_FULL")]
-            private void ObjectInvariant()
-            {
-                Contract.Invariant(_projectFile != null);
-                Contract.Invariant(_propertyGroupNode != null);
-                Contract.Invariant(_properties != null);
-            }
         }
 
         private sealed class ProjectProperty : IProjectProperty
@@ -355,16 +383,14 @@
             [NotNull]
             private readonly XElement _node;
 
-            public ProjectProperty([NotNull] ProjectFile projectFile, [NotNull] XElement node)
+            public ProjectProperty([NotNull] ProjectFile projectFile, [NotNull] XElement node, [NotNull] string name)
             {
-                Contract.Requires(projectFile != null);
-                Contract.Requires(node != null);
-
                 _projectFile = projectFile;
                 _node = node;
+                Name = name;
             }
 
-            public string Name => _node.Name.LocalName;
+            public string Name { get; }
 
             public string Value
             {
@@ -388,25 +414,6 @@
                 _node.RemoveSelfAndWhitespace();
                 _projectFile.SaveChanges();
             }
-
-            [ContractInvariantMethod]
-            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-            [Conditional("CONTRACTS_FULL")]
-            private void ObjectInvariant()
-            {
-                Contract.Invariant(_projectFile != null);
-                Contract.Invariant(_node != null);
-            }
-        }
-
-        [ContractInvariantMethod]
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_project != null);
-            Contract.Invariant(_solution != null);
-            Contract.Invariant(_dispatcher != null);
         }
     }
 }
