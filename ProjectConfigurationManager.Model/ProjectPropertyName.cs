@@ -12,11 +12,12 @@
     [ImplementsEquatable]
     public sealed class ProjectPropertyName
     {
-        internal ProjectPropertyName([NotNull] string name, [NotNull] PropertyGroupName groupName)
+        internal ProjectPropertyName([NotNull] IProjectProperty property)
         {
-            Name = name;
-            GroupName = groupName;
-            DisplayName = GetDisplayName(name, groupName.Name);
+            Name = property.Name;
+            var label = property.Group.Label;
+            GroupName = !string.IsNullOrEmpty(label) ? new PropertyGroupName(label) : PropertyGroupName.GetGroupForProperty(Name);
+            DisplayName = GetDisplayName(Name, GroupName.Name);
         }
 
         [NotNull]

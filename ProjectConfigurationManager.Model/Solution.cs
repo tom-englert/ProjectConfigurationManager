@@ -345,10 +345,9 @@
 
             return Projects
                 .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties.Values))
-                .Select(prop => prop.Name)
-                .Distinct()
-                .Where(PropertyGroupName.IsNotProjectSpecific)
-                .Select(name => new ProjectPropertyName(name, PropertyGroupName.GetGroupForProperty(name)))
+                .Distinct(new DelegateEqualityComparer<IProjectProperty>(p => p.Name))
+                .Where(p => PropertyGroupName.IsNotProjectSpecific(p.Name))
+                .Select(p => new ProjectPropertyName(p))
                 .OrderBy(item => item.GroupName.Index);
         }
 

@@ -13,7 +13,7 @@
     [ImplementsEquatable]
     public sealed class PropertyGroupName
     {
-        public PropertyGroupName([NotNull] string name, int index)
+        public PropertyGroupName([NotNull] string name, int index = 10)
         {
             Contract.Requires(name != null);
 
@@ -37,6 +37,7 @@
         {
             "ApplicationIcon",
             "TargetFrameworkVersion",
+            "TargetFrameworkVersions",
             "TargetFrameworkProfile",
             "FileAlignment",
             "ProjectTypeGuids",
@@ -115,7 +116,7 @@
             Contract.Ensures(Contract.Result<PropertyGroupName>() != null);
 
             if (propertyName.Contains("."))
-                return new PropertyGroupName(propertyName.Split('.')[0], 7);
+                return new PropertyGroupName(propertyName.Split('.')[0]);
 
             if (_globalProperties.Contains(propertyName))
                 return new PropertyGroupName("Global", 0);
@@ -138,7 +139,7 @@
             if (propertyName.Contains("CodeAnalysis"))
                 return new PropertyGroupName("CodeAnalysis", 6);
 
-            return new PropertyGroupName("Other", 8);
+            return new PropertyGroupName("Other", 100);
         }
 
         public override string ToString()

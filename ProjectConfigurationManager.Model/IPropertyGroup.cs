@@ -12,6 +12,9 @@
         [CanBeNull]
         string ConditionExpression { get; }
 
+        [CanBeNull]
+        string Label { get; }
+
         void Delete();
     }
 

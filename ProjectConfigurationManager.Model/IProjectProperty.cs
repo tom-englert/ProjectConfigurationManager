@@ -4,11 +4,13 @@
 
     using JetBrains.Annotations;
 
-    [ContractClass(typeof(ProjectPropertyContract))]
     internal interface IProjectProperty
     {
         [NotNull]
         string Name { get; }
+
+        [NotNull]
+        IPropertyGroup Group { get; }
 
         [NotNull]
         string Value
@@ -18,37 +20,5 @@
         }
 
         void Delete();
-    }
-
-    [ContractClassFor(typeof(IProjectProperty))]
-    internal abstract class ProjectPropertyContract : IProjectProperty
-    {
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                throw new System.NotImplementedException();
-            }
-        }
-
-        public string Value
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-                Contract.Requires(value != null);
-                throw new System.NotImplementedException();
-            }
-        }
-
-        public void Delete()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

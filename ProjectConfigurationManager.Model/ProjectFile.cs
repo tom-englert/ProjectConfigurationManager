@@ -283,12 +283,11 @@
 
         private abstract class PropertyGroup : IPropertyGroup
         {
-            protected PropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement node, [NotNull] IEnumerable<IProjectProperty> properties)
+            protected PropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement node)
             {
                 ProjectFile = projectFile;
                 Node = node;
 
-                Items = new ObservableCollection<IProjectProperty>(properties);
                 Properties = new ReadOnlyObservableCollection<IProjectProperty>(Items);
             }
 
@@ -301,8 +300,10 @@
 
             public IEnumerable<IProjectProperty> Properties { get; }
 
+            public string Label => Node.Attribute("Label")?.Value;
+
             [NotNull]
-            protected ObservableCollection<IProjectProperty> Items { get; }
+            protected ObservableCollection<IProjectProperty> Items { get; } = new ObservableCollection<IProjectProperty>();
 
             public string ConditionExpression => Node.GetAttribute(ConditionAttributeName);
 
@@ -315,16 +316,17 @@
         private sealed class ProjectPropertyGroup : PropertyGroup, IProjectPropertyGroup
         {
             public ProjectPropertyGroup([NotNull] ProjectFile projectFile, [NotNull] XElement node)
-                : base(projectFile, node, EnumerateProperties(projectFile, node))
+                : base(projectFile, node)
             {
+                Items.AddRange(EnumerateProperties(projectFile, node));
             }
 
             [NotNull]
-            private static IEnumerable<ProjectProperty> EnumerateProperties([NotNull] ProjectFile projectFile, [NotNull] XElement groupNode)
+            private IEnumerable<ProjectProperty> EnumerateProperties([NotNull] ProjectFile projectFile, [NotNull] XElement groupNode)
             {
                 return groupNode.Elements()
                     .Where(node => node != null && node.GetAttribute(ConditionAttributeName) == null)
-                    .Select(propertyNode => new ProjectProperty(projectFile, propertyNode, propertyNode.Name.LocalName));
+                    .Select(propertyNode => new ProjectProperty(projectFile, this, propertyNode, propertyNode.Name.LocalName));
             }
 
             public IProjectProperty AddProperty(string propertyName)
@@ -333,29 +335,29 @@
 
                 Node.Add(propertyNode);
 
-                var property = new ProjectProperty(ProjectFile, propertyNode, propertyNode.Name.LocalName);
+                var property = new ProjectProperty(ProjectFile, this, propertyNode, propertyNode.Name.LocalName);
 
                 Items.Add(property);
 
                 return property;
-
             }
         }
 
         private sealed class ItemDefinitionGroup : PropertyGroup, IItemDefinitionGroup
         {
             public ItemDefinitionGroup([NotNull] ProjectFile projectFile, [NotNull] XElement node)
-                : base(projectFile, node, EnumerateProperties(projectFile, node))
+                : base(projectFile, node)
             {
+                Items.AddRange(EnumerateProperties(projectFile, node));
             }
 
             [NotNull]
-            private static IEnumerable<ProjectProperty> EnumerateProperties([NotNull] ProjectFile projectFile, [NotNull] XElement groupNode)
+            private IEnumerable<ProjectProperty> EnumerateProperties([NotNull] ProjectFile projectFile, [NotNull] XElement groupNode)
             {
                 return groupNode.Elements()
                     .SelectMany(propertyGroupNode => propertyGroupNode
                         .Elements()
-                        .Select(propertyNode => new ProjectProperty(projectFile, propertyNode, propertyGroupNode.Name.LocalName + "." + propertyNode.Name.LocalName))
+                        .Select(propertyNode => new ProjectProperty(projectFile, this, propertyNode, propertyGroupNode.Name.LocalName + "." + propertyNode.Name.LocalName))
                     );
             }
 
@@ -367,7 +369,7 @@
 
                 groupNode.AddElement(propertyNode);
 
-                var property = new ProjectProperty(ProjectFile, propertyNode, groupNode.Name.LocalName + "." + propertyNode.Name.LocalName);
+                var property = new ProjectProperty(ProjectFile, this, propertyNode, groupNode.Name.LocalName + "." + propertyNode.Name.LocalName);
 
                 Items.Add(property);
 
@@ -383,14 +385,18 @@
             [NotNull]
             private readonly XElement _node;
 
-            public ProjectProperty([NotNull] ProjectFile projectFile, [NotNull] XElement node, [NotNull] string name)
+            public ProjectProperty([NotNull] ProjectFile projectFile, [NotNull] IPropertyGroup group, [NotNull] XElement node, [NotNull] string name)
             {
                 _projectFile = projectFile;
                 _node = node;
+
+                Group = group;
                 Name = name;
             }
 
             public string Name { get; }
+
+            public IPropertyGroup Group { get; }
 
             public string Value
             {
