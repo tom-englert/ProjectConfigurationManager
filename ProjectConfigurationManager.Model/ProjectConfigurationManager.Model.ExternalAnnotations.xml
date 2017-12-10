@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assembly name="ProjectConfigurationManager.Model">
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.Configuration.#ctor(tomenglertde.ProjectConfigurationManager.Model.ITracer)">
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Configuration.PropertyColumnOrder">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.IIndexer`1.get_Item(System.String)">
+    <parameter name="key">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.IIndexer`1.Item(System.String)">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.IIndexer`1.set_Item(System.String,`0)">
+    <parameter name="key">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.ITracer.TraceError(System.String)">
+    <parameter name="value">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.ITracer.WriteLine(System.String)">
+    <parameter name="value">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.OutputWindowTracer.#ctor(tomenglertde.ProjectConfigurationManager.Model.IVsServiceProvider)">
+    <parameter name="serviceProvider">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.PerformanceTracer.#ctor(tomenglertde.ProjectConfigurationManager.Model.ITracer)">
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.PerformanceTracer.Start(System.String)">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <parameter name="message">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.DefaultProjectConfiguration">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.FullName">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.IsProjectTypeGuidSelected">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.Name">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.ProjectConfigurations">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.ProjectHierarchy">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.ProjectTypeGuids">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.ReferencedBy">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.References">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.RelativePath">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.Project.Reload(Microsoft.VisualStudio.Shell.Interop.IVsHierarchy)">
+    <parameter name="hierarchy">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.Solution">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.SolutionContexts">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.SortKey">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.SpecificProjectConfigurations">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.UniqueName">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectConfiguration.Configuration">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.ProjectConfiguration.DeleteProperty(System.String)">
+    <parameter name="propertyName">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectConfiguration.Platform">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectConfiguration.Project">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectConfiguration.PropertyValue">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectConfiguration.ShouldBuild">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectPropertyName.DisplayName">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectPropertyName.GroupName">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.ProjectPropertyName.Name">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.Model.ProjectTypeGuid.WellKnown">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.PropertyGroupName.#ctor(System.String,System.Int32)">
+    <parameter name="name">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.PropertyGroupName.GetGroupForProperty(System.String)">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <parameter name="propertyName">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.PropertyGroupName.IsNotProjectSpecific(System.String)">
+    <parameter name="propertyName">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.PropertyGroupName.Name">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.Solution.#ctor(tomenglertde.ProjectConfigurationManager.Model.ITracer,tomenglertde.ProjectConfigurationManager.Model.IVsServiceProvider,tomenglertde.ProjectConfigurationManager.Model.PerformanceTracer)">
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="serviceProvider">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="performanceTracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.Solution.GetService(System.Type)">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    <parameter name="serviceType">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.ProjectConfigurations">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.ProjectProperties">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.Projects">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.ProjectTypeGuids">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.SolutionConfigurations">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.SolutionFolder">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.SpecificProjectConfigurations">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Solution.Tracer">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionConfiguration.Contexts">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionConfiguration.Name">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionConfiguration.PlatformName">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionConfiguration.UniqueName">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.SolutionContext.#ctor(tomenglertde.ProjectConfigurationManager.Model.Solution,tomenglertde.ProjectConfigurationManager.Model.SolutionConfiguration,EnvDTE.SolutionContext)">
+    <parameter name="solution">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="solutionConfiguration">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="context">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionContext.ConfigurationName">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionContext.PlatformName">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionContext.ProjectName">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.SolutionContext.SetConfiguration(tomenglertde.ProjectConfigurationManager.Model.ProjectConfiguration)">
+    <parameter name="configuration">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.SolutionContext.SolutionConfiguration">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.TracerExtensions.TraceError(tomenglertde.ProjectConfigurationManager.Model.ITracer,System.Exception)">
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="ex">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.TracerExtensions.TraceError(tomenglertde.ProjectConfigurationManager.Model.ITracer,System.String,System.Object[])">
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="format">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="args">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+      <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.TracerExtensions.WriteLine(tomenglertde.ProjectConfigurationManager.Model.ITracer,System.String,System.Object[])">
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="format">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="args">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+      <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+</assembly>

@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assembly name="ProjectConfigurationManager.View">
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.BuildConfigurationView.#ctor(tomenglertde.ProjectConfigurationManager.Model.ITracer)">
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.CellToBackgroundBrushConverter.#ctor(tomenglertde.ProjectConfigurationManager.View.ThemeManager)">
+    <parameter name="themeManager">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceContentFilterBase.#ctor(System.Collections.Generic.IEnumerable{System.String})">
+    <parameter name="items">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+      <attribute ctor="M:JetBrains.Annotations.ItemCanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceContentFilterBase.Items">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemCanBeNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceFilterBase.CreateFilter(System.Collections.Generic.IEnumerable{System.String})">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <parameter name="items">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+      <attribute ctor="M:JetBrains.Annotations.ItemCanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceFilterBase.Filter">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceFilterBase.FilterProperty">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceFilterBase.OnSourceValuesChanged(System.Collections.Generic.IEnumerable{System.String})">
+    <parameter name="newValue">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+      <attribute ctor="M:JetBrains.Annotations.ItemCanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceFilterBase.Values">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceFilterBase.ValuesProperty">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ProjectDependenciesViewModel.#ctor(tomenglertde.ProjectConfigurationManager.Model.Solution)">
+    <parameter name="solution">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.ProjectDependenciesViewModel.Groups">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ProjectDependenciesViewModel.UpdateSelection(tomenglertde.ProjectConfigurationManager.Model.Project,System.Boolean)">
+    <parameter name="project">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ProjectDependency.#ctor(tomenglertde.ProjectConfigurationManager.View.ProjectDependenciesViewModel,tomenglertde.ProjectConfigurationManager.View.ProjectDependency,tomenglertde.ProjectConfigurationManager.Model.Project,System.Func{tomenglertde.ProjectConfigurationManager.Model.Project,System.Collections.Generic.IList{tomenglertde.ProjectConfigurationManager.Model.Project}})">
+    <parameter name="model">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="parent">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="project">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="getChildProjectsCallback">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.ProjectDependency.Children">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.ProjectDependency.DescendantsAndSelf">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.ProjectDependency.Project">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ProjectDependency.set_IsSelected(System.Boolean)">
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ProjectDependencyGroup.#ctor(System.String,System.Collections.Generic.IList{tomenglertde.ProjectConfigurationManager.View.ProjectDependency})">
+    <parameter name="name">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="items">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+      <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.ProjectDependencyGroup.Items">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.ProjectDependencyGroup.Name">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ProjectTypesColumnManager.GetIsAttached(System.Windows.DependencyObject)">
+    <parameter name="obj">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.ProjectTypesColumnManager.IsAttachedProperty">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ProjectTypesColumnManager.SetIsAttached(System.Windows.DependencyObject,System.Boolean)">
+    <parameter name="obj">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.PropertiesColumnsManagerBehavior.GetPropertyName(System.Windows.DependencyObject)">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    <parameter name="obj">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.PropertiesColumnsManagerBehavior.Properties">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.PropertiesColumnsManagerBehavior.PropertiesProperty">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.PropertiesColumnsManagerBehavior.PropertyNameProperty">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.PropertiesColumnsManagerBehavior.SetPropertyName(System.Windows.DependencyObject,System.String)">
+    <parameter name="obj">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="value">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.PropertiesView.#ctor(System.ComponentModel.Composition.Hosting.ExportProvider,tomenglertde.ProjectConfigurationManager.Model.ITracer)">
+    <parameter name="exportProvider">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="tracer">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.ShellView.#ctor(System.ComponentModel.Composition.Hosting.ExportProvider)">
+    <parameter name="exportProvider">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.Themes.ResourceKeys.MultipleChoiceFilterTemplate">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.Themes.ResourceKeys.ProjectConfigurationNameTemplate">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.Themes.ResourceKeys.ProjectNameTemplate">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.Themes.ResourceKeys.TagFilterTemplate">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+</assembly>

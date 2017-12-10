@@ -2,4 +2,6 @@
 <Weavers>
   <PropertyChanged />
   <Throttle />
+  <NullGuard />
+  <JetBrainsAnnotations />
 </Weavers>
