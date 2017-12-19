@@ -10,6 +10,61 @@
       <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
     </parameter>
   </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.FodyConfigurationMapping.#ctor(tomenglertde.ProjectConfigurationManager.Model.Project,System.Collections.Generic.ICollection{tomenglertde.ProjectConfigurationManager.View.FodyWeaverConfiguration})">
+    <parameter name="project">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="weaverConfigurations">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyConfigurationMapping.Configuration">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyConfigurationMapping.Project">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.FodyView.#ctor(System.ComponentModel.Composition.Hosting.ExportProvider)">
+    <parameter name="exportProvider">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaver.Configuration">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.FodyWeaver.EnumerateWeavers(tomenglertde.ProjectConfigurationManager.Model.Solution)">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
+    <parameter name="solution">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaver.Project">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaver.WeaverName">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.FodyWeaverConfiguration.#ctor(System.String,System.Collections.Generic.ICollection{tomenglertde.ProjectConfigurationManager.View.FodyWeaver})">
+    <parameter name="name">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="weavers">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaverConfiguration.Configuration">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaverConfiguration.Configurations">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaverConfiguration.Name">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaverConfiguration.Weavers">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
   <member name="M:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceContentFilterBase.#ctor(System.Collections.Generic.IEnumerable{System.String})">
     <parameter name="items">
       <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
@@ -154,6 +209,9 @@
     <parameter name="exportProvider">
       <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
     </parameter>
+  </member>
+  <member name="F:tomenglertde.ProjectConfigurationManager.View.Themes.ResourceKeys.FodyConfigurationMappingNameTemplate">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
   </member>
   <member name="F:tomenglertde.ProjectConfigurationManager.View.Themes.ResourceKeys.MultipleChoiceFilterTemplate">
     <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />

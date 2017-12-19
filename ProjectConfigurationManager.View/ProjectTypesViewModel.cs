@@ -26,7 +26,7 @@
         [NotNull]
         public Solution Solution { get; }
 
-        [NotNull]
+        [NotNull, UsedImplicitly]
         public static ICommand UnloadProjectsCommand => new DelegateCommand<IEnumerable>(UnloadProjects);
 
         private static void UnloadProjects([NotNull, ItemNotNull] IEnumerable projects)

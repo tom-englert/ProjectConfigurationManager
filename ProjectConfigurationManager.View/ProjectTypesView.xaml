@@ -47,7 +47,7 @@
           <VirtualizingStackPanel Tag="{Binding ElementName=DataGrid}">
             <VirtualizingStackPanel.ContextMenu>
               <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-              <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
+              <ContextMenu DataContext="{Binding Path=(PlacementTarget).Tag, RelativeSource={RelativeSource Self}}"
                            Style="{StaticResource {x:Static styles:ResourceKeys.ContextMenuStyle}}">
                 <MenuItem Header="Unload selected project(s)" Command="{Binding DataContext.UnloadProjectsCommand}" CommandParameter="{Binding SelectedItems}" />
               </ContextMenu>

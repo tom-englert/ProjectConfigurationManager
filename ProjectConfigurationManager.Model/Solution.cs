@@ -55,11 +55,11 @@
             var solutionEvents = Dte?.Events?.SolutionEvents;
             if (solutionEvents != null)
             {
-                solutionEvents.Opened += () => Solution_Changed("Solution opened");
-                solutionEvents.AfterClosing += () => Solution_Changed("Solution after closing");
-                solutionEvents.ProjectAdded += _ => Solution_Changed("Project added");
-                solutionEvents.ProjectRemoved += _ => Solution_Changed("Project removed");
-                solutionEvents.ProjectRenamed += (_, __) => Solution_Changed("Project renamed");
+                solutionEvents.Opened += () => OnSolutionChanged("Solution opened");
+                solutionEvents.AfterClosing += () => OnSolutionChanged("Solution after closing");
+                solutionEvents.ProjectAdded += _ => OnSolutionChanged("Project added");
+                solutionEvents.ProjectRemoved += _ => OnSolutionChanged("Project removed");
+                solutionEvents.ProjectRenamed += (_, __) => OnSolutionChanged("Project renamed");
             }
 
             _solutionEvents = solutionEvents;
@@ -69,7 +69,9 @@
             CommandManager.RequerySuggested += (_, __) => Projects.ForEach(proj => proj?.InvalidateState());
         }
 
-        private void Solution_Changed([NotNull] string action)
+        public event EventHandler Changed;
+
+        private void OnSolutionChanged([NotNull] string action)
         {
             Tracer.WriteLine(action);
 
@@ -138,6 +140,7 @@
                 {
                     SynchronizeCollections(retry < 3);
                     SetupFileSystemWatcher();
+                    Changed?.Invoke(this, EventArgs.Empty);
                 }
                 catch (RetryException)
                 {

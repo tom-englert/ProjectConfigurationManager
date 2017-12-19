@@ -24,21 +24,6 @@
         private readonly ThemeManager _themeManager;
         [NotNull]
         private readonly Dictionary<string, Color> _mappingCache = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
-        [NotNull]
-        private static readonly Color[] _colors =
-        {
-            Colors.Aquamarine,
-            Colors.Aqua,
-            Colors.BlanchedAlmond,
-            Colors.Gold,
-            Colors.LightBlue,
-            Colors.LightGreen,
-            Colors.LightPink,
-            Colors.LightSalmon,
-            Colors.LightSeaGreen,
-            Colors.Thistle,
-            Colors.Turquoise
-        };
 
         public CellToBackgroundBrushConverter([NotNull] ThemeManager themeManager)
         {
@@ -127,7 +112,7 @@
         [ContractVerification(false)]
         private Color GetNextColor([CanBeNull] string text)
         {
-            return _colors[_mappingCache.Count % _colors.Length];
+            return BackgroundColors.GetColor(_mappingCache.Count);
         }
 
         [ContractInvariantMethod]

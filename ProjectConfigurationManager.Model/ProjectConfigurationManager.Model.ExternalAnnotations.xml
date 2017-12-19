@@ -50,6 +50,9 @@
   <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.DefaultProjectConfiguration">
     <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
   </member>
+  <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.Folder">
+    <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+  </member>
   <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.FullName">
     <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
   </member>

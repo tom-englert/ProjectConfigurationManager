@@ -20,5 +20,8 @@
 
         [NotNull]
         public static readonly ResourceKey ProjectConfigurationNameTemplate = new ComponentResourceKey(typeof(ResourceKeys), "ProjectConfigurationNameTemplate");
+
+        [NotNull]
+        public static readonly ResourceKey FodyConfigurationMappingNameTemplate = new ComponentResourceKey(typeof(ResourceKeys), "FodyConfigurationMappingNameTemplate");
     }
 }

@@ -27,6 +27,9 @@
     <ContentControl Content="{Binding Project}" ContentTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}" Focusable="False" />
   </DataTemplate>
 
+  <DataTemplate x:Key="{x:Static themes:ResourceKeys.FodyConfigurationMappingNameTemplate}" DataType="view:FodyConfigurationMapping">
+    <ContentControl Content="{Binding Project}" ContentTemplate="{StaticResource {x:Static themes:ResourceKeys.ProjectNameTemplate}}" Focusable="False" />
+  </DataTemplate>
 
   <Style TargetType="{x:Type view:MultipleChoiceFilterBase}">
     <Setter Property="Template">

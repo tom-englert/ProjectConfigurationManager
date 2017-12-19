@@ -116,6 +116,10 @@
         [NotNull]
         public string FullName { get; }
 
+        [NotNull]
+        // ReSharper disable once AssignNullToNotNullAttribute
+        public string Folder => Path.GetDirectoryName(FullName);
+
         [NotNull, ItemNotNull]
         public IList<string> ProjectTypeGuids => RetrieveProjectTypeGuids();
 

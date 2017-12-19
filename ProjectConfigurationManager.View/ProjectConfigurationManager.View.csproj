@@ -179,7 +179,15 @@
     <Compile Include="..\Version.cs">
       <Link>Properties\Version.cs</Link>
     </Compile>
+    <Compile Include="BackgroundColors.cs" />
     <Compile Include="DataGridTryBeginEditBehavior.cs" />
+    <Compile Include="FodyProjectColumnsManagerBehavior.cs" />
+    <Compile Include="FodyView.xaml.cs">
+      <DependentUpon>FodyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FodyViewModel.cs" />
+    <Compile Include="FodyWeaver.cs" />
+    <Compile Include="FodyWeaverColumnsManagerBehavior.cs" />
     <Compile Include="MultipleChoiceFilterBase.cs" />
     <Compile Include="ProjectDependenciesView.xaml.cs">
       <DependentUpon>ProjectDependenciesView.xaml</DependentUpon>
@@ -216,6 +224,10 @@
       <DependentUpon>BuildConfigurationView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="FodyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ProjectDependenciesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
