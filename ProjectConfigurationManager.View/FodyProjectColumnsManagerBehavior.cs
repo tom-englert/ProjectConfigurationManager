@@ -81,7 +81,7 @@
         }
 
         [NotNull]
-        private DataGridColumn CreateColumn([NotNull] string weaver)
+        private static DataGridColumn CreateColumn([NotNull] string weaver)
         {
             var configurationBindingPath = "Configuration[" + weaver + "]";
             var configurationBinding = new Binding(configurationBindingPath);
@@ -134,7 +134,7 @@
             {
                 try
                 {
-                    return new SolidColorBrush(BackgroundColors.GetColor(System.Convert.ToInt32(value)));
+                    return new SolidColorBrush(BackgroundColors.GetColor(System.Convert.ToInt32(value, CultureInfo.InvariantCulture)));
                 }
                 catch
                 {
