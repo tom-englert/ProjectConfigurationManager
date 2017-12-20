@@ -20,6 +20,7 @@
   </member>
   <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyConfigurationMapping.Configuration">
     <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    <attribute ctor="M:JetBrains.Annotations.UsedImplicitlyAttribute.#ctor" />
   </member>
   <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyConfigurationMapping.Project">
     <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
@@ -51,6 +52,7 @@
     </parameter>
     <parameter name="weavers">
       <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+      <attribute ctor="M:JetBrains.Annotations.ItemNotNullAttribute.#ctor" />
     </parameter>
   </member>
   <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaverConfiguration.Configuration">

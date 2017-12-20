@@ -108,19 +108,24 @@
             visualTree.AppendChild(content);
             // ReSharper restore AssignNullToNotNullAttribute
 
+            var header = new TextBlock
+            {
+                Text = weaver,
+                LayoutTransform = new RotateTransform(-90),
+                Margin = new Thickness(2)
+            };
+
+            TextOptions.SetTextRenderingMode(header, TextRenderingMode.Grayscale);
+
             var column = new DataGridTemplateColumn
             {
-                Header = new TextBlock
-                {
-                    Text = weaver,
-                    LayoutTransform = new RotateTransform(-90),
-                },
+                Header = header,
                 CanUserResize = false,
+                SortMemberPath = configurationBindingPath,
                 CellTemplate = new DataTemplate(typeof(int))
                 {
                     VisualTree = visualTree
                 }
-                // Binding = new Binding("Configuration[" + weaver + "]")
             };
 
             column.SetIsFilterVisible(false);
@@ -130,7 +135,7 @@
 
         private class IndexToBrushConverter : IValueConverter
         {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            public object Convert(object value, [CanBeNull] Type targetType, object parameter, [CanBeNull] CultureInfo culture)
             {
                 try
                 {
