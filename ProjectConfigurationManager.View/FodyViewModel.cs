@@ -34,9 +34,10 @@
         [NotNull]
         public Solution Solution { get; }
 
+        [NotNull, ItemNotNull]
         public ICollection<FodyConfigurationMapping> ConfigurationMappings { get; }
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         public ICollection<FodyWeaverConfiguration> WeaverConfigurations { get; } = new ObservableCollection<FodyWeaverConfiguration>();
 
         private void Solution_Changed([NotNull] object sender, [NotNull] EventArgs e)
@@ -51,54 +52,16 @@
                 .GroupBy(weaver => weaver.WeaverName)
                 .Select(weavers => new FodyWeaverConfiguration(weavers.Key, weavers.ToArray()))
                 .ToArray());
-        }
-    }
 
-    public class FodyConfigurationMapping
-    {
-        public FodyConfigurationMapping([NotNull] Project project, [NotNull] ICollection<FodyWeaverConfiguration> weaverConfigurations)
-        {
-            Project = project;
-            Configuration = new ConfigurationIndexer(project, weaverConfigurations);
-        }
-
-        private class ConfigurationIndexer : IIndexer<int>
-        {
-            [NotNull]
-            private readonly ICollection<FodyWeaverConfiguration> _weaverConfigurations;
-            [NotNull]
-            private readonly Project _project;
-
-            public ConfigurationIndexer([NotNull] Project project, [NotNull] ICollection<FodyWeaverConfiguration> weaverConfigurations)
+            foreach (var configuration in WeaverConfigurations)
             {
-                _weaverConfigurations = weaverConfigurations;
-                _project = project;
+                configuration.Update();
             }
 
-            public int this[string weaver]
+            foreach (var mapping in ConfigurationMappings)
             {
-                get
-                {
-                    var weaverConfiguration = _weaverConfigurations.FirstOrDefault(w => w.Name == weaver);
-                    var projectConfiguration = weaverConfiguration?.Weavers.FirstOrDefault(w => w.Project == _project)?.Configuration;
-                    if (projectConfiguration == null)
-                        return string.IsNullOrEmpty(weaverConfiguration?.Configuration["0"]) ? -1 : 0;
-
-                    var weaverConfigurations = weaverConfiguration.Configurations;
-                    var weaverProjectConfiguration = weaverConfigurations.LastOrDefault(c => c == projectConfiguration);
-                    if (weaverProjectConfiguration == null)
-                        return -1;
-
-                    return weaverConfigurations.IndexOf(weaverProjectConfiguration);
-                }
-                set => throw new NotImplementedException();
+                mapping.Update();
             }
         }
-
-        [NotNull]
-        public Project Project { get; }
-
-        [NotNull]
-        public IIndexer<int> Configuration { get; }
     }
 }
