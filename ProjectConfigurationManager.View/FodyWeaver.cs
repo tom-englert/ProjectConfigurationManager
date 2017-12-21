@@ -12,6 +12,8 @@
 
     public class FodyWeaver
     {
+        public const string ConfigurationFileName = "FodyWeavers.xml";
+
         private FodyWeaver([NotNull] string weaverName, [NotNull] string configuration, [CanBeNull] Project project)
         {
             WeaverName = weaverName;
@@ -45,7 +47,7 @@
         [NotNull, ItemNotNull]
         private static IEnumerable<FodyWeaver> EnumerateWeavers([NotNull] string folder, [CanBeNull] Project project)
         {
-            var root = GetDocument(Path.Combine(folder, "FodyWeavers.xml"))?.Root;
+            var root = GetDocument(Path.Combine(folder, ConfigurationFileName))?.Root;
 
             if (root == null)
                 yield break;

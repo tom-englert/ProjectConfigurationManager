@@ -5,6 +5,7 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.ComponentModel.Composition;
+    using System.IO;
     using System.Linq;
 
     using JetBrains.Annotations;
@@ -27,6 +28,7 @@
         {
             Solution = solution;
             solution.Changed += Solution_Changed;
+            solution.FileChanged += Solution_FileChanged;
 
             ConfigurationMappings = solution.Projects.ObservableSelect(project => new FodyConfigurationMapping(project, WeaverConfigurations));
         }
@@ -42,6 +44,16 @@
 
         private void Solution_Changed([NotNull] object sender, [NotNull] EventArgs e)
         {
+            UpdateConfigurations();
+        }
+
+        private void Solution_FileChanged([NotNull] object sender, [NotNull] FileSystemEventArgs e)
+        {
+            var changedFile = Path.GetFileName(e.Name);
+
+            if (changedFile?.StartsWith(FodyWeaver.ConfigurationFileName, StringComparison.OrdinalIgnoreCase) != true)
+                return;
+
             UpdateConfigurations();
         }
 

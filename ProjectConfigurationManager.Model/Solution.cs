@@ -71,6 +71,8 @@
 
         public event EventHandler Changed;
 
+        public event EventHandler<FileSystemEventArgs> FileChanged;
+
         private void OnSolutionChanged([NotNull] string action)
         {
             Tracer.WriteLine(action);
@@ -168,7 +170,7 @@
 
                 if (solutionFolder != null)
                 {
-                    watcher = new FileSystemWatcher(solutionFolder, "*.*")
+                    watcher = new FileSystemWatcher(solutionFolder)
                     {
                         EnableRaisingEvents = true,
                         NotifyFilter = NotifyFilters.LastWrite,
@@ -195,6 +197,8 @@
         {
             try
             {
+                FileChanged?.Invoke(this, e);
+
                 var project = Projects.FirstOrDefault(prj => string.Equals(e.FullPath, prj.FullName, StringComparison.OrdinalIgnoreCase));
 
                 if ((project == null) || project.IsSaving || (project.FileTime == File.GetLastWriteTime(project.FullName)))
