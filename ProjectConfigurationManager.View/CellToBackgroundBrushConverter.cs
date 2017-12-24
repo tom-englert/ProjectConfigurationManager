@@ -51,13 +51,6 @@
 
             var color = _mappingCache.ForceValue(text, GetNextColor);
 
-            if (_themeManager.IsDarkTheme)
-            {
-                color.ScR = 1 - color.ScR;
-                color.ScG = 1 - color.ScG;
-                color.ScB = 1 - color.ScB;
-            }
-
             return new SolidColorBrush(color);
         }
 
@@ -112,7 +105,7 @@
         [ContractVerification(false)]
         private Color GetNextColor([CanBeNull] string text)
         {
-            return BackgroundColors.GetColor(_mappingCache.Count);
+            return BackgroundColors.GetColor(_mappingCache.Count, _themeManager.IsDarkTheme);
         }
 
         [ContractInvariantMethod]

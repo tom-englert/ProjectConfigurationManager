@@ -29,6 +29,7 @@
     public sealed class FodyProjectColumnsManagerBehavior : FrameworkElementBehavior<DataGrid>
     {
         private Solution _solution;
+        private IValueConverter _indexToBrushConverter;
 
         protected override void OnAttached()
         {
@@ -39,6 +40,8 @@
 
             dataGrid.KeyDown += DataGrid_KeyDown;
             dataGrid.TextInput += DataGrid_TextInput;
+
+            _indexToBrushConverter = dataGrid.GetExportProvider().GetExportedValue<IndexToBrushConverter>();
         }
 
         protected override void OnDetaching()
@@ -162,7 +165,7 @@
         }
 
         [NotNull]
-        private static DataGridColumn CreateColumn([NotNull] string weaver)
+        private DataGridColumn CreateColumn([NotNull] string weaver)
         {
             var configurationBindingPath = "Configuration[" + weaver + "]";
             var configurationBinding = new Binding(configurationBindingPath);
@@ -179,7 +182,7 @@
 
             // ReSharper disable AssignNullToNotNullAttribute
             var visualTree = new FrameworkElementFactory(typeof(Border));
-            visualTree.SetBinding(Border.BackgroundProperty, new Binding(configurationBindingPath) { Converter = new IndexToBrushConverter() });
+            visualTree.SetBinding(Border.BackgroundProperty, new Binding(configurationBindingPath) { Converter = _indexToBrushConverter });
 
             var content = new FrameworkElementFactory(typeof(ContentControl));
             content.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
@@ -218,26 +221,6 @@
         private string GetWeaver([CanBeNull] DataGridColumn column)
         {
             return (column?.Header as TextBlock)?.Text;
-        }
-
-        private class IndexToBrushConverter : IValueConverter
-        {
-            public object Convert(object value, [CanBeNull] Type targetType, object parameter, [CanBeNull] CultureInfo culture)
-            {
-                try
-                {
-                    return new SolidColorBrush(BackgroundColors.GetColor(System.Convert.ToInt32(value, CultureInfo.InvariantCulture)));
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

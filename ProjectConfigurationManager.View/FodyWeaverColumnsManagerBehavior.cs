@@ -1,6 +1,7 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -22,6 +23,17 @@
     public class FodyWeaverColumnsManagerBehavior : FrameworkElementBehavior<DataGrid>
     {
         private Solution _solution;
+        private IValueConverter _indexToBrushConverter;
+
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+
+            var dataGrid = AssociatedObject;
+            Contract.Assume(dataGrid != null);
+
+            _indexToBrushConverter = dataGrid.GetExportProvider().GetExportedValue<IndexToBrushConverter>();
+        }
 
         protected override void OnAssociatedObjectLoaded()
         {
@@ -95,7 +107,7 @@
         }
 
         [NotNull]
-        private static DataGridColumn CreateColumn(int index)
+        private DataGridColumn CreateColumn(int index)
         {
             var configurationBinding = new Binding("Configuration[" + index + "]");
             // ReSharper disable once AssignNullToNotNullAttribute
@@ -105,7 +117,7 @@
             {
                 Setters =
                 {
-                    new Setter(Control.BackgroundProperty, new SolidColorBrush(BackgroundColors.GetColor(index))),
+                    new Setter(Control.BackgroundProperty, new Binding { Source = index, Converter = _indexToBrushConverter }),
                     // ReSharper disable once AssignNullToNotNullAttribute
                     new Setter(Control.ForegroundProperty, new DynamicResourceExtension(SystemColors.WindowTextBrushKey))
                 },

@@ -22,6 +22,18 @@
             Colors.Gold
         };
 
-        public static Color GetColor(int index) => index < 0 ? Colors.Transparent : _colors[index % _colors.Length];
+        public static Color GetColor(int index, bool isDarkTheme)
+        {
+            var color = index < 0 ? Colors.Transparent : _colors[index % _colors.Length];
+
+            if (isDarkTheme)
+            {
+                color.ScR = 1 - color.ScR;
+                color.ScG = 1 - color.ScG;
+                color.ScB = 1 - color.ScB;
+            }
+
+            return color;
+        }
     }
 }

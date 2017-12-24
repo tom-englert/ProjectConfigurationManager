@@ -194,6 +194,7 @@
     <Compile Include="FodyWeaver.cs" />
     <Compile Include="FodyWeaverColumnsManagerBehavior.cs" />
     <Compile Include="FodyWeaverConfiguration.cs" />
+    <Compile Include="IndexToBrushConverter.cs" />
     <Compile Include="MultipleChoiceFilterBase.cs" />
     <Compile Include="ProjectDependenciesView.xaml.cs">
       <DependentUpon>ProjectDependenciesView.xaml</DependentUpon>
