@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:tomenglertde.ProjectConfigurationManager.View"
              xmlns:themes="clr-namespace:tomenglertde.ProjectConfigurationManager.View.Themes"
              xmlns:styles="urn:TomsToolbox.Wpf.Styles"
-             xmlns:toms="urn:TomsToolbox"
              xmlns:dgx="urn:tom-englert.de/DataGridExtensions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              d:DataContext="{d:DesignInstance local:FodyViewModel}">
@@ -56,13 +55,14 @@
       <TextBlock DockPanel.Dock="Top" Text="Weaver configurations:" Margin="5" />
       <DataGrid
         ItemsSource="{Binding WeaverConfigurations}"
-        AutoGenerateColumns="False" IsReadOnly="True"
+        AutoGenerateColumns="False"
         CanUserAddRows="False" CanUserResizeRows="False"
         dgx:Tools.ApplyInitialSorting="True"
         SelectionUnit="Cell"
-        FrozenColumnCount="1">
+        FrozenColumnCount="2">
         <DataGrid.Columns>
-          <DataGridTextColumn Header="Weaver" Binding="{Binding Name}" />
+          <DataGridTextColumn Header="Weaver" Binding="{Binding Name}" IsReadOnly="True" />
+          <DataGridTextColumn Header="#" Binding="{Binding Index}" SortDirection="Ascending" />
         </DataGrid.Columns>
         <i:Interaction.Behaviors>
           <local:FodyWeaverColumnsManagerBehavior />

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
@@ -36,6 +37,7 @@
                     return;
 
                 solution.Changed += Solution_Changed;
+                solution.FileChanged += Solution_FileChanged;
             }
 
             UpdateColumns();
@@ -43,6 +45,16 @@
 
         private void Solution_Changed([NotNull] object sender, [NotNull] EventArgs e)
         {
+            UpdateColumns();
+        }
+
+        private void Solution_FileChanged([NotNull] object sender, [NotNull] FileSystemEventArgs e)
+        {
+            var changedFile = Path.GetFileName(e.Name);
+
+            if (changedFile?.StartsWith(FodyWeaver.ConfigurationFileName, StringComparison.OrdinalIgnoreCase) != true)
+                return;
+
             UpdateColumns();
         }
 
@@ -90,7 +102,8 @@
             {
                 Setters =
                 {
-                    new Setter(Control.BackgroundProperty, new SolidColorBrush(BackgroundColors.GetColor(index)))
+                    new Setter(Control.BackgroundProperty, new SolidColorBrush(BackgroundColors.GetColor(index))),
+                    new Setter(Control.ForegroundProperty, new DynamicResourceExtension(SystemColors.WindowTextBrushKey))
                 },
                 Triggers =
                 {
@@ -114,7 +127,8 @@
                 Header = index == 0 ? "Solution" : index.ToString(CultureInfo.CurrentCulture),
                 Width = new DataGridLength(1, DataGridLengthUnitType.Star),
                 Binding = configurationBinding,
-                CellStyle = cellStyle
+                CellStyle = cellStyle,
+                IsReadOnly = true,
             };
         }
     }

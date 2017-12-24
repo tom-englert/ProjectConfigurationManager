@@ -14,11 +14,12 @@
     {
         public const string ConfigurationFileName = "FodyWeavers.xml";
 
-        private FodyWeaver([NotNull] string weaverName, [NotNull] string configuration, [CanBeNull] Project project)
+        private FodyWeaver([NotNull] string weaverName, [NotNull] string configuration, [CanBeNull] Project project, int index)
         {
             WeaverName = weaverName;
             Configuration = configuration;
             Project = project;
+            Index = index;
         }
 
         [NotNull]
@@ -29,6 +30,8 @@
 
         [CanBeNull]
         public Project Project { get; }
+
+        public int Index { get; }
 
         [NotNull, ItemNotNull]
         public static IEnumerable<FodyWeaver> EnumerateWeavers([NotNull] Solution solution)
@@ -47,30 +50,48 @@
         [NotNull, ItemNotNull]
         private static IEnumerable<FodyWeaver> EnumerateWeavers([NotNull] string folder, [CanBeNull] Project project)
         {
-            var root = GetDocument(Path.Combine(folder, ConfigurationFileName))?.Root;
+            var root = LoadDocument(folder)?.Root;
 
             if (root == null)
                 yield break;
+
+            var index = 0;
 
             foreach (var element in root.Elements())
             {
                 var weaverName = element.Name.LocalName;
                 var configuration = element.ToString(SaveOptions.OmitDuplicateNamespaces);
 
-                yield return new FodyWeaver(weaverName, configuration, project);
+                yield return new FodyWeaver(weaverName, configuration, project, index++);
             }
         }
 
         [CanBeNull]
-        private static XDocument GetDocument([NotNull] string file)
+        public static XDocument LoadDocument([NotNull] string folder)
         {
             try
             {
+                var file = Path.Combine(folder, ConfigurationFileName);
+
                 return File.Exists(file) ? XDocument.Load(file) : null;
             }
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        public static void SaveDocument([NotNull] string folder, [NotNull] XDocument document)
+        {
+            try
+            {
+                var file = Path.Combine(folder, ConfigurationFileName);
+
+                document.Save(file, SaveOptions.OmitDuplicateNamespaces);
+            }
+            catch (Exception)
+            {
+                // TODO: log error...
             }
         }
     }

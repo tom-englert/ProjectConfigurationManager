@@ -6,14 +6,24 @@
     using System.Linq;
     using System.Runtime.CompilerServices;
 
+    using AutoProperties;
+
     using JetBrains.Annotations;
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
-    public sealed class FodyWeaverConfiguration : INotifyPropertyChanged
+    internal sealed class FodyWeaverConfiguration : INotifyPropertyChanged
     {
-        public FodyWeaverConfiguration([NotNull] string name, [NotNull, ItemNotNull] ICollection<FodyWeaver> weavers)
+        [NotNull]
+        private readonly FodyViewModel _viewModel;
+
+        public FodyWeaverConfiguration([NotNull] FodyViewModel viewModel, [NotNull] string name, [NotNull] [ItemNotNull] ICollection<FodyWeaver> weavers, int index)
         {
+            _viewModel = viewModel;
+            Name = name;
+            Weavers = weavers;
+            Index.SetBackingField(index);
+
             var solutionConfigurations = weavers
                 .Where(w => w.Project == null)
                 .Take(1)
@@ -29,9 +39,6 @@
                 .Concat(projectConfigurations)
                 .ToArray();
 
-            Name = name;
-            Weavers = weavers;
-
             Configuration = new ConfigurationIndexer(Configurations);
         }
 
@@ -46,6 +53,14 @@
 
         [NotNull]
         public IList<string> Configurations { get; }
+
+        public double Index { get; set; }
+
+        [UsedImplicitly]
+        private void OnIndexChanged()
+        {
+            _viewModel.OnWeaverIndexChanged();
+        }
 
         public void Update()
         {

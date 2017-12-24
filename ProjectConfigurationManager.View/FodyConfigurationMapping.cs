@@ -1,21 +1,19 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
-    using System.Runtime.CompilerServices;
 
     using JetBrains.Annotations;
 
     using tomenglertde.ProjectConfigurationManager.Model;
 
-    public sealed class FodyConfigurationMapping : INotifyPropertyChanged
+    internal sealed class FodyConfigurationMapping : INotifyPropertyChanged
     {
-        public FodyConfigurationMapping([NotNull] Project project, [NotNull] ICollection<FodyWeaverConfiguration> weaverConfigurations)
+        public FodyConfigurationMapping([NotNull] FodyViewModel viewModel, [NotNull] Project project)
         {
             Project = project;
-            Configuration = new ConfigurationIndexer(project, weaverConfigurations);
+            Configuration = new ConfigurationIndexer(viewModel, project);
         }
 
         [NotNull]
@@ -32,7 +30,7 @@
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([NotNull] string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -40,13 +38,13 @@
         private class ConfigurationIndexer : IIndexer<int>
         {
             [NotNull]
-            private readonly ICollection<FodyWeaverConfiguration> _weaverConfigurations;
+            private readonly FodyViewModel _viewModel;
             [NotNull]
             private readonly Project _project;
 
-            public ConfigurationIndexer([NotNull] Project project, [NotNull] ICollection<FodyWeaverConfiguration> weaverConfigurations)
+            public ConfigurationIndexer([NotNull] FodyViewModel viewModel, [NotNull] Project project)
             {
-                _weaverConfigurations = weaverConfigurations;
+                _viewModel = viewModel;
                 _project = project;
             }
 
@@ -54,7 +52,7 @@
             {
                 get
                 {
-                    var weaverConfiguration = _weaverConfigurations.FirstOrDefault(w => w.Name == weaver);
+                    var weaverConfiguration = _viewModel.WeaverConfigurations.FirstOrDefault(w => w.Name == weaver);
                     var projectConfiguration = weaverConfiguration?.Weavers.FirstOrDefault(w => w.Project == _project)?.Configuration;
                     if (projectConfiguration == null)
                         return string.IsNullOrEmpty(weaverConfiguration?.Configuration["0"]) ? -1 : 0;
