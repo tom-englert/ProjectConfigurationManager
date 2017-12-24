@@ -1,9 +1,11 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
+    using System.Globalization;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using System.Windows.Markup;
     using System.Windows.Threading;
 
     using JetBrains.Annotations;
@@ -25,6 +27,7 @@
         public ProjectDependenciesView()
         {
             InitializeComponent();
+            Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
         }
 
         private void TreeViewItem_Expanded([NotNull] object sender, [NotNull] RoutedEventArgs e)

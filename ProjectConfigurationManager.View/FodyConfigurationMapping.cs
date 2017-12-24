@@ -1,8 +1,8 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
-    using System;
     using System.ComponentModel;
     using System.Linq;
+    using System.Xml.Linq;
 
     using JetBrains.Annotations;
 
@@ -48,12 +48,12 @@
                 _project = project;
             }
 
-            public int this[string weaver]
+            public int this[string weaverName]
             {
                 get
                 {
-                    var weaverConfiguration = _viewModel.WeaverConfigurations.FirstOrDefault(w => w.Name == weaver);
-                    var projectConfiguration = weaverConfiguration?.Weavers.FirstOrDefault(w => w.Project == _project)?.Configuration;
+                    var weaverConfiguration = _viewModel.WeaverConfigurations.FirstOrDefault(configuration => configuration.Name == weaverName);
+                    var projectConfiguration = weaverConfiguration?.Weavers.FirstOrDefault(weaver => weaver?.Project == _project)?.Configuration;
                     if (projectConfiguration == null)
                         return string.IsNullOrEmpty(weaverConfiguration?.Configuration["0"]) ? -1 : 0;
 
@@ -64,7 +64,65 @@
 
                     return weaverConfigurations.IndexOf(weaverProjectConfiguration);
                 }
-                set => throw new NotImplementedException();
+                set
+                {
+                    var currentValue = this[weaverName];
+
+                    if (value == currentValue)
+                        return;
+
+                    if (value <= 0)
+                    {
+                        if (currentValue <= 0)
+                            return;
+
+                        SetWeaver(weaverName, _project.Folder, null);
+                    }
+                    else
+                    {
+                        var weaverConfiguration = _viewModel.WeaverConfigurations.FirstOrDefault(w => w.Name == weaverName);
+                        var weaverConfigurations = weaverConfiguration?.Configurations;
+                        if (weaverConfigurations == null)
+                            return;
+
+                        if (value >= weaverConfigurations.Count)
+                            return;
+
+                        var configuration = weaverConfigurations[value];
+
+                        SetWeaver(weaverName, _project.Folder, configuration);
+                    }
+                }
+            }
+
+            private void SetWeaver([NotNull] string weaverName, [NotNull] string projectFolder, [CanBeNull] string configuration)
+            {
+                var document = FodyWeaver.LoadDocument(projectFolder);
+                var root = document?.Root;
+                if (root == null)
+                    return;
+
+                var weaverElements = root.Elements().ToArray();
+                var weaverElement = weaverElements.FirstOrDefault(element => element?.Name.LocalName == weaverName);
+                if (weaverElement == null)
+                {
+                    if (string.IsNullOrEmpty(configuration))
+                        return;
+
+                    root.Add(XElement.Parse(configuration));
+                    _viewModel.SortWeavers(root);
+                }
+                else
+                {
+                    if (configuration != null)
+                    {
+                        weaverElement.AddAfterSelf(XElement.Parse(configuration));
+                    }
+
+                    weaverElement.Remove();
+                }
+
+                FodyWeaver.SaveDocument(projectFolder, document);
             }
         }
     }

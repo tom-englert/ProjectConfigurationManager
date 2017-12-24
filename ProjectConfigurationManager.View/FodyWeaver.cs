@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Xml.Linq;
@@ -59,6 +60,8 @@
 
             foreach (var element in root.Elements())
             {
+                Debug.Assert(element != null, nameof(element) + " != null");
+
                 var weaverName = element.Name.LocalName;
                 var configuration = element.ToString(SaveOptions.OmitDuplicateNamespaces);
 

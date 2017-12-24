@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -9,6 +11,7 @@
     using System.Windows.Controls;
     using System.Windows.Data;
     using System.Windows.Documents;
+    using System.Windows.Input;
     using System.Windows.Media;
 
     using DataGridExtensions;
@@ -27,13 +30,44 @@
     {
         private Solution _solution;
 
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+
+            var dataGrid = AssociatedObject;
+            Contract.Assume(dataGrid != null);
+
+            dataGrid.KeyDown += DataGrid_KeyDown;
+            dataGrid.TextInput += DataGrid_TextInput;
+        }
+
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+
+            var dataGrid = AssociatedObject;
+            Contract.Assume(dataGrid != null);
+
+            dataGrid.KeyDown -= DataGrid_KeyDown;
+            dataGrid.TextInput -= DataGrid_TextInput;
+
+            var solution = _solution;
+
+            if (solution == null)
+                return;
+
+            solution.Changed += Solution_Changed;
+            solution.FileChanged += Solution_FileChanged;
+
+        }
+
         protected override void OnAssociatedObjectLoaded()
         {
             base.OnAssociatedObjectLoaded();
 
             if (_solution == null)
             {
-                var solution = AssociatedObject?.GetExportProvider()?.GetExportedValue<Solution>();
+                var solution = AssociatedObject?.GetExportProvider().GetExportedValue<Solution>();
 
                 _solution = solution;
 
@@ -62,6 +96,40 @@
             UpdateColumns();
         }
 
+        private void DataGrid_KeyDown([NotNull] object sender, [NotNull] KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Delete:
+                case Key.OemMinus:
+                case Key.Subtract:
+                    SetWeaverConfiguration((DataGrid)sender, 0);
+                    break;
+            }
+        }
+
+        private void DataGrid_TextInput([NotNull] object sender, [NotNull] TextCompositionEventArgs e)
+        {
+            if (!int.TryParse(e.Text, NumberStyles.Integer, CultureInfo.CurrentCulture, out var number))
+                return;
+
+            SetWeaverConfiguration((DataGrid)sender, number);
+        }
+
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        private void SetWeaverConfiguration([NotNull] DataGrid dataGrid, int number)
+        {
+            foreach (var cell in dataGrid.SelectedCells)
+            {
+                var row = (FodyConfigurationMapping)cell.Item;
+                var weaver = GetWeaver(cell.Column);
+                if (weaver == null)
+                    continue;
+
+                row.Configuration[weaver] = number;
+            }
+        }
+
         [Throttled(typeof(DispatcherThrottle))]
         private void UpdateColumns()
         {
@@ -88,6 +156,7 @@
 
             foreach (var weaver in toAdd)
             {
+                Contract.Assume(weaver != null);
                 dataGrid.Columns.Add(CreateColumn(weaver));
             }
         }
@@ -145,6 +214,12 @@
             return column;
         }
 
+        [CanBeNull]
+        private string GetWeaver([CanBeNull] DataGridColumn column)
+        {
+            return (column?.Header as TextBlock)?.Text;
+        }
+
         private class IndexToBrushConverter : IValueConverter
         {
             public object Convert(object value, [CanBeNull] Type targetType, object parameter, [CanBeNull] CultureInfo culture)
@@ -163,12 +238,6 @@
             {
                 throw new NotImplementedException();
             }
-        }
-
-        [CanBeNull]
-        private string GetWeaver([CanBeNull] DataGridColumn column)
-        {
-            return (column?.Header as TextBlock)?.Text;
         }
     }
 }

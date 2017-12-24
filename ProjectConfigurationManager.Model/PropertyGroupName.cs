@@ -116,6 +116,7 @@
             Contract.Ensures(Contract.Result<PropertyGroupName>() != null);
 
             if (propertyName.Contains("."))
+                // ReSharper disable once AssignNullToNotNullAttribute
                 return new PropertyGroupName(propertyName.Split('.')[0]);
 
             if (_globalProperties.Contains(propertyName))

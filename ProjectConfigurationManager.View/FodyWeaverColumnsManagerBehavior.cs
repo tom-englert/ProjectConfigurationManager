@@ -75,6 +75,8 @@
                 .ToArray();
 
             var numberOfConfigurations = 1 + projectWeavers
+                // ReSharper disable once AssignNullToNotNullAttribute
+                // ReSharper disable once PossibleNullReferenceException
                 .Select(group => group.Select(item => item.Configuration)
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .Count())
@@ -96,6 +98,7 @@
         private static DataGridColumn CreateColumn(int index)
         {
             var configurationBinding = new Binding("Configuration[" + index + "]");
+            // ReSharper disable once AssignNullToNotNullAttribute
             var transparentBackgoundSetter = new Setter(Control.BackgroundProperty, Brushes.Transparent);
 
             var cellStyle = new Style(typeof(DataGridCell))
@@ -103,6 +106,7 @@
                 Setters =
                 {
                     new Setter(Control.BackgroundProperty, new SolidColorBrush(BackgroundColors.GetColor(index))),
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     new Setter(Control.ForegroundProperty, new DynamicResourceExtension(SystemColors.WindowTextBrushKey))
                 },
                 Triggers =

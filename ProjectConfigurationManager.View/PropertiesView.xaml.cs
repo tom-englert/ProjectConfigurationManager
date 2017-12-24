@@ -7,10 +7,12 @@
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Markup;
 
     using DataGridExtensions;
 
@@ -41,6 +43,7 @@
             _tracer = tracer;
 
             InitializeComponent();
+            Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
         }
 
         private static bool FilterPredicate([CanBeNull] ProjectConfiguration item, [NotNull, ItemNotNull] IEnumerable<string> selectedGuids)

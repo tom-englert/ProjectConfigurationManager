@@ -4,7 +4,9 @@
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
     using System.IO;
+    using System.Windows.Markup;
 
     using JetBrains.Annotations;
 
@@ -25,6 +27,7 @@
             _tracer = tracer;
 
             InitializeComponent();
+            Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
         }
 
         private void ConfirmedCommandConverter_Error([NotNull] object sender, [NotNull] ErrorEventArgs e)

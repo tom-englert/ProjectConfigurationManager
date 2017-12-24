@@ -36,18 +36,6 @@
     public sealed class ProjectConfigurationManagerPackage : Package
     {
         /// <summary>
-        /// Default constructor of the package.
-        /// Inside this method you can place any initialization code that does not require 
-        /// any Visual Studio service because at this point the package object is created but 
-        /// not sited yet inside Visual Studio environment. The place to do all the other 
-        /// initialization is the Initialize method.
-        /// </summary>
-        public ProjectConfigurationManagerPackage()
-        {
-            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", ToString()));
-        }
-
-        /// <summary>
         /// This function is called when the user clicks the menu item that shows the 
         /// tool window. See the Initialize method to see how the menu item is associated to 
         /// this function using the OleMenuCommandService service and the MenuCommand class.
@@ -64,6 +52,11 @@
             }
             var windowFrame = (IVsWindowFrame)window.Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
+        }
+
+        [UsedImplicitly]
+        public void Dummy()
+        {
         }
 
         /////////////////////////////////////////////////////////////////////////////

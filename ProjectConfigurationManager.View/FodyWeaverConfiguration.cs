@@ -17,7 +17,7 @@
         [NotNull]
         private readonly FodyViewModel _viewModel;
 
-        public FodyWeaverConfiguration([NotNull] FodyViewModel viewModel, [NotNull] string name, [NotNull] [ItemNotNull] ICollection<FodyWeaver> weavers, int index)
+        public FodyWeaverConfiguration([NotNull] FodyViewModel viewModel, [NotNull] string name, [NotNull, ItemNotNull] ICollection<FodyWeaver> weavers, int index)
         {
             _viewModel = viewModel;
             Name = name;
@@ -27,7 +27,7 @@
             var solutionConfigurations = weavers
                 .Where(w => w.Project == null)
                 .Take(1)
-                .Select(w => w.Configuration)
+                .Select(w => w?.Configuration)
                 .DefaultIfEmpty();
 
             var projectConfigurations = weavers

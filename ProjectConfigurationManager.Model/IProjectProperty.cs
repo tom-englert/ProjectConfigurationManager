@@ -1,7 +1,5 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.Model
 {
-    using System.Diagnostics.Contracts;
-
     using JetBrains.Annotations;
 
     internal interface IProjectProperty

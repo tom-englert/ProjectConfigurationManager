@@ -2,6 +2,8 @@
 {
     using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
+    using System.Globalization;
+    using System.Windows.Markup;
 
     using JetBrains.Annotations;
 
@@ -19,6 +21,8 @@
             this.SetExportProvider(exportProvider);
 
             InitializeComponent();
+
+            Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
         }
     }
 }

@@ -1,5 +1,8 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
+    using System.Globalization;
+    using System.Windows.Markup;
+
     using TomsToolbox.Wpf.Composition;
 
     /// <summary>
@@ -11,6 +14,7 @@
         public ProjectTypesView()
         {
             InitializeComponent();
+            Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
         }
     }
 }

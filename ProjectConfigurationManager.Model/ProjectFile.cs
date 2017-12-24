@@ -72,9 +72,11 @@
                     .OfType<IItemDefinitionGroup>()
                     .FirstOrDefault();
 
+                // ReSharper disable AssignNullToNotNullAttribute
                 group = group ?? CreateNewPropertyGroup(configuration, platform, ItemDefinitionGroupNodeName, element => new ItemDefinitionGroup(this, element));
 
                 return group?.AddProperty(itemGroupName, propertyName);
+                // ReSharper enable AssignNullToNotNullAttribute
             }
             else
             {
@@ -354,18 +356,20 @@
             [NotNull]
             private IEnumerable<ProjectProperty> EnumerateProperties([NotNull] ProjectFile projectFile, [NotNull] XElement groupNode)
             {
+                // ReSharper disable PossibleNullReferenceException
                 return groupNode.Elements()
                     .SelectMany(propertyGroupNode => propertyGroupNode
                         .Elements()
                         .Select(propertyNode => new ProjectProperty(projectFile, this, propertyNode, propertyGroupNode.Name.LocalName + "." + propertyNode.Name.LocalName))
                     );
+                // ReSharper restore PossibleNullReferenceException
             }
 
             public IProjectProperty AddProperty(string itemGroupName, string propertyName)
             {
                 var propertyNode = new XElement(Xmlns.GetName(propertyName));
 
-                var groupNode = Node.Elements().FirstOrDefault(n => n.Name.LocalName == itemGroupName) ?? Node.AddElement(new XElement(Xmlns.GetName(itemGroupName)));
+                var groupNode = Node.Elements().FirstOrDefault(element => element?.Name.LocalName == itemGroupName) ?? Node.AddElement(new XElement(Xmlns.GetName(itemGroupName)));
 
                 groupNode.AddElement(propertyNode);
 
