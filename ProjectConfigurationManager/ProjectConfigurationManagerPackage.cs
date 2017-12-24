@@ -55,7 +55,7 @@
         }
 
         [UsedImplicitly]
-        public void Dummy()
+        public static void Dummy()
         {
         }
 

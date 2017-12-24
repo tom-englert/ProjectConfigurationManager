@@ -45,6 +45,19 @@
   <member name="P:tomenglertde.ProjectConfigurationManager.View.FodyWeaver.WeaverName">
     <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
   </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.IndexToBrushConverter.#ctor(tomenglertde.ProjectConfigurationManager.View.ThemeManager)">
+    <parameter name="themeManager">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.View.IndexToBrushConverter.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+    <parameter name="targetType">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="culture">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
+    </parameter>
+  </member>
   <member name="M:tomenglertde.ProjectConfigurationManager.View.MultipleChoiceContentFilterBase.#ctor(System.Collections.Generic.IEnumerable{System.String})">
     <parameter name="items">
       <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />

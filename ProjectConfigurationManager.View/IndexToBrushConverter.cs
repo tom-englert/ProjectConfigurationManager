@@ -2,6 +2,7 @@
 {
     using System;
     using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Windows.Data;
     using System.Windows.Media;
@@ -9,7 +10,7 @@
     using JetBrains.Annotations;
 
     [Export]
-    internal class IndexToBrushConverter : IValueConverter
+    public class IndexToBrushConverter : IValueConverter
     {
         [NotNull]
         private readonly ThemeManager _themeManager;
