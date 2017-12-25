@@ -3,6 +3,6 @@
   <PropertyChanged />
   <Throttle />
   <Equatable />
-  <NullGuard />
+  <NullGuard Mode="Explicit"/>
   <JetBrainsAnnotations />
 </Weavers>
