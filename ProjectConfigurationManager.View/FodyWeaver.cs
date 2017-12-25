@@ -84,16 +84,20 @@
             }
         }
 
-        public static void SaveDocument([NotNull] string folder, [NotNull] XDocument document)
+        [CanBeNull]
+        public static string SaveDocument([NotNull] string folder, [NotNull] XDocument document)
         {
             try
             {
                 var file = Path.Combine(folder, ConfigurationFileName);
 
                 document.Save(file, SaveOptions.OmitDuplicateNamespaces);
+
+                return file;
             }
             catch (Exception)
             {
+                return null;
                 // TODO: log error...
             }
         }

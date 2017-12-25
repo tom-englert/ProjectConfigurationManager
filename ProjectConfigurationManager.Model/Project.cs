@@ -213,6 +213,22 @@
             }
         }
 
+        public void AddFile([NotNull] string fileName, int buildAction = 0)
+        {
+            try
+            {
+                var projectItem = DteProject?.ProjectItems?.AddFromFile(fileName);
+
+                var property = projectItem?.Properties?.Item(@"BuildAction");
+                if (property != null)
+                    property.Value = buildAction;
+            }
+            catch
+            {
+                // TODO: log errors?
+            }
+        }
+
         public bool IsSaved
         {
             get

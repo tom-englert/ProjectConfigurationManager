@@ -35,6 +35,7 @@
     <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
   </member>
   <member name="M:tomenglertde.ProjectConfigurationManager.View.FodyWeaver.SaveDocument(System.String,System.Xml.Linq.XDocument)">
+    <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor" />
     <parameter name="folder">
       <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
     </parameter>

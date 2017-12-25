@@ -1,6 +1,8 @@
 ﻿namespace tomenglertde.ProjectConfigurationManager.View
 {
     using System.ComponentModel;
+    using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Xml.Linq;
 
@@ -76,7 +78,7 @@
                         if (currentValue <= 0)
                             return;
 
-                        SetWeaver(weaverName, _project.Folder, null);
+                        SetWeaver(weaverName, _project, null);
                     }
                     else
                     {
@@ -90,17 +92,23 @@
 
                         var configuration = weaverConfigurations[value];
 
-                        SetWeaver(weaverName, _project.Folder, configuration);
+                        SetWeaver(weaverName, _project, configuration);
                     }
                 }
             }
 
-            private void SetWeaver([NotNull] string weaverName, [NotNull] string projectFolder, [CanBeNull] string configuration)
+            private void SetWeaver([NotNull] string weaverName, [NotNull] Project project, [CanBeNull] string configuration)
             {
+                var projectFolder = project.Folder;
+
                 var document = FodyWeaver.LoadDocument(projectFolder);
                 var root = document?.Root;
                 if (root == null)
-                    return;
+                {
+                    document = XDocument.Parse(@"<?xml version=""1.0"" encoding=""utf-8""?><Weavers/>");
+                    root = document.Root;
+                    Debug.Assert(root != null);
+                }
 
                 var weaverElements = root.Elements().ToArray();
                 var weaverElement = weaverElements.FirstOrDefault(element => element?.Name.LocalName == weaverName);
@@ -122,7 +130,9 @@
                     weaverElement.Remove();
                 }
 
-                FodyWeaver.SaveDocument(projectFolder, document);
+                var fileName = FodyWeaver.SaveDocument(projectFolder, document);
+                if (fileName != null && File.Exists(fileName))
+                    project.AddFile(fileName);
             }
         }
     }

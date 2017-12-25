@@ -103,7 +103,6 @@
         {
             switch (e.Key)
             {
-                case Key.Delete:
                 case Key.OemMinus:
                 case Key.Subtract:
                     SetWeaverConfiguration((DataGrid)sender, 0);

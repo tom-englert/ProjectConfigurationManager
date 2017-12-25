@@ -47,6 +47,11 @@
       <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
     </parameter>
   </member>
+  <member name="M:tomenglertde.ProjectConfigurationManager.Model.Project.AddFile(System.String,System.Int32)">
+    <parameter name="fileName">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
   <member name="P:tomenglertde.ProjectConfigurationManager.Model.Project.DefaultProjectConfiguration">
     <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
   </member>
