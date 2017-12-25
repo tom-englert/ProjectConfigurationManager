@@ -1,3 +1,7 @@
+1.5
+- #17: Support C++ project properties.
+- Support [Fody](https://github.com/Fody/Fody) configuration.
+
 1.4
 - Improve load performance: lazy load dependencies.
 - Use text filter for projects, multiple-choice is not useful here.
