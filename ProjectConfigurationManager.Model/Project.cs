@@ -4,9 +4,6 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
 
@@ -30,10 +27,6 @@
 
         private Project([NotNull] Solution solution, [NotNull] string fullName, [NotNull] IVsHierarchy projectHierarchy)
         {
-            Contract.Requires(solution != null);
-            Contract.Requires(fullName != null);
-            Contract.Requires(projectHierarchy != null);
-
             Solution = solution;
             FullName = fullName;
             ProjectHierarchy = projectHierarchy;
@@ -52,11 +45,6 @@
         [CanBeNull]
         internal static Project Create([NotNull] Solution solution, [NotNull] string fullName, [NotNull] IVsHierarchy projectHierarchy, bool retryOnErrors, [NotNull] ITracer tracer)
         {
-            Contract.Requires(solution != null);
-            Contract.Requires(fullName != null);
-            Contract.Requires(projectHierarchy != null);
-            Contract.Requires(tracer != null);
-
             try
             {
                 return new Project(solution, fullName, projectHierarchy);
@@ -86,8 +74,6 @@
         {
             get
             {
-                Contract.Ensures(Contract.Result<string>() != null);
-
                 var solutionFolder = Solution.SolutionFolder;
                 if (string.IsNullOrEmpty(solutionFolder))
                     return FullName;
@@ -99,8 +85,6 @@
                         .MakeRelativeUri(projectUri)
                         .ToString())
                     .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-
-                Contract.Assume(DteProject == null || DteProject.UniqueName == uniqueName);
 
                 return uniqueName;
             }
@@ -151,13 +135,10 @@
         [NotNull, ItemNotNull]
         private IEnumerable<VSLangProj.Reference> GetReferences()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<VSLangProj.Reference>>() != null);
-
             return VsProjectReferences ?? MpfProjectReferences ?? Enumerable.Empty<VSLangProj.Reference>();
         }
 
         [CanBeNull, ItemNotNull]
-        [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> MpfProjectReferences
         {
             get
@@ -184,7 +165,6 @@
         }
 
         [CanBeNull, ItemNotNull]
-        [ContractVerification(false)]
         private IEnumerable<VSLangProj.Reference> VsProjectReferences
         {
             get
@@ -273,8 +253,6 @@
 
         public void Reload([NotNull] IVsHierarchy hierarchy)
         {
-            Contract.Requires(hierarchy != null);
-
             ProjectHierarchy = hierarchy;
 
             Reload();
@@ -330,22 +308,16 @@
         [CanBeNull]
         internal IProjectProperty CreateProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
-            Contract.Requires(propertyName != null);
-
             return ProjectFile.CreateProperty(propertyName, configuration, platform);
         }
 
         internal void DeleteProperty([NotNull] string propertyName, [CanBeNull] string configuration, [CanBeNull] string platform)
         {
-            Contract.Requires(propertyName != null);
-
             ProjectFile.DeleteProperty(propertyName, configuration, platform);
         }
 
         internal void Delete([NotNull] ProjectConfiguration configuration)
         {
-            Contract.Requires(configuration != null);
-
             if (_internalSpecificProjectConfigurations.Remove(configuration))
             {
                 ProjectFile.DeleteConfiguration(configuration.Configuration, configuration.Platform);
@@ -355,8 +327,6 @@
         [NotNull, ItemNotNull]
         private string[] RetrieveProjectTypeGuids()
         {
-            Contract.Ensures(Contract.Result<string[]>() != null);
-
             return (DefaultProjectConfiguration.PropertyValue[ProjectTypeGuidsPropertyKey] ?? ProjectTypeGuid.Unspecified)
                 .Split(';')
                 // ReSharper disable once PossibleNullReferenceException
@@ -368,8 +338,6 @@
         [CanBeNull]
         private static string GetSourceProjectFullName([NotNull] VSLangProj.Reference reference)
         {
-            Contract.Requires(reference != null);
-
             try
             {
                 return reference.SourceProject?.FullName;
@@ -389,8 +357,6 @@
 
             public ProjectTypeGuidIndexer([NotNull] ProjectConfiguration configuration)
             {
-                Contract.Requires(configuration != null);
-
                 _configuration = configuration;
             }
 
@@ -417,15 +383,6 @@
                 }
                 set => _configuration.PropertyValue[ProjectTypeGuidsPropertyKey] = string.Join(";", value);
             }
-
-
-            [ContractInvariantMethod]
-            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-            [Conditional("CONTRACTS_FULL")]
-            private void ObjectInvariant()
-            {
-                Contract.Invariant(_configuration != null);
-            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -438,24 +395,6 @@
         public override string ToString()
         {
             return Name;
-        }
-
-        [ContractInvariantMethod]
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(!string.IsNullOrEmpty(FullName));
-            Contract.Invariant(Solution != null);
-            Contract.Invariant(ProjectFile != null);
-            Contract.Invariant(DefaultProjectConfiguration != null);
-            Contract.Invariant(_internalSpecificProjectConfigurations != null);
-            Contract.Invariant(SpecificProjectConfigurations != null);
-            Contract.Invariant(ProjectConfigurations != null);
-            Contract.Invariant(ReferencedBy != null);
-            Contract.Invariant(References != null);
-            Contract.Invariant(ProjectHierarchy != null);
-            Contract.Invariant(IsProjectTypeGuidSelected != null);
         }
     }
 }

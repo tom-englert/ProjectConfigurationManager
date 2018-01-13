@@ -6,7 +6,6 @@
     using System.ComponentModel.Composition;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -41,10 +40,6 @@
         [ImportingConstructor]
         public Solution([NotNull] ITracer tracer, [NotNull] IVsServiceProvider serviceProvider, [NotNull] PerformanceTracer performanceTracer)
         {
-            Contract.Requires(tracer != null);
-            Contract.Requires(serviceProvider != null);
-            Contract.Requires(performanceTracer != null);
-
             Tracer = tracer;
             _serviceProvider = serviceProvider;
             _performanceTracer = performanceTracer;
@@ -258,19 +253,16 @@
 
             foreach (var project in Projects)
             {
-                Contract.Assume(project != null);
                 foreach (var dependency in project.References)
                 {
-                    Contract.Assume(dependency != null);
                     dependencies.ForceValue(dependency, _ => new List<Project>())?.Add(project);
                 }
             }
 
             foreach (var project in Projects)
             {
-                Contract.Assume(project != null);
                 var dependentProjects = dependencies.ForceValue(project, _ => new List<Project>());
-                Contract.Assume(dependentProjects != null);
+                Debug.Assert(dependentProjects != null, nameof(dependentProjects) + " != null");
                 project.ReferencedBy.SynchronizeWith(dependentProjects);
             }
         }
@@ -278,8 +270,6 @@
         [NotNull, ItemNotNull]
         private IEnumerable<SolutionConfiguration> GetConfigurations()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<SolutionConfiguration>>() != null);
-
             return DteSolution?.SolutionBuild?.SolutionConfigurations?.OfType<EnvDTE80.SolutionConfiguration2>()
                 .Select(item => new SolutionConfiguration(this, item)) ?? Enumerable.Empty<SolutionConfiguration>();
         }
@@ -287,8 +277,6 @@
         [NotNull, ItemNotNull]
         private IEnumerable<Project> GetProjects(bool retryOnErrors)
         {
-            Contract.Ensures(Contract.Result<IEnumerable<Project>>() != null);
-
             var solution = (IVsSolution)GetService(typeof(IVsSolution));
 
             foreach (var projectHierarchy in GetProjectsInSolution(solution, __VSENUMPROJFLAGS.EPF_ALLINSOLUTION))
@@ -325,8 +313,6 @@
         [NotNull, ItemNotNull]
         private static IEnumerable<IVsHierarchy> GetProjectsInSolution([CanBeNull] IVsSolution solution, __VSENUMPROJFLAGS flags)
         {
-            Contract.Ensures(Contract.Result<IEnumerable<IVsHierarchy>>() != null);
-
             if (solution == null)
                 yield break;
 
@@ -348,8 +334,6 @@
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private IEnumerable<ProjectPropertyName> GetProjectProperties()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<ProjectPropertyName>>() != null);
-
             return Projects
                 .SelectMany(prj => ProjectConfigurations.SelectMany(cfg => cfg.Properties.Values))
                 .Distinct(new DelegateEqualityComparer<IProjectProperty>(p => p.Name))
@@ -374,22 +358,6 @@
                 var fullName = solution?.FullName;
                 return string.IsNullOrEmpty(fullName) ? null : solution.Globals;
             }
-        }
-
-        [ContractInvariantMethod]
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Required for code contracts.")]
-        [Conditional("CONTRACTS_FULL")]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Tracer != null);
-            Contract.Invariant(_serviceProvider != null);
-            Contract.Invariant(_performanceTracer != null);
-            Contract.Invariant(Projects != null);
-            Contract.Invariant(SolutionConfigurations != null);
-            Contract.Invariant(SpecificProjectConfigurations != null);
-            Contract.Invariant(ProjectConfigurations != null);
-            Contract.Invariant(ProjectProperties != null);
-            Contract.Invariant(ProjectTypeGuids != null);
         }
     }
 }
