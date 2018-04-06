@@ -1,4 +1,6 @@
-﻿namespace tomenglertde.ProjectConfigurationManager
+﻿using System.Reflection;
+
+namespace tomenglertde.ProjectConfigurationManager
 {
     using System;
     using System.ComponentModel.Design;
@@ -35,6 +37,11 @@
     [Guid(GuidList.guidProjectConfigurationManagerPkgString)]
     public sealed class ProjectConfigurationManagerPackage : Package
     {
+        public ProjectConfigurationManagerPackage()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += AppDomain_AssemblyResolve;
+        }
+
         /// <summary>
         /// This function is called when the user clicks the menu item that shows the 
         /// tool window. See the Initialize method to see how the menu item is associated to 
@@ -59,10 +66,6 @@
         {
         }
 
-        /////////////////////////////////////////////////////////////////////////////
-        // Overridden Package Implementation
-        #region Package Members
-
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -81,6 +84,16 @@
             var menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
             mcs.AddCommand(menuToolWin);
         }
-        #endregion
+
+        private static Assembly AppDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var assemblyName = new AssemblyName(args.Name);
+
+            if (assemblyName.Name != "System.Windows.Interactivity") 
+                return null;
+
+            assemblyName.Version = new Version(4, 5, 0, 0);
+            return Assembly.Load(assemblyName);
+        }
     }
 }
