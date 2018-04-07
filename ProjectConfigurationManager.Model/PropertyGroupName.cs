@@ -52,6 +52,9 @@
             "WarningsAsErrors",
             "DocumentationFile",
             "GenerateSerializationAssemblies",
+            "Prefer32Bit",
+            "StartupObject",
+            "ApplicationManifest"
         };
 
         [NotNull, ItemNotNull]
@@ -99,6 +102,18 @@
             "GenerateManifests",
         };
 
+        [NotNull, ItemNotNull]
+        private static readonly HashSet<string> _vbProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "MyType",
+            "OptionExplicit",
+            "OptionCompare",
+            "OptionStrict",
+            "OptionInfer",
+            "DefineDebug",
+            "DefineTrace"
+        };
+
         [NotNull, Equals]
         public string Name { get; }
 
@@ -134,11 +149,14 @@
             if (_signingProperties.Contains(propertyName))
                 return new PropertyGroupName("Signing", 4);
 
+            if (_vbProperties.Contains(propertyName))
+                return new PropertyGroupName("VB", 5);
+
             if (propertyName.StartsWith("Scc", StringComparison.OrdinalIgnoreCase))
-                return new PropertyGroupName("Scc", 5);
+                return new PropertyGroupName("Scc", 6);
 
             if (propertyName.Contains("CodeAnalysis"))
-                return new PropertyGroupName("CodeAnalysis", 6);
+                return new PropertyGroupName("CodeAnalysis", 7);
 
             return new PropertyGroupName("Other", 100);
         }
