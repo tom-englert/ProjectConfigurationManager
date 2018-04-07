@@ -1,3 +1,7 @@
+1.6
+- Fix issues with mixed versions of System.Windows.Interactivity
+- Add standard VB properties group
+
 1.5
 - #17: Support C++ project properties.
 - Support [Fody](https://github.com/Fody/Fody) configuration.
