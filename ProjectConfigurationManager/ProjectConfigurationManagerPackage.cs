@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace tomenglertde.ProjectConfigurationManager
+﻿namespace tomenglertde.ProjectConfigurationManager
 {
     using System;
     using System.ComponentModel.Design;
@@ -37,11 +35,6 @@ namespace tomenglertde.ProjectConfigurationManager
     [Guid(GuidList.guidProjectConfigurationManagerPkgString)]
     public sealed class ProjectConfigurationManagerPackage : Package
     {
-        public ProjectConfigurationManagerPackage()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomain_AssemblyResolve;
-        }
-
         /// <summary>
         /// This function is called when the user clicks the menu item that shows the 
         /// tool window. See the Initialize method to see how the menu item is associated to 
@@ -83,17 +76,6 @@ namespace tomenglertde.ProjectConfigurationManager
             var toolwndCommandID = new CommandID(GuidList.guidProjectConfigurationManagerCmdSet, (int)PkgCmdIDList.cmdidProjectConfigurationManager);
             var menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
             mcs.AddCommand(menuToolWin);
-        }
-
-        private static Assembly AppDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            var assemblyName = new AssemblyName(args.Name);
-
-            if (assemblyName.Name != "System.Windows.Interactivity") 
-                return null;
-
-            assemblyName.Version = new Version(4, 5, 0, 0);
-            return Assembly.Load(assemblyName);
         }
     }
 }

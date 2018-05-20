@@ -2,4 +2,5 @@
 <Weavers>
   <NullGuard />
   <JetBrainsAnnotations />
+  <LoadAssembliesOnStartup IncludeAssemblies="System.Windows.Interactivity|DataGridExtensions" />
 </Weavers>

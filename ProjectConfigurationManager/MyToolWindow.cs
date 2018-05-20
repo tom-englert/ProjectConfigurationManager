@@ -68,7 +68,7 @@
             var context = CreateRegistrationContext();
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            _compositionHost.AddCatalog(new DirectoryCatalog(path, "*.dll", context));
+            _compositionHost.AddCatalog(new DirectoryCatalog(path, "ProjectConfigurationManager*.dll", context));
             _compositionHost.ComposeExportedValue((IVsServiceProvider)this);
 
             _tracer = _compositionHost.GetExportedValue<ITracer>();
