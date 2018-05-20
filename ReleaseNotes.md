@@ -1,3 +1,6 @@
+1.7
+- Update packages to use latest version of System.Windows.Interactivity
+
 1.6
 - Fix issues with mixed versions of System.Windows.Interactivity
 - Add standard VB properties group
