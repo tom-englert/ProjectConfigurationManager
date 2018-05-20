@@ -2,7 +2,6 @@
 {
     using System;
     using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Windows.Data;
     using System.Windows.Media;
