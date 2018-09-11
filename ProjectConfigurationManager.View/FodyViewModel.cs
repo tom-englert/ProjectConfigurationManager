@@ -39,6 +39,8 @@
             solution.FileChanged += Solution_FileChanged;
 
             ConfigurationMappings = solution.Projects.ObservableSelect(project => new FodyConfigurationMapping(this, project));
+
+            UpdateConfigurations();
         }
 
         [NotNull, ItemNotNull]
