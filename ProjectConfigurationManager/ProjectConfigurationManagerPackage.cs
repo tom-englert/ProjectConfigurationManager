@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Runtime.InteropServices;
+    using System.Threading;
 
     using JetBrains.Annotations;
 
@@ -24,7 +25,7 @@
     /// </summary>
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", Product.Version, IconResourceID = 400)]
@@ -33,7 +34,7 @@
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(MyToolWindow))]
     [Guid(GuidList.guidProjectConfigurationManagerPkgString)]
-    public sealed class ProjectConfigurationManagerPackage : Package
+    public sealed class ProjectConfigurationManagerPackage : AsyncPackage
     {
         /// <summary>
         /// This function is called when the user clicks the menu item that shows the 
@@ -59,17 +60,19 @@
         {
         }
 
-        /// <summary>
-        /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initialization code that rely on services provided by VisualStudio.
-        /// </summary>
-        protected override void Initialize()
+
+        protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, [NotNull] IProgress<ServiceProgressData> progress)
         {
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
-            base.Initialize();
+
+            await base.InitializeAsync(cancellationToken, progress).ConfigureAwait(false);
+
+            var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService));
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            if (!(GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs))
+            if (!(menuCommandService is OleMenuCommandService mcs))
                 return;
 
             // Create the command for the tool window
