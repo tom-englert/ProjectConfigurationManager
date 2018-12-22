@@ -1,3 +1,6 @@
+1.8
+- Support VS2019
+
 1.7
 - Update packages to use latest version of System.Windows.Interactivity
 
