@@ -1,3 +1,6 @@
+1.9
+- Fix support VS2019
+
 1.8
 - Support VS2019
 
