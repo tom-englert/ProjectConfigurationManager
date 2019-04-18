@@ -325,7 +325,7 @@
         }
 
         [NotNull, ItemNotNull]
-        private string[] RetrieveProjectTypeGuids()
+        private IList<string> RetrieveProjectTypeGuids()
         {
             return (DefaultProjectConfiguration.PropertyValue[ProjectTypeGuidsPropertyKey] ?? ProjectTypeGuid.Unspecified)
                 .Split(';')
