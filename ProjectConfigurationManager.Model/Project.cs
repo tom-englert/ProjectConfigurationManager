@@ -276,7 +276,7 @@
 
         private void Update()
         {
-            var projectConfigurations = this.GetProjectConfigurations().ToArray();
+            var projectConfigurations = this.GetProjectConfigurations().ToList().AsReadOnly();
 
             _internalSpecificProjectConfigurations.SynchronizeWith(projectConfigurations);
 
@@ -300,7 +300,7 @@
                 .Where(fullName => fullName != null)
                 .Select(fullName => Solution.Projects.SingleOrDefault(p => string.Equals(p.FullName, fullName, StringComparison.OrdinalIgnoreCase)))
                 .Where(project => project != null)
-                .ToArray();
+                .ToList().AsReadOnly();
 
             References.SynchronizeWith(projectReferences);
         }
@@ -332,7 +332,7 @@
                 // ReSharper disable once PossibleNullReferenceException
                 .Select(item => item.Trim())
                 .Where(item => !string.IsNullOrEmpty(item))
-                .ToArray();
+                .ToList().AsReadOnly();
         }
 
         [CanBeNull]
