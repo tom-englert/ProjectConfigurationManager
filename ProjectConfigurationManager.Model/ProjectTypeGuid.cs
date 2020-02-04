@@ -47,6 +47,7 @@
             { "{68B1623D-7FB9-47D8-8664-7ECEA3297D4F}", "Smart Device (VB.NET)"},
             { "{2150E333-8FDC-42A3-9474-1A3956D46DE8}", "Solution Folder"},
             { "{3AC096D0-A1C2-E12C-1390-A8335801FDAB}", "Test"},
+            { "{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A}", "Universal Windows Class Library"},
             { "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}", "VB.NET"},
             { "{C252FEB5-A946-4202-B1D4-9916A0590387}", "Visual Database Tools"},
             { "{A860303F-1F3F-4691-B57E-529FC101A107}", "VSTA"},
